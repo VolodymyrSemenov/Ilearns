@@ -1,54 +1,109 @@
-// #include <Arduino.h>
+/**************************************************************************/
+/*!
+    @file     iso14443a_uid.pde
+    @author   Adafruit Industries
+	@license  BSD (see license.txt)
 
-// // (c) Michael Schoeffler 2014, http://www.mschoeffler.de
+    This example will attempt to connect to an ISO14443A
+    card or tag and retrieve some basic information about it
+    that can be used to determine what type of card it is.
 
-// #include "SPI.h" // SPI library
-// #include "MFRC522.h" // RFID library (https://github.com/miguelbalboa/rfid)
+    Note that you need the baud rate to be 115200 because we need to print
+	out the data and read from the card at the same time!
 
-// const int pinRST = 9;
-// const int pinSDA = 10;
+This is an example sketch for the Adafruit PN532 NFC/RFID breakout boards
+This library works with the Adafruit NFC breakout
+  ----> https://www.adafruit.com/products/364
 
-// MFRC522 mfrc522(pinRST); // Set up mfrc522 on the Arduino
+Check out the links above for our tutorials and wiring diagrams
+These chips use SPI or I2C to communicate.
 
-// void selectMuxChannel(int channel) {
-//     int active = HIGH;
-//   switch (channel) {
-//     case 0:
-//       digitalWrite(6, active);
-//       digitalWrite(8, !active);
-//       digitalWrite(10, !active);
-//       break;
-//     case 1:
-//       digitalWrite(6, !active);
-//       digitalWrite(8, active);
-//       digitalWrite(10, !active);
-//       break;
-//     case 2:
-//       digitalWrite(6, !active);
-//       digitalWrite(8, !active);
-//       digitalWrite(10, active);
-//       break;
-//   }
-// }
+Adafruit invests time and resources providing this open source code,
+please support Adafruit and open-source hardware by purchasing
+products from Adafruit!
 
-// void setup() {
-//   SPI.begin(); // open SPI connectiona
-//   selectMuxChannel(2);
-//   delay(100);
-//   mfrc522.PCD_Init(); // Initialize Proximity Coupling Device (PCD)
-//   Serial.begin(9600); // open serial connection
-// }
+*/
+/**************************************************************************/
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_PN532.h>
 
-// void loop() {
-//   selectMuxChannel(2);
-//   if (mfrc522.PICC_IsNewCardPresent()) { // (true, if RFID tag/card is present ) PICC = Proximity Integrated Circuit Card
-//     if(mfrc522.PICC_ReadCardSerial()) { // true, if RFID tag/card was read
-//       Serial.print("RFID TAG ID:");
-//       for (byte i = 0; i < mfrc522.uid.size; ++i) { // read id (in parts)
-//         Serial.print(mfrc522.uid.uidByte[i], HEX); // print id as hex values
-//         Serial.print(" "); // add space between hex blocks to increase readability
-//       }
-//       Serial.println(); // Print out of id is complete.
-//     }
-//   }
-// }
+// If using the breakout with SPI, define the pins for SPI communication.
+#define PN532_SCK  (2)
+#define PN532_MOSI (3)
+#define PN532_SS   (4)
+#define PN532_MISO (5)
+
+// If using the breakout or shield with I2C, define just the pins connected
+// to the IRQ and reset lines.  Use the values below (2, 3) for the shield!
+#define PN532_IRQ   (2)
+#define PN532_RESET (3)  // Not connected by default on the NFC Shield
+
+// Uncomment just _one_ line below depending on how your breakout or shield
+// is connected to the Arduino:
+
+// Use this line for a breakout with a SPI connection:
+//Adafruit_PN532 nfc(PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
+
+// Use this line for a breakout with a hardware SPI connection.  Note that
+// the PN532 SCK, MOSI, and MISO pins need to be connected to the Arduino's
+// hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
+// SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
+Adafruit_PN532 nfc(PN532_SS);
+
+// Or use this line for a breakout or shield with an I2C connection:
+//Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
+
+void setup(void) {
+  Serial.begin(9600);
+  while (!Serial) delay(10); // for Leonardo/Micro/Zero
+  Serial.println("Hello!");
+
+  nfc.begin();
+
+  uint32_t versiondata = nfc.getFirmwareVersion();
+  if (! versiondata) {
+    Serial.print("Didn't find PN53x board");
+    while (1); // halt
+  }
+
+  // Got ok data, print it out!
+  Serial.print("Found chip PN5"); Serial.println((versiondata>>24) & 0xFF, HEX);
+  Serial.print("Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC);
+  Serial.print('.'); Serial.println((versiondata>>8) & 0xFF, DEC);
+
+  // Set the max number of retry attempts to read from a card
+  // This prevents us from waiting forever for a card, which is
+  // the default behaviour of the PN532.
+  nfc.setPassiveActivationRetries(0xFF);
+
+  Serial.println("Waiting for an ISO14443A card");
+}
+
+void loop(void) {
+  boolean success;
+  uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };	// Buffer to store the returned UID
+  uint8_t uidLength;				// Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+
+  // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
+  // 'uid' will be populated with the UID, and uidLength will indicate
+  // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+
+  if (success) {
+    Serial.println("Found a card!");
+    Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
+    Serial.print("UID Value: ");
+    for (uint8_t i=0; i < uidLength; i++)
+    {
+      Serial.print(" 0x");Serial.print(uid[i], HEX);
+    }
+    Serial.println("");
+	// Wait 1 second before continuing
+	delay(1000);
+  }
+  else
+  {
+    // PN532 probably timed out waiting for a card
+  }
+}
