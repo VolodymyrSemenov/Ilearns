@@ -1,3 +1,6 @@
+
+
+
 /**************************************************************************/
 /*!
     @file     iso14443a_uid.pde
@@ -42,6 +45,7 @@ products from Adafruit!
 // Uncomment just _one_ line below depending on how your breakout or shield
 // is connected to the Arduino:
 
+uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2};
 // Use this line for a breakout with a SPI connection:
 //Adafruit_PN532 nfc(PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
 
@@ -49,8 +53,8 @@ products from Adafruit!
 // the PN532 SCK, MOSI, and MISO pins need to be connected to the Arduino's
 // hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
 // SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
-Adafruit_PN532 nfc(PN532_SS);
-
+ Adafruit_PN532 nfc(decoderPins, &SPI, 10);
+  uint8_t readers[] = {32};
 // Or use this line for a breakout or shield with an I2C connection:
 //Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 
@@ -58,19 +62,9 @@ void setup(void) {
   Serial.begin(9600);
   while (!Serial) delay(10); // for Leonardo/Micro/Zero
   Serial.println("Hello!");
-
   nfc.begin();
 
-  uint32_t versiondata = nfc.getFirmwareVersion();
-  if (! versiondata) {
-    Serial.print("Didn't find PN53x board");
-    while (1); // halt
-  }
 
-  // Got ok data, print it out!
-  Serial.print("Found chip PN5"); Serial.println((versiondata>>24) & 0xFF, HEX);
-  Serial.print("Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC);
-  Serial.print('.'); Serial.println((versiondata>>8) & 0xFF, DEC);
 
   // Set the max number of retry attempts to read from a card
   // This prevents us from waiting forever for a card, which is
@@ -88,22 +82,26 @@ void loop(void) {
   // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
   // 'uid' will be populated with the UID, and uidLength will indicate
   // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+   for(int i = 0; i < 1; i++) {
+    nfc.setCurrentReader(readers[i]);
+    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength,50);
 
-  if (success) {
-    Serial.println("Found a card!");
-    Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
-    Serial.print("UID Value: ");
+    if (success) {
+      Serial.print("Reader "); Serial.print(2);
+      Serial.println("Found a card!");
+      Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
+      Serial.print("UID Value: ");
     for (uint8_t i=0; i < uidLength; i++)
     {
       Serial.print(" 0x");Serial.print(uid[i], HEX);
     }
     Serial.println("");
 	// Wait 1 second before continuing
-	delay(1000);
-  }
-  else
-  {
-    // PN532 probably timed out waiting for a card
-  }
+    delay(1000);
+    }
+  
+
+ // }
+  
+}
 }
