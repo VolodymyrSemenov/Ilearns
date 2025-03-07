@@ -96,7 +96,7 @@ bool Adafruit_SPIDevice::begin() {
   setDecoderHigh();
   if (_spi) { // hardware SPI
 #ifdef BUSIO_HAS_HW_SPI
-    Serial.println("made it here");
+    // Serial.println("made it here");
     _spi->begin();
 #endif
   } else {
@@ -313,15 +313,14 @@ void Adafruit_SPIDevice::setDecoderHigh() {
 }
 
 void Adafruit_SPIDevice::setCurrentReader(int readerNum) {
-  
-    digitalWrite(_decoderPins[1], bitRead(readerNum, 0));
-    digitalWrite(_decoderPins[2], bitRead(readerNum, 1));
-    digitalWrite(_decoderPins[3], bitRead(readerNum, 2));
-    digitalWrite(_decoderPins[4], bitRead(readerNum, 3));
-    digitalWrite(_decoderPins[5], bitRead(readerNum, 4));
-    digitalWrite(_decoderPins[6], bitRead(readerNum, 5));
+  Serial.print("Setting Reader "); Serial.println(readerNum);
 
+  for (int i=0; i<NUM_DECODER_PINS; i++){
+    digitalWrite(_decoderPins[i+1], bitRead(readerNum, i));
     delay(5);
+    // Serial.print(bitRead(readerNum, NUM_DECODER_PINS-i-1));
+  }
+  // Serial.println("");
 }
 
 /*!
