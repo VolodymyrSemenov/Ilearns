@@ -30,6 +30,14 @@ products from Adafruit!
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
+#include <FastLED.h>
+
+#define LED_PIN     10   // Pin where the data line is connected
+#define NUM_LEDS    6 // Number of LEDs in the strand
+#define BRIGHTNESS  128 // Half brightness (max is 255)
+#define WIDTH_PER_PIECE 1
+
+CRGB leds[NUM_LEDS];
 
 // If using the breakout with SPI, define the pins for SPI communication.
 #define PN532_SCK  (2)
@@ -54,9 +62,19 @@ uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2};
 // hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
 // SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
  Adafruit_PN532 nfc(decoderPins, &SPI, 10);
-  uint8_t readers[] = {32};
+  uint8_t readers[] = {54, 43, 32, 22};
+  uint8_t card_not_present[] = {0, 0, 0, 0};
 // Or use this line for a breakout or shield with an I2C connection:
 //Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
+
+// Forward declaration of functions
+void illuminate_leds(CRGB color, int positions);
+void lightUpWhite();
+void lightUpRed();
+void lightUpGreen();
+void lightUpBlue();
+void lightUpYellow();
+void lightUpPurple();
 
 void setup(void) {
   Serial.begin(9600);
@@ -71,6 +89,12 @@ void setup(void) {
   // the default behaviour of the PN532.
   nfc.setPassiveActivationRetries(0xFF);
 
+  digitalWrite(11, HIGH);
+  FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+  lightUpWhite();
+  // SPI.setClockDivider(SPI_CLOCK_DIV8);
+
   Serial.println("Waiting for an ISO14443A card");
 }
 
@@ -82,26 +106,81 @@ void loop(void) {
   // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
   // 'uid' will be populated with the UID, and uidLength will indicate
   // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-   for(int i = 0; i < 1; i++) {
+   for(int i = 0; i < sizeof(readers); i++) {
+    delay(50);
+    nfc.begin();
+    nfc.SAMConfig();
     nfc.setCurrentReader(readers[i]);
-    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength,50);
+
+
+    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 200);
+
+    // for(int j = 0; j < 3; j++){
+
+      // Serial.print("j for loop with j="); Serial.println(j);
 
     if (success) {
-      Serial.print("Reader "); Serial.print(2);
+      Serial.print("Reader on decoder line "); Serial.println(readers[i]);
       Serial.println("Found a card!");
       Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
       Serial.print("UID Value: ");
-    for (uint8_t i=0; i < uidLength; i++)
-    {
-      Serial.print(" 0x");Serial.print(uid[i], HEX);
+      for (uint8_t i=0; i < uidLength; i++)
+      {
+        Serial.print(" 0x");Serial.print(uid[i], HEX);
+      }
+      Serial.println("");
+      illuminate_leds(CRGB::Green, i);
+      card_not_present[i] = 0;
+      // lightUpWhite();
+      // delay(1000);
+      // lightUpRed();
+      // delay(1000);
+      // lightUpGreen();
+      // delay(1000);
+      // lightUpBlue();
+      // delay(1000);
+      // j = 3;
+      // }
+      // success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 50);
     }
-    Serial.println("");
-	// Wait 1 second before continuing
-    delay(1000);
+
+    else{
+      int failed_attempts = card_not_present[i];
+
+      if (failed_attempts < 2) {
+        card_not_present[i] = failed_attempts + 1;
+      }
+      else{
+        card_not_present[i] = 2;
+        illuminate_leds(CRGB::Red, i);
+      }
+      // illuminate_leds(CRGB::Red,i);
     }
+    
+    // leds[0] = CRGB::Green;
+    // FastLED.show();
   
 
  // }
-  
+
+Serial.println("end");
+  }
 }
+
+// LED functions (same as before)
+void illuminate_leds(CRGB color, int positions){
+  leds[0] = CRGB::Black;
+  for (int i=0; i<1; i++){
+    leds[positions+1] = color;
+  }
+  FastLED.show();
 }
+
+void lightUpWhite() { fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255)); FastLED.show(); }
+void lightUpRed()   { fill_solid(leds, NUM_LEDS, CRGB(255, 0, 0)); FastLED.show(); }
+void lightUpGreen() { fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0)); FastLED.show(); }
+void lightUpBlue()  { fill_solid(leds, NUM_LEDS, CRGB(0, 0, 255)); FastLED.show(); }
+void lightUpYellow(){ fill_solid(leds, NUM_LEDS, CRGB(255, 255, 0)); FastLED.show(); }
+void lightUpPurple(){ fill_solid(leds, NUM_LEDS, CRGB(255, 0, 255)); FastLED.show(); }
+// void lightUpOrange(){ fill_solid(leds, NUM_LEDS, orange_1); FastLED.show(); }
+// void lightUpBla
