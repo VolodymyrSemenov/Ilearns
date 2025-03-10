@@ -62,8 +62,8 @@ uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2};
 // hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
 // SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
  Adafruit_PN532 nfc(decoderPins, &SPI, 10);
-  uint8_t readers[] = {54, 43, 32, 22};
-  uint8_t card_not_present[] = {0, 0, 0, 0};
+  uint8_t readers[] = {54, 43, 32, 22, 12, 5};
+  uint8_t card_not_present[sizeof(readers)];
 // Or use this line for a breakout or shield with an I2C connection:
 //Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 
@@ -108,12 +108,13 @@ void loop(void) {
   // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
    for(int i = 0; i < sizeof(readers); i++) {
     delay(50);
-    nfc.begin();
-    nfc.SAMConfig();
+    nfc.begin(); // Calls nfc.wakeup that sets SAMConfig
+    // nffc.wakeup();
+    // nfc.SAMConfig();
     nfc.setCurrentReader(readers[i]);
 
 
-    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 200);
+    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 50);
 
     // for(int j = 0; j < 3; j++){
 
