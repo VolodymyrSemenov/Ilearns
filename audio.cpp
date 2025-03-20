@@ -10,11 +10,6 @@
 #include <Arduino_USBHostMbed5.h>
 #include <FATFileSystem.h>
 
-//random number
-// #include <iostream>
-// #include <cstdlib>  // For rand() and srand()
-// #include <ctime>    // For time()
-
 AdvancedDAC dac0(A12);
 
 USBHostMSD msd;
@@ -28,12 +23,14 @@ int swapFile;
 char tempLetter = 'A';
 char tempNumber0 = '0';
 char tempNumber1 = '1';
+int tempNumber = 0;
 String USBLetterPoint = "/usb/Point-Letter-Split-wav/pLett";
 String USBLetterSound = "/usb/Letter-Sound-Split-wav/sLett";
 String USBNumberPoint = "/usb/Point-Number-Split-wav/pNum";
 String wav = ".wav";
 
 int gameState = 2;
+boolean played = false;
 
 void setup() {
   Serial.begin(115200);
@@ -54,11 +51,38 @@ void setup() {
     Serial.println(rc_mount);
     return;
   }
-  configFile();
+  configFile(gameState, tempLetter);
 }
 
 //converts digital to analog
 void loop() {
+  if(played == false){
+    playAudioFile();
+  }
+
+  int buttonState = digitalRead(PC_13);
+
+  if (buttonState == 1) {
+    played = false;
+    Serial.println("Increment clicked");
+    tempLetter++;
+    tempNumber1++;
+    if(tempNumber0 == '2' && tempNumber1 == '1'){
+      tempNumber0 = '0';
+    }
+    if(tempNumber1 == '9' + 1){
+      tempNumber0 += 1;
+      tempNumber1 = '0';
+    }
+    if(tempLetter == 'Z' + 1){
+      tempLetter = 'A';
+    }
+    delay(500);
+    configFile(gameState, tempLetter);
+  } 
+}
+
+void playAudioFile(){
   if (dac0.available() && !feof(file)) {
     /* Read data from file. */
     uint16_t sample_data[256] = { 0 };
@@ -79,40 +103,15 @@ void loop() {
 
     if(feof(file)){
       fclose(file);
-      configFile();
+      played = true;
+      Serial.println("played");
+      configFile(gameState, tempLetter);
     }
   }
-
-  int buttonState = digitalRead(PC_13);
-
-  // Seed the random number generator with the current time
-  //std::srand(std::time(0));
-
-  // Generate a random number between 1 and 20
-  //int randomNumber = std::rand() % 20 + 1;
-
-  if (buttonState == 1) {
-    Serial.println("Increment clicked");
-    tempLetter++;
-    tempNumber1++;
-    if(tempNumber0 == '2' && tempNumber1 == '1'){
-      tempNumber0 = '0';
-    }
-    if(tempNumber1 == '9' + 1){
-      tempNumber0 += 1;
-      tempNumber1 = '0';
-    }
-    if(tempLetter == 'Z' + 1){
-      tempLetter = 'A';
-    }
-    delay(500);
-    configFile();
-  } 
-
-
 }
 
-void configFile() {
+
+void configFile(int gameState, char tempLetter) {
   /* 16-bit PCM Mono 16kHz realigned noise reduction */
   // test 8bit "usb/pLettA_8bit_test.wav"
 
@@ -126,7 +125,7 @@ void configFile() {
     break;
 
   case 2:  //Letter Pointing
-    tempLetter++;
+    //tempLetter++;
     result = USBLetterPoint + tempLetter + wav;
     file = fopen(result.c_str(), "rb");
     break;
@@ -203,7 +202,7 @@ void configFile() {
   /* Find data chunk. */
   while (true) {
     fread(&chunk, sizeof(chunk), 1, file);
-    snprintf(msg, sizeof(msg), "%c%c%c%c\t" "%li", chunk.ID[0], chunk.ID[1], chunk.ID[2], chunk.ID[3], chunk.size);
+    //snprintf(msg, sizeof(msg), "%c%c%c%c\t" "%li", chunk.ID[0], chunk.ID[1], chunk.ID[2], chunk.ID[3], chunk.size);
     //Serial.println(msg);
     if (*(unsigned int *)&chunk.ID == 0x61746164)
       break;
@@ -214,9 +213,9 @@ void configFile() {
   /* Determine number of samples. */
   sample_size = header.bitsPerSample / 8;
   samples_count = chunk.size * 8 / header.bitsPerSample;
-  snprintf(msg, sizeof(msg), "Sample size = %i", sample_size);
+  //snprintf(msg, sizeof(msg), "Sample size = %i", sample_size);
   //Serial.println(msg);
-  snprintf(msg, sizeof(msg), "Samples count = %i", samples_count);
+  //snprintf(msg, sizeof(msg), "Samples count = %i", samples_count);
   //Serial.println(msg);
 
   /* Configure the advanced DAC. */
