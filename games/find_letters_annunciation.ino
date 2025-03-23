@@ -50,7 +50,7 @@ void setup() {
 }
 
 void loop() {
-  begin_game_find_letters_spoken();
+  begin_game_find_letters_annunciation();
   delay(3000);
 }
 
