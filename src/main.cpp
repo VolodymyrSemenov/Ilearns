@@ -31,6 +31,7 @@ products from Adafruit!
 #include <SPI.h>
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
+#include <EEPROM.h>
 
 #define LED_PIN     10   // Pin where the data line is connected
 #define NUM_LEDS    6 // Number of LEDs in the strand
@@ -76,13 +77,32 @@ void lightUpBlue();
 void lightUpYellow();
 void lightUpPurple();
 
+void PiecesToEEPROM();
+// Use EEPROM put to write entire struct into EEPROM 
+// containing all the tag id values for the letters and numbers
+// 0 -> A
+// 26 -> 0
+// 46 -> 20
+
+struct GamePiece {
+    uint8_t tagID[4];
+};
+
+struct GamePieces {
+  GamePiece pieces[47];
+};
+
+GamePieces * gamePieces;
+
+GamePieces * PiecesFromEEPROM();
+
 void setup(void) {
   Serial.begin(9600);
   while (!Serial) delay(10); // for Leonardo/Micro/Zero
   Serial.println("Hello!");
   nfc.begin();
 
-
+  gamePieces = PiecesFromEEPROM();
 
   // Set the max number of retry attempts to read from a card
   // This prevents us from waiting forever for a card, which is
@@ -108,7 +128,7 @@ void loop(void) {
   // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
    for(int i = 0; i < sizeof(readers); i++) {
     delay(50);
-    nfc.begin(); // Calls nfc.wakeup that sets SAMConfig
+    nfc.wakeup(); // Calls nfc.wakeup that sets SAMConfig
     // nffc.wakeup();
     // nfc.SAMConfig();
     nfc.setCurrentReader(readers[i]);
@@ -183,5 +203,51 @@ void lightUpGreen() { fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0)); FastLED.show(
 void lightUpBlue()  { fill_solid(leds, NUM_LEDS, CRGB(0, 0, 255)); FastLED.show(); }
 void lightUpYellow(){ fill_solid(leds, NUM_LEDS, CRGB(255, 255, 0)); FastLED.show(); }
 void lightUpPurple(){ fill_solid(leds, NUM_LEDS, CRGB(255, 0, 255)); FastLED.show(); }
+
+// reads the gamepieces structure that is in EEPROM, only used during initialization
+GamePieces *PiecesFromEEPROM()
+{
+  return EEPROM.get(0, gamePieces);
+}
+
+// takes the GamePieces structure and puts it in EEPROM
+void PiecesToEEPROM() 
+{
+  EEPROM.put(0, gamePieces);
+}
+
+// returns true if the game piece that is being read is the correct piece for the slot
+bool checkGamePiece(int reader, uint8_t *uid) {
+  for(int i = 0; i < 4; i++) {
+    if(uid[i] != gamePieces->pieces[reader].tagID[i])
+      return false;
+  }
+  return true;
+}
+
+void recalibrateGamePieces() {
+
+  // read each piece, storing the uid value into the gamepiece structure
+  uint8_t uid[] = {0, 0, 0, 0};
+  uint8_t uidLength;
+  for(int i = 0; i < 47; i++) {
+    // selects the current reader to read from
+    nfc.setCurrentReader(i);
+
+    // reads from the rfid reader, storing the uid into the correct piece object
+    bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 50);
+
+    // if card is read, the value will get updated in the structure, otherwise it will stay as it was
+    if(success) {
+      for(int j = 0; j < uidLength; j++){
+        gamePieces->pieces[i].tagID[j] = uid[j];
+      }
+    }
+  }
+
+  // sends the GamePieces structure to the EEPROM for permanent storage
+  PiecesToEEPROM();
+
+}
 // void lightUpOrange(){ fill_solid(leds, NUM_LEDS, orange_1); FastLED.show(); }
 // void lightUpBla
