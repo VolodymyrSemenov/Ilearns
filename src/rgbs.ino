@@ -1,4 +1,3 @@
-/*
 #include <FastLED.h>
 #include <Arduino.h>
 
@@ -189,4 +188,3 @@ void loop() {
   Serial.println("Hello World");
   delay(1000);  // Wait 1 second
 }
-*/
