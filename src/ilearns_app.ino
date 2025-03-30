@@ -1,15 +1,5 @@
 /**************************************************************************
  * Integrated Game Code
- * 
- * This sketch integrates:
- *  - Game selection via buttons (letter ordering, number ordering,
- *    find letters [spoken/annunciation], and find numbers)
- *  - EEPROM routines to store and recall game piece data (letters & numbers)
- *  - WS2811 LED strips (via FastLED) for lighting up game tiles
- *  - NFC tag reading using the PN532 (for reading/assigning tags to pieces)
- * 
- * Note: Some game routines are stubbed (begin_game_*) – fill these in with
- * your specific game logic.
  **************************************************************************/
 
 #include <Wire.h>
@@ -17,6 +7,13 @@
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
 #include <EEPROM.h>
+
+// Include Game Logic
+#include <../games/letter_ordering.ino>
+#include <../games/number_ordering.ino>
+#include <../games/find_letters_spoken.ino>
+#include <../games/find_letters_annunciation.ino>
+#include <../games/find_numbers.ino>
 
 // -------------------------
 // Pin Definitions & Constants
