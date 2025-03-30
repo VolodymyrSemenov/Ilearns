@@ -40,20 +40,20 @@ products from Adafruit!
 CRGB leds[NUM_LEDS];
 
 // If using the breakout with SPI, define the pins for SPI communication.
-#define PN532_SCK  (2)
-#define PN532_MOSI (3)
-#define PN532_SS   (4)
-#define PN532_MISO (5)
+// #define PN532_SCK  (2)
+// #define PN532_MOSI (3)
+// #define PN532_SS   (4)
+// #define PN532_MISO (5)
 
 // If using the breakout or shield with I2C, define just the pins connected
 // to the IRQ and reset lines.  Use the values below (2, 3) for the shield!
-#define PN532_IRQ   (2)
-#define PN532_RESET (3)  // Not connected by default on the NFC Shield
+// #define PN532_IRQ   (2)
+// #define PN532_RESET (3)  // Not connected by default on the NFC Shield
 
 // Uncomment just _one_ line below depending on how your breakout or shield
 // is connected to the Arduino:
 
-uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2}; // EN through A5
+uint8_t decoderPins[] = {30, 31, 32, 33, 34, 35, 36}; // EN through A5
 // Use this line for a breakout with a SPI connection:
 //Adafruit_PN532 nfc(PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
 
@@ -62,7 +62,7 @@ uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2}; // EN through A5
 // hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
 // SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
  Adafruit_PN532 nfc(decoderPins, &SPI, 10);
-  uint8_t readers[] = {54, 43, 32, 22, 12, 5};
+  uint8_t readers[] = {1};
   uint8_t card_not_present[sizeof(readers)];
 // Or use this line for a breakout or shield with an I2C connection:
 //Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
