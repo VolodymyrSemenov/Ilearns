@@ -53,7 +53,7 @@ CRGB leds[NUM_LEDS];
 // Uncomment just _one_ line below depending on how your breakout or shield
 // is connected to the Arduino:
 
-uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2};
+uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2}; // EN through A5
 // Use this line for a breakout with a SPI connection:
 //Adafruit_PN532 nfc(PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
 
