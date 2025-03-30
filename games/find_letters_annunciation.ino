@@ -1,89 +1,102 @@
-  //Set all LED's off | set all LED's to red
-  //pass random letter into audio
-  //match letter with rfid tag
-  //check if reader is reading the correct rfid tag
+/**************************************************************************
+ * Find Letters Annunciation Game
+ * 
+ * This game asks the user (via the wand input) to match a random letter by
+ * presenting the correct RFID tag. For each round, the corresponding audio 
+ * file for the prompted letter is played (using letter pointing audio).
+ * The game continues until 5 letters are correctly matched, then exits.
+ * 
+ * This file assumes that the global 'letters' array (of type gamePiece),
+ * the LED array 'letter_crgb_leds' (for FastLED), the NFC instance 'nfc', and
+ * audio configuration functions (from audio_config.ino) are defined in the
+ * main file.
+ **************************************************************************/
 
-struct matchRFID{
-  char letter;
-  String rfidTag;
-};
+// Include the audio configuration file.
+#include "audio_config.ino"
 
-matchRFID RFIDDict[] = {
-  {'A', "tag1"},
-  {'B', "tag2"},
-  {'C', "tag3"},
-  {'D', "tag4"},
-  {'E', "tag5"},
-  {'F', "tag6"},
-  {'G', "tag7"},
-  {'H', "tag8"},
-  {'I', "tag9"},
-  {'J', "tag10"},
-  {'K', "tag11"},
-  {'L', "tag12"},
-  {'M', "tag13"},
-  {'N', "tag14"},
-  {'O', "tag15"},
-  {'P', "tag16"},
-  {'Q', "tag17"},
-  {'R', "tag18"},
-  {'S', "tag19"},
-  {'T', "tag20"},
-  {'U', "tag21"},
-  {'V', "tag22"},
-  {'W', "tag23"},
-  {'X', "tag24"},
-  {'Y', "tag25"},
-  {'Z', "tag26"}
-};
-
-
-void setup() {
-  Serial.begin(9600);
-  randomSeed(analogRead(A0));
-
-  int gameState = 2;     //gameState 2 = letter pointing
-
-  //turn off all led
-  
-
+// Wand RFID reading functions.
+String uidToString(uint8_t *uid, uint8_t uidLength) {
+  String tag = "";
+  for (uint8_t i = 0; i < uidLength; i++) {
+    if (uid[i] < 0x10) tag += "0";
+    tag += String(uid[i], HEX);
+  }
+  tag.toLowerCase();
+  return tag;
 }
 
-void loop() {
-  begin_game_find_letters_annunciation();
-  delay(3000);
+String readWandTag() {
+  uint8_t uid[7];
+  uint8_t uidLength = 0;
+  bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 5000);
+  if (success && uidLength > 0) {
+    String tag = uidToString(uid, uidLength);
+    Serial.print("Wand read tag: ");
+    Serial.println(tag);
+    return tag;
+  }
+  Serial.println("No tag read from wand.");
+  return "";
 }
 
-char getRandomLetter(){
-  return 'A' + (random() % 26);
+// Returns a random letter from the global letters array.
+String getRandomLetter() {
+  int index = random(0, num_letters);
+  return String(letters[index].character);
 }
 
-bool checkRFIDTagMatch(char currentLetter, String readRfidTag){
-  for(int i = 0; i < 26; i++){
-    if(RFIDDict[i].letter == currentLetter){
-      if(RFIDDict[i].rfidTag == readRfidTag){
-        return true;
-      }else{
-        return false;
-      }
+// Checks if the RFID tag read from the wand matches the expected tag
+// for the given letter. The expected tag is simulated as "tag" + (index+1).
+bool checkRFIDTagMatch(String currentLetter, String readTag) {
+  for (int i = 0; i < num_letters; i++) {
+    if (String(letters[i].character) == currentLetter) {
+      String expectedTag = "tag" + String(i + 1);
+      Serial.print("Expected tag: ");
+      Serial.println(expectedTag);
+      return (expectedTag == readTag);
     }
   }
+  return false;
 }
 
-void begin_game_find_letters_annunciation(){
-  char randomLetter = getRandomLetter(); 
-  Serial.println(randomLetter);
-
-  //find rfid tag mapped to the letter
+// Main game loop: prompts the user for a random letter, plays its audio file,
+// reads the wand's RFID tag, checks for a match, and repeats until 5 correct matches.
+void begin_game_find_letters_annunciation() {
+  int correctSelections = 0;
+  const int maxCorrect = 5;
+  Serial.println("Starting Find Letters Annunciation Game...");
   
-  //configFile(gameState, randomLetter);    //play audio file once
-
-  String tagBeingRead = "";                 //store tag being read from reader
-
-  bool checkResult = checkRFIDTagMatch(randomLetter, "tag20");    //check if rfid tag being read corresponds with current letter
-  if(checkResult == true){
-    Serial.println("checkResult == true");
-    //turn on green LED
+  while (correctSelections < maxCorrect) {
+    String randomLetter = getRandomLetter();
+    Serial.print("Find the letter: ");
+    Serial.println(randomLetter);
+    
+    // Play the audio file for the selected letter (using gameState 2: Letter Pointing).
+    playLetterAudio(randomLetter, 2);
+    
+    // Wait for the wand to present a tag.
+    String tagBeingRead = readWandTag();
+    if (tagBeingRead == "") {
+      delay(500);
+      continue;
+    }
+    
+    if (checkRFIDTagMatch(randomLetter, tagBeingRead)) {
+      Serial.println("Correct match!");
+      correctSelections++;
+      fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+      FastLED.show();
+    } else {
+      Serial.println("Incorrect match, try again.");
+      fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
+      FastLED.show();
+    }
+    
+    delay(1500);
+    fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
+    FastLED.show();
   }
   
+  Serial.println("Game complete: 5 correct selections achieved!");
 }
