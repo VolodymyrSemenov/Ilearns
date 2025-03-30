@@ -1,84 +1,100 @@
-  //Set all LED's off | set all LED's to red
-  //pass random number into audio
-  //match number with rfid tag
-  //check if reader is reading the correct rfid tag
+/**************************************************************************
+ * Find Numbers Game
+ **************************************************************************/
 
-struct matchRFID{
-  String number;
-  String rfidTag;
-};
+ #include "audio_config.ino"
 
-matchRFID RFIDDict[] = {
-  {"1", "tag1"},
-  {"2", "tag2"},
-  {"3", "tag3"},
-  {"4", "tag4"},
-  {"5", "tag5"},
-  {"6", "tag6"},
-  {"7", "tag7"},
-  {"8", "tag8"},
-  {"9", "tag9"},
-  {"10", "tag10"},
-  {"11", "tag11"},
-  {"12", "tag12"},
-  {"13", "tag13"},
-  {"14", "tag14"},
-  {"15", "tag15"},
-  {"16", "tag16"},
-  {"17", "tag17"},
-  {"18", "tag18"},
-  {"19", "tag19"},
-  {"20", "tag20"}
-};
-
-
-void setup() {
-  Serial.begin(9600);
-  randomSeed(analogRead(A0));
-
-  int gameState = 3;     //gameState 3 = number pointing
-
-  //turn off all led
-  
-
-}
-
-void loop() {
-  begin_game_find_numbers();
-  delay(3000);
-}
-
-String getRandomNumber(){
-  int num = 1 + (random() % 20);
-  return String(num);
-}
-
-bool checkRFIDTagMatch(String currentNumber, String readRfidTag){
-  for(int i = 0; i < 26; i++){
-    if(RFIDDict[i].number == currentNumber){
-      if(RFIDDict[i].rfidTag == readRfidTag){
-        return true;
-      }else{
-        return false;
-      }
-    }
-  }
-}
-
-void begin_game_find_numbers() {
-  String randomNumber = getRandomNumber(); 
-  Serial.println(randomNumber);
-
-  //find rfid tag mapped to the numb
-  
-  //configFile(gameState, randomNumber);    //play audio file once
-
-  String tagBeingRead = "";                 //store tag being read from reader
-
-  bool checkResult = checkRFIDTagMatch(randomNumber, "tag2");    //check if rfid tag being read corresponds with current number
-  if(checkResult == true){
-    Serial.println("checkResult == true");
-    //turn on green LED
-  }
-  
-}
+ // --- Decoder Selection Function ---
+ const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace later with actual pins
+ 
+ void selectRFIDReader(int readerNumber) {
+   for (int i = 0; i < 6; i++) {
+     digitalWrite(DECODER_PINS[i], (readerNumber >> i) & 1);
+   }
+   delay(10);
+ }
+ 
+ // --- Wand RFID Reading Functions ---
+ String uidToString(uint8_t *uid, uint8_t uidLength) {
+   String tag = "";
+   for (uint8_t i = 0; i < uidLength; i++) {
+     if (uid[i] < 0x10) tag += "0";
+     tag += String(uid[i], HEX);
+   }
+   tag.toLowerCase();
+   return tag;
+ }
+ 
+ String readWandTag() {
+   selectRFIDReader(0);  // Always use the wand reader (reader 0)
+   uint8_t uid[7];
+   uint8_t uidLength = 0;
+   bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 5000);
+   if (success && uidLength > 0) {
+     String tag = uidToString(uid, uidLength);
+     Serial.print("Wand read tag: ");
+     Serial.println(tag);
+     return tag;
+   }
+   Serial.println("No tag read from wand.");
+   return "";
+ }
+ 
+ // --- Game Functions ---
+ String getRandomNumber() {
+   // Assumes numbers array is pre-populated (e.g., with "1" to "20").
+   int index = random(0, num_numbers);
+   return String(numbers[index].character);
+ }
+ 
+ bool checkRFIDTagMatch_Number(String currentNumber, String readTag) {
+   for (int i = 0; i < num_numbers; i++) {
+     if (String(numbers[i].character) == currentNumber) {
+       String expectedTag = "tag" + String(i + 1);
+       Serial.print("Expected tag: ");
+       Serial.println(expectedTag);
+       return (expectedTag == readTag);
+     }
+   }
+   return false;
+ }
+ 
+ void begin_game_find_numbers() {
+   int correctSelections = 0;
+   const int maxCorrect = 5;
+   Serial.println("Starting Find Numbers Game...");
+   
+   while (correctSelections < maxCorrect) {
+     String randomNumber = getRandomNumber();
+     Serial.print("Find the number: ");
+     Serial.println(randomNumber);
+     
+     // Play the audio file for the selected number (gameState 1: Number Pointing).
+     playLetterAudio(randomNumber, 1);
+     
+     // Read the wand's tag.
+     String tagBeingRead = readWandTag();
+     if (tagBeingRead == "") {
+       delay(500);
+       continue;
+     }
+     
+     if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
+       Serial.println("Correct match!");
+       correctSelections++;
+       fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
+       FastLED.show();
+     } else {
+       Serial.println("Incorrect match, try again.");
+       fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
+       FastLED.show();
+     }
+     
+     delay(1500);
+     fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
+     FastLED.show();
+   }
+   
+   Serial.println("Game complete: 5 correct selections achieved!");
+ }
+ 

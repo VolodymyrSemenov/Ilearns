@@ -9,7 +9,6 @@
  *   GameState 2: Letter Pointing – plays a file from USBLetterPoint.
  *   GameState 3: Letter Sounding  – plays a file from USBLetterSound.
  * 
- * Adjust the USB file paths and hardware settings as needed.
  **************************************************************************/
 
  #include <Arduino_AdvancedAnalog.h>
