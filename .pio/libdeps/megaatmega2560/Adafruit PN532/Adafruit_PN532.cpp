@@ -120,8 +120,8 @@ Adafruit_PN532::Adafruit_PN532(uint8_t irq, uint8_t reset, TwoWire *theWire)
     @param  theSPI    pointer to the SPI bus to use
 */
 /**************************************************************************/
-Adafruit_PN532::Adafruit_PN532(uint8_t *decoderPins, SPIClass *theSPI, uint8_t reset) {
-  spi_dev = new Adafruit_SPIDevice(decoderPins, 1000000, SPI_BITORDER_LSBFIRST,
+Adafruit_PN532::Adafruit_PN532(uint8_t *decoderPins, uint32_t spi_speed, SPIClass *theSPI, uint8_t reset) {
+  spi_dev = new Adafruit_SPIDevice(decoderPins, spi_speed, SPI_BITORDER_LSBFIRST,
                                    SPI_MODE0, theSPI);
   _reset = reset;
 }

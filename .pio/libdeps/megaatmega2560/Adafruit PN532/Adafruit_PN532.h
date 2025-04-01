@@ -142,7 +142,7 @@ class Adafruit_PN532 {
 public:
   Adafruit_PN532(uint8_t clk, uint8_t miso, uint8_t mosi,
                  uint8_t ss);                          // Software SPI
-  Adafruit_PN532(uint8_t *decoderPins, SPIClass *theSPI = &SPI, uint8_t reset = 10); // Hardware SPI
+  Adafruit_PN532(uint8_t *decoderPins, uint32_t spi_speed, SPIClass *theSPI = &SPI, uint8_t reset = 10); // Hardware SPI
   Adafruit_PN532(uint8_t irq, uint8_t reset,
                  TwoWire *theWire = &Wire);              // Hardware I2C
   Adafruit_PN532(uint8_t reset, HardwareSerial *theSer); // Hardware UART
