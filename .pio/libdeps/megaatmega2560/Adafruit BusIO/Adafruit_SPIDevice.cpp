@@ -313,11 +313,11 @@ void Adafruit_SPIDevice::setDecoderHigh() {
 }
 
 void Adafruit_SPIDevice::setCurrentReader(int readerNum) {
-  Serial.println("Setting Reader "); //Serial.println(readerNum);
+  // Serial.println("Setting Reader "); //Serial.println(readerNum);
 
   for (int i=0; i<NUM_DECODER_PINS; i++){
     digitalWrite(_decoderPins[i+1], bitRead(readerNum, i));
-    delay(5);
+    // delay(5);
     // Serial.print(bitRead(readerNum, NUM_DECODER_PINS-i-1));
   }
   // Serial.println("");

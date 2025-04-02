@@ -239,7 +239,7 @@ void Adafruit_PN532::PrintHex(const byte *data, const uint32_t numBytes) {
 void Adafruit_PN532::setCurrentReader(int readerNum) {
   _currentReader = readerNum;
   spi_dev -> setCurrentReader(readerNum);
-  wakeup();
+  delay(2);
 }
 /**************************************************************************/
 /*!
