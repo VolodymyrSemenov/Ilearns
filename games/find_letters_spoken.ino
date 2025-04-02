@@ -4,8 +4,11 @@
 
  #include "audio_config.ino"
 
- // --- Declare End Game Button Pin (defined in the main file) ---
+ // Declare external buttons (defined in the main file)
  extern const int endGameBtnPin;
+ extern const int skipBtnPin;
+ extern const int repeatBtnPin;
+ extern const int extraBtnPin;
  
  // --- Decoder Selection Function ---
  const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
@@ -71,15 +74,24 @@
      Serial.print("Find the letter: ");
      Serial.println(randomLetter);
       
-     // Play the audio file for the selected letter (gameState 2: Letter Pointing)
+     // Play audio prompt (gameState 2: Letter Pointing)
      playLetterAudio(randomLetter, 2);
       
-     // Wait until a tile is scanned
      String tagBeingRead;
      while (true) {
+       // Check buttons while waiting:
        if (digitalRead(endGameBtnPin) == LOW) {
          Serial.println("End Game button pressed. Exiting Find Letters Spoken Game.");
          return;
+       }
+       if (digitalRead(skipBtnPin) == LOW) {
+         Serial.println("Skip button pressed. Moving to next target.");
+         break;
+       }
+       if (digitalRead(repeatBtnPin) == LOW) {
+         Serial.println("Repeat button pressed. Replaying audio.");
+         playLetterAudio(randomLetter, 2);
+         delay(500);
        }
        
        tagBeingRead = readWandTag();
@@ -93,7 +105,7 @@
          correctSelections++;
          fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
          FastLED.show();
-         break;  // Target found, exit waiting loop
+         break;  // Exit waiting loop if correct
        } else {
          Serial.println("Incorrect match, try again.");
          fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);

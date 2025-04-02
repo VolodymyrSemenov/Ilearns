@@ -34,9 +34,15 @@
  const int findLettersLED      = 8;
  const int findNumbersLED      = 9;
  
- // **** New: End Game Button Pin and LED Pin ****
+ // Rest of functionality buttons
  const int endGameBtnPin       = 11;  // Ends the current game
- const int endGameLEDPin       = 17;  // LED for the End Game button (always on)
+ const int endGameLEDPin       = 17; 
+ const int skipBtn             = 12;
+ const int repeatBtn           = 13;
+ const int extraBtn            = 14;
+ const int skipLEDPin          = 18;
+ const int repeatLEDPin        = 19;
+ const int extraLEDPin         = 20;
  
  // Game constants
  const int num_letters = 26;
@@ -218,9 +224,18 @@
      pinMode(findLettersBtn, INPUT_PULLUP);
      pinMode(findNumbersBtn, INPUT_PULLUP);
      pinMode(endGameBtnPin, INPUT_PULLUP); // Initialize End Game Button
- 
-     // Initialize the End Game LED pin and keep it always on
+     
+     // Rest of functionality buttons
+     pinMode(skipBtn, INPUT_PULLUP);
+     pinMode(repeatBtn, INPUT_PULLUP);
+     pinMode(extraBtn, INPUT_PULLUP);
      pinMode(endGameLEDPin, OUTPUT);
+     pinMode(skipLEDPin, OUTPUT);
+     pinMode(repeatLEDPin, OUTPUT);
+     pinMode(extraLEDPin, OUTPUT);
+     digitalWrite(skipLEDPin, HIGH);
+     digitalWrite(repeatLEDPin, HIGH);
+     digitalWrite(extraLEDPin, HIGH);
      digitalWrite(endGameLEDPin, HIGH);
      
      // Initialize WS2811 LED strips for game pieces
@@ -288,11 +303,11 @@
          }
          delay(1000); // Basic debounce/delay between games
      }
- 
+  
      // Check if recalibrate is being held down
- 
+  
      // Other buttons are skip, end game, and repeat
- 
+  
      delay(100);
  }
  

@@ -4,8 +4,11 @@
 
  #include "audio_config.ino"
 
- // --- Declare End Game Button Pin (defined in the main file) ---
+ // Declare external buttons (defined in the main file)
  extern const int endGameBtnPin;
+ extern const int skipBtnPin;
+ extern const int repeatBtnPin;
+ extern const int extraBtnPin;
  
  // --- Decoder Selection Function ---
  const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
@@ -28,7 +31,7 @@
  }
   
  String readWandTag() {
-   selectRFIDReader(0);  // Always use the wand reader (reader 0)
+   selectRFIDReader(0);
    uint8_t uid[7];
    uint8_t uidLength = 0;
    bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 5000);
@@ -71,15 +74,24 @@
      Serial.print("Find the number: ");
      Serial.println(randomNumber);
       
-     // Play the audio file for the selected number (gameState 1: Number Pointing)
+     // Play audio prompt (gameState 1: Number Pointing)
      playLetterAudio(randomNumber, 1);
       
-     // Wait until a tile is scanned
      String tagBeingRead;
      while (true) {
+       // Check buttons while waiting:
        if (digitalRead(endGameBtnPin) == LOW) {
          Serial.println("End Game button pressed. Exiting Find Numbers Game.");
          return;
+       }
+       if (digitalRead(skipBtnPin) == LOW) {
+         Serial.println("Skip button pressed. Moving to next target.");
+         break;
+       }
+       if (digitalRead(repeatBtnPin) == LOW) {
+         Serial.println("Repeat button pressed. Replaying audio.");
+         playLetterAudio(randomNumber, 1);
+         delay(500);
        }
        
        tagBeingRead = readWandTag();
@@ -93,7 +105,7 @@
          correctSelections++;
          fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
          FastLED.show();
-         break;  // Correct tile found, exit waiting loop
+         break;  // Exit waiting loop if correct
        } else {
          Serial.println("Incorrect match, try again.");
          fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
