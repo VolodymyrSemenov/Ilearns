@@ -311,9 +311,9 @@ void loop() {
     }
 
     // Check if recalibrate is being held down
-    
-
-    // Other buttons are skip, end game, and repeat
+    if(digitalRead(recalibrateBtnPin) == LOW){
+        recalibrateGamePieces();
+    }
 
     delay(100);
 }
