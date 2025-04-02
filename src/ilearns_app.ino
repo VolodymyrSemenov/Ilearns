@@ -22,25 +22,21 @@
 #define LED_PIN_NUMBERS 7   // WS2811 data pin for number LEDs
 #define WIDTH_PER_PIECE 3   // Number of WS2811 LEDs per game piece
 
-// Button Pins
+// Big Button Pins
 const int letterOrderingBtn = 2;
 const int numberOrderingBtn   = 3;
 const int findLettersBtn      = 4;
 const int findNumbersBtn      = 5;
+const int endGameBtnPin       = 11;
+const int skipBtn             = 12;
+const int repeatBtn           = 13;
+const int extraBtn            = 14;
 
 // LEDs for button indicators
 const int letterOrderingLED   = 6;  // Same as LED strip pin (conflict resolved by design)
 const int numberOrderingLED   = 7;
 const int findLettersLED      = 8;
 const int findNumbersLED      = 9;
-
-// Rest of functionality buttons
-const int endGameBtnPin       = 11;
-const int skipBtn             = 12;
-const int repeatBtn           = 13;
-const int extraBtn            = 14;
-
-// LEDs for functionality buttons
 const int endGameLEDPin       = 17; 
 const int skipLEDPin          = 18;
 const int repeatLEDPin        = 19;
@@ -49,11 +45,19 @@ const int extraLEDPin         = 20;
 // Recalibrate Button Pin
 const int recalibrateBtnPin    = 21;
 
+// Difficulty Switch
+const int pronouncePin = 22;
+
 // Game constants
 const int num_letters = 26;
 const int num_numbers = 21;
 const int num_letter_leds = num_letters * WIDTH_PER_PIECE;
 const int num_number_leds = num_numbers * WIDTH_PER_PIECE;
+
+// -------------------------
+// Game State Variables
+// -------------------------
+bool gameWon = false;
 
 // -------------------------
 // Data Structures
@@ -292,9 +296,15 @@ void loop() {
         switch (button_number) {
         case letterOrderingBtn:
             begin_game_letter_ordering();
+
+            // Start LED Dance on win
+
             break;
         case numberOrderingBtn:
             begin_game_number_ordering();
+
+            // Start LED Dance on win
+            
             break;
         case findLettersBtn:
             // Check difficulty and choose one of the find letters games
@@ -303,6 +313,9 @@ void loop() {
             break;
         case findNumbersBtn:
             begin_game_find_numbers();
+
+            // Start LED Dance on win
+            
             break;
         default:
             Serial.println("Unknown button pressed.");
