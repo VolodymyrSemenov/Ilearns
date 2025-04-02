@@ -11,10 +11,15 @@ void begin_game_number_ordering() {
     
     bool game_complete = false;
     while (!game_complete) {
+        if (digitalRead(endGameBtnPin) == LOW) {
+            Serial.println("End Game button pressed. Exiting Number Ordering Game.");
+            return;
+        }
+        
         bool all_correct = true;
         
         for (int i = 0; i <= 20; i++) {  // Checking positions 0-20
-            uint8_t uid[7]; // Buffer to store the UID
+            uint8_t uid[7];
             uint8_t uidLength;
             
             nfc.setCurrentReader(readers[i]);
@@ -28,12 +33,11 @@ void begin_game_number_ordering() {
                 }
                 Serial.println("");
                 
-                // Check if UID matches the expected number for this position
                 if (!is_correct_number(i, uid, uidLength)) {
                     all_correct = false;
-                    illuminate_leds(CRGB::Red, i); // Mark incorrect position
+                    illuminate_leds(CRGB::Red, i);
                 } else {
-                    illuminate_leds(CRGB::Green, i); // Mark correct position
+                    illuminate_leds(CRGB::Green, i);
                 }
             } else {
                 Serial.print("No tile detected at position "); Serial.println(i);
@@ -48,14 +52,8 @@ void begin_game_number_ordering() {
             game_complete = true;
         }
         
-        delay(1000); // Small delay before rechecking
+        delay(1000);
     }
     
     Serial.println("Number Ordering Game Ended");
-}
-
-bool is_correct_number(int position, uint8_t *uid, uint8_t uidLength) {
-    // should be implemented with actual UID-to-number mapping to verify correct placement
-    // For now, this is a placeholder that always returns true.
-    return true;
 }
