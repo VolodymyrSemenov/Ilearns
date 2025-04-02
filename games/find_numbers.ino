@@ -4,12 +4,11 @@
 
  #include "audio_config.ino"
 
- // --- Define End Game Button Pin as external (defined in main file) ---
+ // --- Declare End Game Button Pin (defined in the main file) ---
  extern const int endGameBtnPin;
  
  // --- Decoder Selection Function ---
- const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace later with actual pins
-  
+ const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
  void selectRFIDReader(int readerNumber) {
    for (int i = 0; i < 6; i++) {
      digitalWrite(DECODER_PINS[i], (readerNumber >> i) & 1);
@@ -45,7 +44,6 @@
   
  // --- Game Functions ---
  String getRandomNumber() {
-   // Assumes numbers array is pre-populated (e.g., with "1" to "20").
    int index = random(0, num_numbers);
    return String(numbers[index].character);
  }
@@ -68,40 +66,44 @@
    Serial.println("Starting Find Numbers Game...");
     
    while (correctSelections < maxCorrect) {
+     // Select a target number for this round
      String randomNumber = getRandomNumber();
      Serial.print("Find the number: ");
      Serial.println(randomNumber);
       
-     // Play the audio file for the selected number (gameState 1: Number Pointing).
+     // Play the audio file for the selected number (gameState 1: Number Pointing)
      playLetterAudio(randomNumber, 1);
       
-     // Check for End Game button before attempting to read the wand tag.
-     if (digitalRead(endGameBtnPin) == LOW) {
-       Serial.println("End Game button pressed. Exiting Find Numbers Game.");
-       return;
-     }
-      
-     // Read the wand's tag.
-     String tagBeingRead = readWandTag();
-     if (tagBeingRead == "") {
-       delay(500);
-       continue;
-     }
-      
-     if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
-       Serial.println("Correct match!");
-       correctSelections++;
-       fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
+     // Wait until a tile is scanned
+     String tagBeingRead;
+     while (true) {
+       if (digitalRead(endGameBtnPin) == LOW) {
+         Serial.println("End Game button pressed. Exiting Find Numbers Game.");
+         return;
+       }
+       
+       tagBeingRead = readWandTag();
+       if (tagBeingRead == "") {
+         delay(500);
+         continue;
+       }
+       
+       if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
+         Serial.println("Correct match!");
+         correctSelections++;
+         fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
+         FastLED.show();
+         break;  // Correct tile found, exit waiting loop
+       } else {
+         Serial.println("Incorrect match, try again.");
+         fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
+         FastLED.show();
+       }
+       
+       delay(1500);
+       fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
        FastLED.show();
-     } else {
-       Serial.println("Incorrect match, try again.");
-       fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
-       FastLED.show();
      }
-      
-     delay(1500);
-     fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
-     FastLED.show();
    }
     
    Serial.println("Game complete: 5 correct selections achieved!");

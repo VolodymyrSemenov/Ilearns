@@ -4,12 +4,11 @@
 
  #include "audio_config.ino"
 
- // --- Define End Game Button Pin as external (defined in main file) ---
+ // --- Declare End Game Button Pin (defined in the main file) ---
  extern const int endGameBtnPin;
  
  // --- Decoder Selection Function ---
  const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
-  
  void selectRFIDReader(int readerNumber) {
    for (int i = 0; i < 6; i++) {
      digitalWrite(DECODER_PINS[i], (readerNumber >> i) & 1);
@@ -67,43 +66,45 @@
    Serial.println("Starting Find Letters Spoken Game...");
     
    while (correctSelections < maxCorrect) {
+     // Select a target letter for this round
      String randomLetter = getRandomLetter_Spoken();
      Serial.print("Find the letter: ");
      Serial.println(randomLetter);
       
-     // Play the audio file for the selected letter (gameState 2: Letter Pointing).
+     // Play the audio file for the selected letter (gameState 2: Letter Pointing)
      playLetterAudio(randomLetter, 2);
       
-     // Check for End Game button before attempting to read the wand tag.
-     if (digitalRead(endGameBtnPin) == LOW) {
-       Serial.println("End Game button pressed. Exiting Find Letters Spoken Game.");
-       return;
-     }
-      
-     // Read the wand's tag.
-     String tagBeingRead = readWandTag();
-     if (tagBeingRead == "") {
-       delay(500);
-       continue;
-     }
-      
-     char chosenLetter = randomLetter.charAt(0);
-     if (checkRFIDTagMatch_Letter(chosenLetter, tagBeingRead)) {
-       Serial.println("Correct match!");
-       correctSelections++;
-       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+     // Wait until a tile is scanned
+     String tagBeingRead;
+     while (true) {
+       if (digitalRead(endGameBtnPin) == LOW) {
+         Serial.println("End Game button pressed. Exiting Find Letters Spoken Game.");
+         return;
+       }
+       
+       tagBeingRead = readWandTag();
+       if (tagBeingRead == "") {
+         delay(500);
+         continue;
+       }
+       
+       if (checkRFIDTagMatch_Letter(randomLetter.charAt(0), tagBeingRead)) {
+         Serial.println("Correct match!");
+         correctSelections++;
+         fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+         FastLED.show();
+         break;  // Target found, exit waiting loop
+       } else {
+         Serial.println("Incorrect match, try again.");
+         fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
+         FastLED.show();
+       }
+       
+       delay(1500);
+       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
        FastLED.show();
-     } else {
-       Serial.println("Incorrect match, try again.");
-       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
-       FastLED.show();
      }
-      
-     delay(1500);
-     fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
-     FastLED.show();
    }
-    
    Serial.println("Game complete: 5 correct selections achieved!");
  }
  

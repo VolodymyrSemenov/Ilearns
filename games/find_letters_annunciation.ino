@@ -4,12 +4,11 @@
 
  #include "audio_config.ino"
 
- // --- Define End Game Button Pin as external (defined in main file) ---
+ // --- Declare End Game Button Pin (defined in the main file) ---
  extern const int endGameBtnPin;
  
- // --- Decoder Selection Function --- (not entirely sure how the decoder works yet tbh)
+ // --- Decoder Selection Function ---
  const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
-  
  void selectRFIDReader(int readerNumber) {
    for (int i = 0; i < 6; i++) {
      digitalWrite(DECODER_PINS[i], (readerNumber >> i) & 1);
@@ -29,7 +28,7 @@
  }
   
  String readWandTag() {
-   // Force selection of the wand reader (assigned as reader 0). Can be changed later
+   // Force selection of the wand reader (assigned as reader 0)
    selectRFIDReader(0);
    uint8_t uid[7];
    uint8_t uidLength = 0;
@@ -68,40 +67,45 @@
    Serial.println("Starting Find Letters Annunciation Game...");
     
    while (correctSelections < maxCorrect) {
+     // Select a target letter for this round
      String randomLetter = getRandomLetter();
      Serial.print("Find the letter: ");
      Serial.println(randomLetter);
       
-     // Play the audio file for the selected letter (gameState 2: Letter Pointing).
+     // Play the audio file for the selected letter (gameState 2: Letter Pointing)
      playLetterAudio(randomLetter, 2);
      
-     // Check for End Game button before attempting to read the wand tag.
-     if (digitalRead(endGameBtnPin) == LOW) {
-       Serial.println("End Game button pressed. Exiting Find Letters Annunciation Game.");
-       return;
-     }
-      
-     // Read the wand's tag (ensuring the wand reader is active).
-     String tagBeingRead = readWandTag();
-     if (tagBeingRead == "") {
-       delay(500);
-       continue;
-     }
-      
-     if (checkRFIDTagMatch(randomLetter, tagBeingRead)) {
-       Serial.println("Correct match!");
-       correctSelections++;
-       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+     // Wait until a tile is scanned
+     String tagBeingRead;
+     while (true) {
+       // Check if End Game button is pressed
+       if (digitalRead(endGameBtnPin) == LOW) {
+         Serial.println("End Game button pressed. Exiting Find Letters Annunciation Game.");
+         return;
+       }
+       
+       tagBeingRead = readWandTag();
+       if (tagBeingRead == "") {
+         delay(500);
+         continue;
+       }
+       
+       if (checkRFIDTagMatch(randomLetter, tagBeingRead)) {
+         Serial.println("Correct match!");
+         correctSelections++;
+         fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+         FastLED.show();
+         break;  // Move on to the next round
+       } else {
+         Serial.println("Incorrect match, try again.");
+         fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
+         FastLED.show();
+       }
+       
+       delay(1500);
+       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
        FastLED.show();
-     } else {
-       Serial.println("Incorrect match, try again.");
-       fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
-       FastLED.show();
      }
-      
-     delay(1500);
-     fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
-     FastLED.show();
    }
     
    Serial.println("Game complete: 5 correct selections achieved!");
