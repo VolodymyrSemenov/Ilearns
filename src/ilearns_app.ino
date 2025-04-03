@@ -45,7 +45,7 @@ const int extraLEDPin         = 20;
 // Recalibrate Button Pin
 const int recalibrateBtnPin    = 21;
 
-// Difficulty Switch / Rocker for selecting between annunciation & spoken
+// Difficulty Switch / Rocker for selecting between games
 const int annunciationPin = 22;
 
 // Game constants
@@ -119,6 +119,17 @@ void initializeLEDs() {
     FastLED.addLeds<WS2811, LED_PIN_NUMBERS, RGB>(number_crgb_leds, num_number_leds);
     FastLED.show();
     FastLED.setBrightness(128);
+}
+
+// Subroutine to start a rainbow LED dance when gameWon is true.
+void startLEDRainbowDance() {
+    // Run a rainbow pattern for a full cycle.
+    for (int j = 0; j < 256; j++) {
+        fill_rainbow(letter_crgb_leds, num_letter_leds, j, 8);
+        fill_rainbow(number_crgb_leds, num_number_leds, j, 8);
+        FastLED.show();
+        delay(20);
+    }
 }
 
 // -------------------------
@@ -299,34 +310,36 @@ void loop() {
         switch (button_number) {
         case letterOrderingBtn:
             begin_game_letter_ordering();
-            // Start LED Dance on win
             break;
         case numberOrderingBtn:
             begin_game_number_ordering();
-            // Start LED Dance on win
             break;
         case findLettersBtn:
             // Check the annunciation rocker switch to choose between games.
-            // If the annunciationPin reads LOW, select the annunciation game.
+            // If annunciationPin reads LOW, select the annunciation game.
             if (digitalRead(annunciationPin) == LOW) {
                 begin_game_find_letters_annunciation();
             } else {
                 begin_game_find_letters_spoken();
             }
-            // Start LED Dance on Win
             break;
         case findNumbersBtn:
             begin_game_find_numbers();
-            // Start LED Dance on win
             break;
         default:
             Serial.println("Unknown button pressed.");
         }
         delay(1000); // Basic debounce/delay between games
+        
+        // After a game ends, if gameWon is true, start the LED rainbow dance.
+        if (gameWon) {
+            startLEDRainbowDance();
+            gameWon = false; // Reset the flag
+        }
     }
 
     // Check if recalibrate is being held down
-    if (digitalRead(recalibrateBtnPin) == LOW) {
+    if(digitalRead(recalibrateBtnPin) == LOW){
         recalibrateGamePieces();
     }
 
