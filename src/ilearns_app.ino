@@ -45,8 +45,8 @@ const int extraLEDPin         = 20;
 // Recalibrate Button Pin
 const int recalibrateBtnPin    = 21;
 
-// Difficulty Switch
-const int pronouncePin = 22;
+// Difficulty Switch / Rocker for selecting between annunciation & spoken
+const int annunciationPin = 22;
 
 // Game constants
 const int num_letters = 26;
@@ -101,7 +101,7 @@ GamePieces gamePiecesGlobal;  // global copy for EEPROM read/write
 void PiecesToEEPROM() {
     EEPROM.put(0, gamePiecesGlobal);
 }
-
+ 
 // Read the GamePieces struct from EEPROM
 GamePieces PiecesFromEEPROM() {
     GamePieces gp;
@@ -112,7 +112,7 @@ GamePieces PiecesFromEEPROM() {
 // -------------------------
 // LED Utility Functions
 // -------------------------
-
+//
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
 void initializeLEDs() {
     FastLED.addLeds<WS2811, LED_PIN_LETTERS, RGB>(letter_crgb_leds, num_letter_leds);
@@ -124,14 +124,14 @@ void initializeLEDs() {
 // -------------------------
 // Game Piece Helper Functions
 // -------------------------
-
+//
 // Given a base index, fill the positions array for a game piece.
 void generatePositions(int baseIndex, int positions[]) {
     for (int i = 0; i < WIDTH_PER_PIECE; i++) {
         positions[i] = baseIndex + i;
     }
 }
-
+ 
 // Generate the gamePiece structures for letters (A-Z) and numbers (0-20)
 void generateGamePieceStructures() {
     // Letters: assign characters, clear UIDs, set decoder value, and assign LED positions.
@@ -158,8 +158,8 @@ void printGamePieces() {
         Serial.print("Character: "); Serial.println(letters[i].character);
         Serial.print("Positions: "); 
         for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-        Serial.print(letters[i].positions[j]); 
-        Serial.print(" ");
+            Serial.print(letters[i].positions[j]); 
+            Serial.print(" ");
         }
         Serial.println();
     }
@@ -168,8 +168,8 @@ void printGamePieces() {
         Serial.print("Character: "); Serial.println(numbers[i].character);
         Serial.print("Positions: "); 
         for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-        Serial.print(numbers[i].positions[j]); 
-        Serial.print(" ");
+            Serial.print(numbers[i].positions[j]); 
+            Serial.print(" ");
         }
         Serial.println();
     }
@@ -178,7 +178,7 @@ void printGamePieces() {
 // -------------------------
 // Button Checking Function
 // -------------------------
-
+//
 // Checks the four game buttons and returns true if one is pressed.
 // Sets button_number to the pressed button’s defined constant.
 bool check_button_pressed(int &button_number) {
@@ -201,7 +201,7 @@ bool check_button_pressed(int &button_number) {
 // -------------------------
 // NFC & EEPROM Recalibration
 // -------------------------
-
+//
 // This stub function attempts to read a card for each game piece slot (total 47).
 // It then updates the gamePiecesGlobal with the new UID values.
 void recalibrateGamePieces() {
@@ -211,11 +211,11 @@ void recalibrateGamePieces() {
     for (int i = 0; i < 47; i++) {
         bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);
         if (success) {
-        if (i < num_letters) {
-            memcpy(gamePiecesGlobal.letters[i].uid, uid, uidLength);
-        } else {
-            memcpy(gamePiecesGlobal.numbers[i - num_letters].uid, uid, uidLength);
-        }
+            if (i < num_letters) {
+                memcpy(gamePiecesGlobal.letters[i].uid, uid, uidLength);
+            } else {
+                memcpy(gamePiecesGlobal.numbers[i - num_letters].uid, uid, uidLength);
+            }
         }
     }
     PiecesToEEPROM();
@@ -247,6 +247,9 @@ void setup() {
     digitalWrite(extraLEDPin, HIGH);
     digitalWrite(endGameLEDPin, HIGH);
     
+    // Initialize the annunciation rocker switch pin
+    pinMode(annunciationPin, INPUT_PULLUP);
+    
     // Initialize WS2811 LED strips for game pieces
     delay(500);
     Serial.println("Initializing Letter LEDs...");
@@ -264,25 +267,25 @@ void setup() {
     // If EEPROM is empty (first letter is empty), generate the structures.
     GamePieces stored = PiecesFromEEPROM();
     if (stored.letters[0].character[0] == '\\0') {
-    Serial.println("EEPROM empty, generating game pieces...");
-    generateGamePieceStructures();
-    // Copy into global structure for EEPROM storage
-    for (int i = 0; i < num_letters; i++) {
-        gamePiecesGlobal.letters[i] = letters[i];
-    }
-    for (int i = 0; i < num_numbers; i++) {
-        gamePiecesGlobal.numbers[i] = numbers[i];
-    }
-    PiecesToEEPROM();
+        Serial.println("EEPROM empty, generating game pieces...");
+        generateGamePieceStructures();
+        // Copy into global structure for EEPROM storage
+        for (int i = 0; i < num_letters; i++) {
+            gamePiecesGlobal.letters[i] = letters[i];
+        }
+        for (int i = 0; i < num_numbers; i++) {
+            gamePiecesGlobal.numbers[i] = numbers[i];
+        }
+        PiecesToEEPROM();
     } else {
-    Serial.println("Loaded game pieces from EEPROM.");
-    // Copy stored values into our working arrays
-    for (int i = 0; i < num_letters; i++) {
-        letters[i] = stored.letters[i];
-    }
-    for (int i = 0; i < num_numbers; i++) {
-        numbers[i] = stored.numbers[i];
-    }
+        Serial.println("Loaded game pieces from EEPROM.");
+        // Copy stored values into our working arrays
+        for (int i = 0; i < num_letters; i++) {
+            letters[i] = stored.letters[i];
+        }
+        for (int i = 0; i < num_numbers; i++) {
+            numbers[i] = stored.numbers[i];
+        }
     }
     
     printGamePieces();
@@ -290,32 +293,31 @@ void setup() {
 }
 
 void loop() {
-// Game Buttons
+    // Game Buttons
     int button_number;
     if (check_button_pressed(button_number)) {
         switch (button_number) {
         case letterOrderingBtn:
             begin_game_letter_ordering();
-
             // Start LED Dance on win
-
             break;
         case numberOrderingBtn:
             begin_game_number_ordering();
-
             // Start LED Dance on win
-            
             break;
         case findLettersBtn:
-            // Check difficulty and choose one of the find letters games
-            // begin_game_find_letters_spoken();
-            // begin_game_find_letters_annunciation();
+            // Check the annunciation rocker switch to choose between games.
+            // If the annunciationPin reads LOW, select the annunciation game.
+            if (digitalRead(annunciationPin) == LOW) {
+                begin_game_find_letters_annunciation();
+            } else {
+                begin_game_find_letters_spoken();
+            }
+            // Start LED Dance on Win
             break;
         case findNumbersBtn:
             begin_game_find_numbers();
-
             // Start LED Dance on win
-            
             break;
         default:
             Serial.println("Unknown button pressed.");
@@ -324,7 +326,7 @@ void loop() {
     }
 
     // Check if recalibrate is being held down
-    if(digitalRead(recalibrateBtnPin) == LOW){
+    if (digitalRead(recalibrateBtnPin) == LOW) {
         recalibrateGamePieces();
     }
 
