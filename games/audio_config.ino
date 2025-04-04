@@ -35,7 +35,7 @@
  // Opens and configures the audio file for the given input.
  // For gameState 1 (Number Pointing), tempInput should be a digit character (or you may extend to a String if needed).
  // For gameState 2 (Letter Pointing) or 3 (Letter Sounding), tempInput is the letter.
- void configFile(int gameState, char tempInput) {
+ void configFile(int gameState, String tempInput) {
    String result = "";
    switch (gameState) {
      case 1:  // Number Pointing
@@ -122,7 +122,7 @@
  void playLetterAudio(String letter, int gameState = 2) {
    // For letter games, gameState 2 (pointing) or 3 (sounding) are used.
    // Here, we use the first character of the letter string.
-   char tempInput = letter.charAt(0);
+   String tempInput = letter;
    configFile(gameState, tempInput);
    played = false;
    while (!played) {
