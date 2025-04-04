@@ -1,3 +1,6 @@
+// Game state
+extern bool gameWon;
+
 void begin_game_letter_ordering() {
     Serial.println("Starting Letter Ordering Game...");
     
@@ -46,4 +49,6 @@ void begin_game_letter_ordering() {
             delay(1000);
         }
     }
+    // Game state
+    extern bool gameWon;
 }

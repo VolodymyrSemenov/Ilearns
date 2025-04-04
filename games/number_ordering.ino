@@ -1,3 +1,6 @@
+// Game state
+extern bool gameWon;
+
 void begin_game_number_ordering() {
     Serial.println("Number Ordering Game Started");
     
@@ -54,6 +57,6 @@ void begin_game_number_ordering() {
         
         delay(1000);
     }
-    
+    gameWon = true;
     Serial.println("Number Ordering Game Ended");
 }

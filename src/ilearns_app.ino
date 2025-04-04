@@ -122,15 +122,25 @@ void initializeLEDs() {
 }
 
 // Subroutine to start a rainbow LED dance when gameWon is true.
+// New subroutine to start a rainbow LED dance for 5 seconds when gameWon is true.
 void startLEDRainbowDance() {
-    // Run a rainbow pattern for a full cycle.
-    for (int j = 0; j < 256; j++) {
-        fill_rainbow(letter_crgb_leds, num_letter_leds, j, 8);
-        fill_rainbow(number_crgb_leds, num_number_leds, j, 8);
+    unsigned long startTime = millis(); // Record the start time
+
+    // Run a rainbow pattern for 5 seconds.
+    while (millis() - startTime < 5000) {
+        static uint8_t hue = 0;
+        fill_rainbow(letter_crgb_leds, num_letter_leds, hue, 8);
+        fill_rainbow(number_crgb_leds, num_number_leds, hue, 8);
         FastLED.show();
-        delay(20);
+        hue += 5; // Gradually shift colors
+        delay(50);
     }
+
+    // After 5 seconds, clear the LEDs
+    FastLED.clear();
+    FastLED.show();
 }
+
 
 // -------------------------
 // Game Piece Helper Functions
