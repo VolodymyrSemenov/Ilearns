@@ -27,6 +27,7 @@ void begin_game_letter_ordering() {
         for (int i = 0; i < 26; i++) { // Loop through all 26 placements
             uint8_t uid[7];
             uint8_t uidLength;
+            nfc.SAMConfig();
             bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);
             
             if (success) {

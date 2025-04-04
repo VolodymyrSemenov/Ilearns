@@ -26,6 +26,7 @@ void begin_game_number_ordering() {
             uint8_t uidLength;
             
             nfc.setCurrentReader(readers[i]);
+            nfc.SAMConfig();
             bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);
             
             if (success) {

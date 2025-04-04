@@ -37,6 +37,7 @@ String readWandTag() {
   selectRFIDReader(0);
   uint8_t uid[7];
   uint8_t uidLength = 0;
+  nfc.SAMConfig();
   bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 5000);
   if (success && uidLength > 0) {
     String tag = uidToString(uid, uidLength);
