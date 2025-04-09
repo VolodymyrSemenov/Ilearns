@@ -53,7 +53,7 @@ CRGB leds[NUM_LEDS];
 // Uncomment just _one_ line below depending on how your breakout or shield
 // is connected to the Arduino:
 
-uint8_t decoderPins[] = {30, 31, 32, 33, 34, 35, 36}; // EN through A5
+uint8_t decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // EN through A5
 // Use this line for a breakout with a SPI connection:
 //Adafruit_PN532 nfc(PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
 
@@ -61,13 +61,13 @@ uint8_t decoderPins[] = {30, 31, 32, 33, 34, 35, 36}; // EN through A5
 // the PN532 SCK, MOSI, and MISO pins need to be connected to the Arduino's
 // hardware SPI SCK, MOSI, and MISO pins.  On an Arduino Uno these are
 // SCK = 13, MOSI = 11, MISO = 12.  The SS line can be any digital IO pin.
- Adafruit_PN532 nfc(decoderPins, 4000000, &SPI, 30);
+ Adafruit_PN532 nfc(decoderPins, 4000000, &SPI, 28);
 
 
 
 
 
-uint8_t readers[] = {14,24};
+uint8_t readers[] = {6,7,8,9};
 uint8_t card_not_present[sizeof(readers)];
 // Or use this line for a breakout or shield with an I2C connection:
 //Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
@@ -124,9 +124,9 @@ void loop(void) {
     // SPI.beginTransaction(SPISettings(125000, MSBFIRST, SPI_MODE0));
     // delay(250);
     nfc.setCurrentReader(readers[i]);
-    // nfc.begin(); // Calls nfc.wakeup that sets SAMConfig
-    // nfc.setPassiveActivationRetries(0xFF);
-    // nfc.SAMConfig();
+    nfc.begin(); // Calls nfc.wakeup that sets SAMConfig
+    nfc.setPassiveActivationRetries(0xFF);
+    nfc.SAMConfig();
 
     // Check if the PN532 is connected
   // uint32_t versiondata = nfc.getFirmwareVersion();
@@ -155,15 +155,15 @@ void loop(void) {
 
     if (success) {
       // Serial.print("Reader on decoder line "); 
-      Serial.println(readers[i]);
+      // Serial.println(readers[i]);
       Serial.println("Found a card!");
-      Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
-      Serial.print("UID Value: ");
-      for (uint8_t i=0; i < uidLength; i++)
-      {
-        Serial.print(" 0x");Serial.print(uid[i], HEX);
-      }
-      Serial.println("");
+      // Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
+      // Serial.print("UID Value: ");
+      // for (uint8_t i=0; i < uidLength; i++)
+      // {
+      //   Serial.print(" 0x");Serial.print(uid[i], HEX);
+      // }
+      // Serial.println("");
 
       illuminate_leds(CRGB::Green, i*WIDTH_PER_PIECE);
       card_not_present[i] = 0;
@@ -201,8 +201,8 @@ void loop(void) {
 // LED functions (same as before)
 void illuminate_leds(CRGB color, int positions){
   //leds[0] = CRGB::Black;
-  int offset = 0 *WIDTH_PER_PIECE;
-  for (int i=0; i<WIDTH_PER_PIECE-1; i++){
+  int offset = 4 *WIDTH_PER_PIECE;
+  for (int i=0; i<WIDTH_PER_PIECE; i++){
     leds[i+positions+offset] = color;
   }
   FastLED.show();
