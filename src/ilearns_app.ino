@@ -15,49 +15,64 @@
 #include <../games/find_letters_annunciation.ino>
 #include <../games/find_numbers.ino>
 
+
 // -------------------------
 // Pin Definitions & Constants
 // -------------------------
-#define LED_PIN_LETTERS 6   // WS2811 data pin for letter LEDs
-#define LED_PIN_NUMBERS 7   // WS2811 data pin for number LEDs
-#define WIDTH_PER_PIECE 3   // Number of WS2811 LEDs per game piece
-
-// Big Button Pins
-const int letterOrderingBtn = 2;
-const int numberOrderingBtn   = 3;
-const int findLettersBtn      = 4;
-const int findNumbersBtn      = 5;
-const int endGameBtnPin       = 11;
-const int skipBtn             = 12;
-const int repeatBtn           = 13;
-const int extraBtn            = 14;
-
-// LEDs for button indicators
-const int letterOrderingLED   = 6;  // Same as LED strip pin (conflict resolved by design)
-const int numberOrderingLED   = 7;
-const int findLettersLED      = 8;
-const int findNumbersLED      = 9;
-const int endGameLEDPin       = 17; 
-const int skipLEDPin          = 18;
-const int repeatLEDPin        = 19;
-const int extraLEDPin         = 20;
-
-// Recalibrate Button Pin
-const int recalibrateBtnPin    = 21;
 
 // Difficulty Switch / Rocker for selecting between games
-const int annunciationPin = 22;
+const int annunciationPin = 9;
+
+// BUTTONS
+// Left side
+const int letterOrderingBtn   = 10; // left red
+const int findLettersBtn      = 11; // left blue
+const int numberOrderingBtn   = 12; // left yellow
+const int findNumbersBtn      = 13; // left green
+// Right side
+const int hintBtn             = 18; // right yellow
+const int endGameBtnPin       = 19; // right red
+const int repeatBtn           = 20; // right white
+const int skipBtn             = 21; // right green
+
+// Decoder Pins
+uint8_t decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
+
+// LEDs
+// Left side (+23 offset from their respective button pins)
+const int letterOrderingLED   = 33; 
+const int findLettersLED      = 34;
+const int numberOrderingLED   = 35;
+const int findNumbersLED      = 36;
+
+// WS2811 LED strips
+#define LED_PIN_LETTERS 38   // WS2811 data pin for letter LEDs
+#define LED_PIN_NUMBERS 39   // WS2811 data pin for number LEDs
+
+// Right side (+23 offset from their respective button pins)
+const int endGameLEDPin       = 41; 
+const int skipLEDPin          = 42;
+const int repeatLEDPin        = 43;
+const int extraLEDPin         = 44;
+
+// Recalibrate Button Pin
+const int recalibrateBtnPin    = 46;
 
 // Game constants
+#define WIDTH_PER_PIECE 3   // Number of WS2811 LEDs per game piece
+
 const int num_letters = 26;
 const int num_numbers = 21;
 const int num_letter_leds = num_letters * WIDTH_PER_PIECE;
 const int num_number_leds = num_numbers * WIDTH_PER_PIECE;
 
+
 // -------------------------
 // Game State Variables
 // -------------------------
+
 bool gameWon = false;
+
 
 // -------------------------
 // Data Structures
@@ -79,16 +94,19 @@ gamePiece numbers[num_numbers];
 CRGB letter_crgb_leds[num_letter_leds];
 CRGB number_crgb_leds[num_number_leds];
 
+
 // -------------------------
 // NFC (PN532) Setup
 // -------------------------
+
 // Using SPI with a custom set of decoder pins for this example.
-uint8_t decoderPins[] = {8, 7, 6, 5, 4, 3, 2}; // Will change later depending on design
 Adafruit_PN532 nfc(decoderPins, &SPI, 10);
+
 
 // -------------------------
 // EEPROM Handling
 // -------------------------
+
 // We combine both sets of game pieces into one struct for EEPROM storage.
 struct GamePieces {
     gamePiece letters[num_letters];
@@ -109,10 +127,11 @@ GamePieces PiecesFromEEPROM() {
     return gp;
 }
 
+
 // -------------------------
 // LED Utility Functions
 // -------------------------
-//
+
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
 void initializeLEDs() {
     FastLED.addLeds<WS2811, LED_PIN_LETTERS, RGB>(letter_crgb_leds, num_letter_leds);
@@ -145,7 +164,7 @@ void startLEDRainbowDance() {
 // -------------------------
 // Game Piece Helper Functions
 // -------------------------
-//
+
 // Given a base index, fill the positions array for a game piece.
 void generatePositions(int baseIndex, int positions[]) {
     for (int i = 0; i < WIDTH_PER_PIECE; i++) {
@@ -196,10 +215,11 @@ void printGamePieces() {
     }
 }
 
+
 // -------------------------
 // Button Checking Function
 // -------------------------
-//
+
 // Checks the four game buttons and returns true if one is pressed.
 // Sets button_number to the pressed button’s defined constant.
 bool check_button_pressed(int &button_number) {
@@ -219,10 +239,11 @@ bool check_button_pressed(int &button_number) {
     return false;
 }
 
+
 // -------------------------
 // NFC & EEPROM Recalibration
 // -------------------------
-//
+
 // This stub function attempts to read a card for each game piece slot (total 47).
 // It then updates the gamePiecesGlobal with the new UID values.
 void recalibrateGamePieces() {
@@ -242,6 +263,7 @@ void recalibrateGamePieces() {
     PiecesToEEPROM();
 }
 
+
 // -------------------------
 // Arduino Setup and Loop
 // -------------------------
@@ -258,7 +280,7 @@ void setup() {
     // Rest of functionality buttons
     pinMode(skipBtn, INPUT_PULLUP);
     pinMode(repeatBtn, INPUT_PULLUP);
-    pinMode(extraBtn, INPUT_PULLUP);
+    pinMode(hintBtn, INPUT_PULLUP);
     pinMode(endGameLEDPin, OUTPUT);
     pinMode(skipLEDPin, OUTPUT);
     pinMode(repeatLEDPin, OUTPUT);

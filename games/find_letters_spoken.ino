@@ -8,7 +8,7 @@
 extern const int endGameBtnPin;
 extern const int skipBtnPin;
 extern const int repeatBtnPin;
-extern const int extraBtnPin;
+extern const int hintBtnPin;
 
 // Game state
 extern bool gameWon;
