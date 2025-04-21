@@ -2,16 +2,16 @@
  * Find Numbers Game
  **************************************************************************/
 
-#include "audio_config.ino"
+#include <audio_config.ino>
 
 // Declare external buttons (defined in the main file)
-extern const int endGameBtnPin;
-extern const int skipBtnPin;
-extern const int repeatBtnPin;
-extern const int hintBtnPin;
+extern const int end_game_button;
+extern const int skip_button;
+extern const int repeat_button;
+extern const int hint_button;
 
-// Game state
-extern bool gameWon;
+extern int game_state;
+extern bool game_over;
 
 // --- Decoder Selection Function ---
 const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
@@ -68,60 +68,70 @@ bool checkRFIDTagMatch_Number(String currentNumber, String readTag) {
 }
 
 void begin_game_find_numbers() {
-  int correctSelections = 0;
-  const int maxCorrect = 5;
-  Serial.println("Starting Find Numbers Game...");
-  
-  while (correctSelections < maxCorrect) {
-    // Select a target number for this round
-    String randomNumber = getRandomNumber();
-    Serial.print("Find the number: ");
-    Serial.println(randomNumber);
-    
-    // Play audio prompt (gameState 1: Number Pointing)
-    playLetterAudio(randomNumber, 1);
-    
-    String tagBeingRead;
-    while (true) {
-      // Check buttons while waiting:
-      if (digitalRead(endGameBtnPin) == LOW) {
-        Serial.println("End Game button pressed. Exiting Find Numbers Game.");
-        return;
-      }
-      if (digitalRead(skipBtnPin) == LOW) {
-        Serial.println("Skip button pressed. Moving to next target.");
-        break;
-      }
-      if (digitalRead(repeatBtnPin) == LOW) {
-        Serial.println("Repeat button pressed. Replaying audio.");
-        playLetterAudio(randomNumber, 1);
-        delay(500);
-      }
-      
-      tagBeingRead = readWandTag();
-      if (tagBeingRead == "") {
-        delay(500);
-        continue;
-      }
-      
-      if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
-        Serial.println("Correct match!");
-        correctSelections++;
-        fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
-        FastLED.show();
-        break;  // Exit waiting loop if correct
-      } else {
-        Serial.println("Incorrect match, try again.");
-        fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
-        FastLED.show();
-      }
-      
-      delay(1500);
-      fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
-      FastLED.show();
-    }
-  }
+  game_over = false;
 
-  gameWon = true;
-  Serial.println("Game complete: 5 correct selections achieved!");
+  while (!game_over){
+    int correctSelections = 0;
+    const int maxCorrect = 5;
+    String random_numbers_list[maxCorrect];
+    Serial.println("Starting Find Numbers Game...");
+
+    for (int i=0; i<maxCorrect; i++){
+      random_numbers_list[i] = getRandomNumber
+
+    }
+    
+    while (correctSelections < maxCorrect) {
+      // Select a target number for this round
+      String randomNumber = getRandomNumber();
+      Serial.print("Find the number: ");
+      Serial.println(randomNumber);
+      
+      // Play audio prompt (gameState 1: Number Pointing)
+      playLetterAudio(randomNumber, 1);
+      
+      String tagBeingRead;
+      while (true) {
+        // Check buttons while waiting:
+        if (digitalRead(end_game_button) == LOW) {
+          Serial.println("End Game button pressed. Exiting Find Numbers Game.");
+          return;
+        }
+        if (digitalRead(skip_button) == LOW) {
+          Serial.println("Skip button pressed. Moving to next target.");
+          break;
+        }
+        if (digitalRead(repeat_button) == LOW) {
+          Serial.println("Repeat button pressed. Replaying audio.");
+          playLetterAudio(randomNumber, 1);
+          delay(500);
+        }
+        
+        tagBeingRead = readWandTag();
+        if (tagBeingRead == "") {
+          delay(500);
+          continue;
+        }
+        
+        if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
+          Serial.println("Correct match!");
+          correctSelections++;
+          fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
+          FastLED.show();
+          break;  // Exit waiting loop if correct
+        } else {
+          Serial.println("Incorrect match, try again.");
+          fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
+          FastLED.show();
+        }
+        
+        delay(1500);
+        fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
+        FastLED.show();
+      }
+    }
+
+    game_over = true;
+    Serial.println("Game complete: 5 correct selections achieved!");
+  }
 }

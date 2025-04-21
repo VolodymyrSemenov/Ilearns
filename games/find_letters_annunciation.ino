@@ -5,13 +5,13 @@
 #include "audio_config.ino"
 
 // Declare external buttons (defined in the main file)
-extern const int endGameBtnPin;
-extern const int skipBtnPin;
-extern const int repeatBtnPin;
-extern const int hintBtnPin;
+extern const int end_game_button;
+extern const int skip_button;
+extern const int repeat_button;
+extern const int hint_button;
 
 // Game state
-extern bool gameWon;
+extern bool game_over;
 
 // --- Decoder Selection Function ---
 const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
@@ -68,60 +68,64 @@ bool checkRFIDTagMatch(String currentLetter, String readTag) {
 }
 
 void begin_game_find_letters_annunciation() {
-  int correctSelections = 0;
-  const int maxCorrect = 5;
-  Serial.println("Starting Find Letters Annunciation Game...");
+  game_over = false;
   
-  while (correctSelections < maxCorrect) {
-    // Select a target letter for this round
-    String randomLetter = getRandomLetter();
-    Serial.print("Find the letter: ");
-    Serial.println(randomLetter);
+  while(!game_over){
+    int correctSelections = 0;
+    const int maxCorrect = 5;
+    Serial.println("Starting Find Letters Annunciation Game...");
     
-    // Play audio prompt (gameState 2: Letter Pointing)
-    playLetterAudio(randomLetter, 2);
-    
-    String tagBeingRead;
-    while (true) {
-      // Check buttons while waiting for a scan:
-      if (digitalRead(endGameBtnPin) == LOW) {
-        Serial.println("End Game button pressed. Exiting Find Letters Annunciation Game.");
-        return;
-      }
-      if (digitalRead(skipBtnPin) == LOW) {
-        Serial.println("Skip button pressed. Moving to next target.");
-        break; // Abandon this target and pick a new one
-      }
-      if (digitalRead(repeatBtnPin) == LOW) {
-        Serial.println("Repeat button pressed. Replaying audio.");
-        playLetterAudio(randomLetter, 2);
-        delay(500); // Debounce delay
-      }
+    while (correctSelections < maxCorrect) {
+      // Select a target letter for this round
+      String randomLetter = getRandomLetter();
+      Serial.print("Find the letter: ");
+      Serial.println(randomLetter);
       
-      tagBeingRead = readWandTag();
-      if (tagBeingRead == "") {
-        delay(500);
-        continue;
-      }
+      // Play audio prompt (gameState 2: Letter Pointing)
+      playLetterAudio(randomLetter, 2);
       
-      if (checkRFIDTagMatch(randomLetter, tagBeingRead)) {
-        Serial.println("Correct match!");
-        correctSelections++;
-        fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+      String tagBeingRead;
+      while (true) {
+        // Check buttons while waiting for a scan:
+        if (digitalRead(end_game_button) == LOW) {
+          Serial.println("End Game button pressed. Exiting Find Letters Annunciation Game.");
+          return;
+        }
+        if (digitalRead(skip_button) == LOW) {
+          Serial.println("Skip button pressed. Moving to next target.");
+          break; // Abandon this target and pick a new one
+        }
+        if (digitalRead(repeat_button) == LOW) {
+          Serial.println("Repeat button pressed. Replaying audio.");
+          playLetterAudio(randomLetter, 2);
+          delay(500); // Debounce delay
+        }
+        
+        tagBeingRead = readWandTag();
+        if (tagBeingRead == "") {
+          delay(500);
+          continue;
+        }
+        
+        if (checkRFIDTagMatch(randomLetter, tagBeingRead)) {
+          Serial.println("Correct match!");
+          correctSelections++;
+          fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+          FastLED.show();
+          break;  // Correct tile found, exit waiting loop
+        } else {
+          Serial.println("Incorrect match, try again.");
+          fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
+          FastLED.show();
+        }
+        
+        delay(1500);
+        fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
         FastLED.show();
-        break;  // Correct tile found, exit waiting loop
-      } else {
-        Serial.println("Incorrect match, try again.");
-        fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
-        FastLED.show();
       }
-      
-      delay(1500);
-      fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
-      FastLED.show();
     }
+    
+    Serial.println("Game complete: 5 correct selections achieved!");
+    game_over = true;
   }
-  
-  gameWon = true;
-  Serial.println("Game complete: 5 correct selections achieved!");
 }

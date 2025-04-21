@@ -1,14 +1,16 @@
+#include <Arduino.h>
+
 // Game state
-extern bool gameWon;
+extern bool game_over;
 
 void begin_game_letter_ordering() {
     Serial.println("Starting Letter Ordering Game...");
     
     // Turn off button LEDs of other games
-    digitalWrite(numberOrderingLED, LOW);
-    digitalWrite(findLettersLED, LOW);
-    digitalWrite(findNumbersLED, LOW);
-    digitalWrite(letterOrderingLED, HIGH); // Turn on LED for this game
+    digitalWrite(number_ordering_led, LOW);
+    digitalWrite(letter_wand_led, LOW);
+    digitalWrite(number_wand_led, LOW);
+    digitalWrite(letter_ordering_led, HIGH); // Turn on LED for this game
     
     char expectedLetters[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
                               'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 
@@ -17,7 +19,7 @@ void begin_game_letter_ordering() {
     bool gameComplete = false;
     while (!gameComplete) {
         // Check end game button
-        if (digitalRead(endGameBtnPin) == LOW) {
+        if (digitalRead(end_game_button) == LOW) {
             Serial.println("End Game button pressed. Exiting Letter Ordering Game.");
             return;
         }
@@ -51,5 +53,5 @@ void begin_game_letter_ordering() {
         }
     }
     // Game state
-    extern bool gameWon;
+    extern bool game_over;
 }

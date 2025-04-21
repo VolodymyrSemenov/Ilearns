@@ -1,20 +1,20 @@
 // Game state
-extern bool gameWon;
+extern bool game_over;
 
 void begin_game_number_ordering() {
     Serial.println("Number Ordering Game Started");
     
     // Turn off LEDs of other games
-    digitalWrite(letterOrderingLED, LOW);
-    digitalWrite(findLettersLED, LOW);
-    digitalWrite(findNumbersLED, LOW);
+    digitalWrite(letter_ordering_led, LOW);
+    digitalWrite(letter_wand_led, LOW);
+    digitalWrite(number_wand_led, LOW);
     
     // Turn on number ordering LED
-    digitalWrite(numberOrderingLED, HIGH);
+    digitalWrite(number_ordering_led, HIGH);
     
     bool game_complete = false;
     while (!game_complete) {
-        if (digitalRead(endGameBtnPin) == LOW) {
+        if (digitalRead(end_game_button) == LOW) {
             Serial.println("End Game button pressed. Exiting Number Ordering Game.");
             return;
         }
@@ -58,6 +58,6 @@ void begin_game_number_ordering() {
         
         delay(1000);
     }
-    gameWon = true;
+    game_over = true;
     Serial.println("Number Ordering Game Ended");
 }
