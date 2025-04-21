@@ -1,4 +1,4 @@
-FastLED
-EnableInterrupt
-Wire
 SPI
+EnableInterrupt
+FastLED
+Wire
