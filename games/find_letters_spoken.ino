@@ -2,7 +2,7 @@
  * Find Letters Spoken Game
  **************************************************************************/
 
-#include "audio_config.ino"
+// #include "audio_config.ino"
 
 // Declare external buttons (defined in the main file)
 extern const int end_game_button;

@@ -73,6 +73,9 @@ const int num_numbers = 21;
 const int num_letter_leds = num_letters * WIDTH_PER_PIECE;
 const int num_number_leds = num_numbers * WIDTH_PER_PIECE;
 
+// void PiecesToEEPROM();
+// void generatePositions();
+
 
 // -------------------------
 // Game State Variables
@@ -95,8 +98,8 @@ struct gamePiece {
 };
 
 // Global arrays for game pieces (letters and numbers)
-gamePiece letters[num_letters];
-gamePiece numbers[num_numbers];
+// gamePiece letters[num_letters];
+// gamePiece numbers[num_numbers];
 
 // LED arrays for FastLED (each strip holds all LEDs for that group)
 CRGB letter_crgb_leds[num_letter_leds];
@@ -204,7 +207,7 @@ void enable_interrupts(){
     enableInterrupt(repeat_button, repeat_button_handler, FALLING);
     enableInterrupt(skip_button, skip_button_handler, FALLING);
 
-    enableInterrupt(recalibrate_button, recalibrate_button_handler, FALLING)
+    enableInterrupt(recalibrate_button, recalibrate_button_handler, FALLING);
 }
 
 
@@ -223,32 +226,35 @@ GamePieces PiecesFromEEPROM() {
     EEPROM.get(0, gp);
     return gp;
 }
- 
-
-// Generate the gamePiece structures for letters (A-Z) and numbers (0-20)
-void generateGamePieceStructures() {
-    // Letters: assign characters, clear UIDs, set decoder value, and assign LED positions.
-    for (int i = 0; i < num_letters; i++) {
-        // Use uppercase letters – adjust if you prefer lowercase
-        snprintf(letters[i].character, sizeof(letters[i].character), "%c", 'a' + i);
-        memset(letters[i].uid, 0, sizeof(letters[i].uid));
-        letters[i].decoder_value = i;
-        generatePositions(i * WIDTH_PER_PIECE, letters[i].positions);
-    }
-    // Numbers: assign string versions of numbers 0 to 20
-    for (int i = 0; i < num_numbers; i++) {
-        snprintf(numbers[i].character, sizeof(numbers[i].character), "%d", i);
-        memset(numbers[i].uid, 0, sizeof(numbers[i].uid));
-        numbers[i].decoder_value = i;
-        generatePositions(i * WIDTH_PER_PIECE, numbers[i].positions);
-    }
-}
 
 
 // Given a base index, fill the positions array for a game piece.
 void generatePositions(int baseIndex, int positions[]) {
     for (int i = 0; i < WIDTH_PER_PIECE; i++) {
         positions[i] = baseIndex + i;
+    }
+}
+ 
+
+// Generate the gamePiece structures for letters (A-Z) and numbers (0-20)
+void generateGamePieceStructures() {
+    int lower_case_ascii_offset = 97; // ASCII value for 'a'
+    // Letters
+    for (int i = 0; i < num_letters; i++) {
+        // Use uppercase letters – adjust if you prefer lowercase
+        // snprintf(letters[i].character, sizeof(letters[i].character), "%c", 'a' + i);
+        gamePiecesGlobal.letters[i].character = lower_case_ascii_offset + i;
+        memset(gamePiecesGlobal.letters[i].uid, 0, sizeof(gamePiecesGlobal.letters[i].uid));
+        gamePiecesGlobal.letters[i].decoder_value = i;
+        generatePositions(i * WIDTH_PER_PIECE, gamePiecesGlobal.letters[i].positions);
+    }
+    // Numbers
+    for (int i = 0; i < num_numbers; i++) {
+        // snprintf(numbers[i].character, sizeof(numbers[i].character), "%d", i);
+        gamePiecesGlobal.numbers[i].character = i;
+        memset(gamePiecesGlobal.numbers[i].uid, 0, sizeof(gamePiecesGlobal.numbers[i].uid));
+        gamePiecesGlobal.numbers[i].decoder_value = i;
+        generatePositions(i * WIDTH_PER_PIECE, gamePiecesGlobal.numbers[i].positions);
     }
 }
 
@@ -263,20 +269,20 @@ void PiecesToEEPROM() {
 void printGamePieces() {
     Serial.println("Letter Game Pieces:");
     for (int i = 0; i < num_letters; i++) {
-        Serial.print("Character: "); Serial.println(letters[i].character);
+        Serial.print("Character: "); Serial.println(gamePiecesGlobal.letters[i].character);
         Serial.print("Positions: "); 
         for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-            Serial.print(letters[i].positions[j]); 
+            Serial.print(gamePiecesGlobal.letters[i].positions[j]); 
             Serial.print(" ");
         }
         Serial.println();
     }
     Serial.println("Number Game Pieces:");
     for (int i = 0; i < num_numbers; i++) {
-        Serial.print("Character: "); Serial.println(numbers[i].character);
+        Serial.print("Character: "); Serial.println(gamePiecesGlobal.numbers[i].character);
         Serial.print("Positions: "); 
         for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-            Serial.print(numbers[i].positions[j]); 
+            Serial.print(gamePiecesGlobal.numbers[i].positions[j]); 
             Serial.print(" ");
         }
         Serial.println();
@@ -307,25 +313,25 @@ void setup() {
 
     Serial.println("EEPROM Initializing");
     GamePieces stored = PiecesFromEEPROM();
-    if (stored.letters[0].character[0] == '\\0') {
+    if (stored.letters[0].character[0] != 0) {
         Serial.println("EEPROM empty, generating game pieces...");
         generateGamePieceStructures();
         // Copy into global structure for EEPROM storage
-        for (int i = 0; i < num_letters; i++) {
-            gamePiecesGlobal.letters[i] = letters[i];
-        }
-        for (int i = 0; i < num_numbers; i++) {
-            gamePiecesGlobal.numbers[i] = numbers[i];
-        }
+        // for (int i = 0; i < num_letters; i++) {
+        //     gamePiecesGlobal.letters[i] = letters[i];
+        // }
+        // for (int i = 0; i < num_numbers; i++) {
+        //     gamePiecesGlobal.numbers[i] = numbers[i];
+        // }
         PiecesToEEPROM();
     } else {
         Serial.println("Loaded game pieces from EEPROM.");
         // Copy stored values into our working arrays
         for (int i = 0; i < num_letters; i++) {
-            letters[i] = stored.letters[i];
+            gamePiecesGlobal.letters[i] = stored.letters[i];
         }
         for (int i = 0; i < num_numbers; i++) {
-            numbers[i] = stored.numbers[i];
+            gamePiecesGlobal.numbers[i] = stored.numbers[i];
         }
     }
     printGamePieces();
@@ -395,9 +401,9 @@ void loop() {
     }
 
     // Check if recalibrate is being held down
-    if(digitalRead(recalibrate_button_led) == LOW){
-        recalibrateGamePieces();
-    }
+//     if(digitalRead(recalibrate_button_led) == LOW){
+//         recalibrateGamePieces();
+//     }
 
-    delay(100);
-}
+//     delay(100);
+// }
