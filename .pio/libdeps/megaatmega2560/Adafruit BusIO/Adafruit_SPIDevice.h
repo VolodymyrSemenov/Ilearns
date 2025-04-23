@@ -90,12 +90,11 @@ typedef uint32_t BusIO_PortMask;
 #undef BUSIO_USE_FAST_PINIO
 #endif
 
-#define NUM_DECODER_PINS 7
 /**! The class which defines how we will talk to this device over SPI **/
 class Adafruit_SPIDevice {
 public:
 #ifdef BUSIO_HAS_HW_SPI
-  Adafruit_SPIDevice(uint8_t *decoderPins, uint32_t freq = 1000000,
+  Adafruit_SPIDevice(int8_t cspin, uint32_t freq = 1000000,
                      BusIOBitOrder dataOrder = SPI_BITORDER_MSBFIRST,
                      uint8_t dataMode = SPI_MODE0, SPIClass *theSPI = &SPI);
 #else
@@ -108,10 +107,8 @@ public:
                      BusIOBitOrder dataOrder = SPI_BITORDER_MSBFIRST,
                      uint8_t dataMode = SPI_MODE0);
   ~Adafruit_SPIDevice();
-  void setCurrentReader(int readerNum);
-  void setDecoderLow();
-  void setDecoderHigh();
-  bool begin();
+
+  bool begin(void);
   bool read(uint8_t *buffer, size_t len, uint8_t sendvalue = 0xFF);
   bool write(const uint8_t *buffer, size_t len,
              const uint8_t *prefix_buffer = nullptr, size_t prefix_len = 0);
@@ -138,11 +135,9 @@ private:
   uint32_t _freq;
   BusIOBitOrder _dataOrder;
   uint8_t _dataMode;
-  
+  void setChipSelect(int value);
+
   int8_t _cs, _sck, _mosi, _miso;
-  // pins = [EN, A0, A1, A2, A3, A4, A5]
-  uint8_t *_decoderPins = nullptr;
-  uint8_t _currentReader = -1;
 #ifdef BUSIO_USE_FAST_PINIO
   BusIO_PortReg *mosiPort, *clkPort, *misoPort, *csPort;
   BusIO_PortMask mosiPinMask, misoPinMask, clkPinMask, csPinMask;

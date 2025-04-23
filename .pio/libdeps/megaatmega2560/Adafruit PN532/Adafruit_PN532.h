@@ -142,7 +142,7 @@ class Adafruit_PN532 {
 public:
   Adafruit_PN532(uint8_t clk, uint8_t miso, uint8_t mosi,
                  uint8_t ss);                          // Software SPI
-  Adafruit_PN532(uint8_t *decoderPins, uint32_t spi_speed, SPIClass *theSPI = &SPI, uint8_t reset = 10); // Hardware SPI
+  Adafruit_PN532(uint8_t ss, SPIClass *theSPI = &SPI); // Hardware SPI
   Adafruit_PN532(uint8_t irq, uint8_t reset,
                  TwoWire *theWire = &Wire);              // Hardware I2C
   Adafruit_PN532(uint8_t reset, HardwareSerial *theSer); // Hardware UART
@@ -199,8 +199,6 @@ public:
   static void PrintHex(const byte *data, const uint32_t numBytes);
   static void PrintHexChar(const byte *pbtData, const uint32_t numBytes);
 
-  void setCurrentReader(int readerNum);
-
 private:
   int8_t _irq = -1, _reset = -1, _cs = -1;
   int8_t _uid[7];      // ISO14443A uid
@@ -215,7 +213,6 @@ private:
   bool waitready(uint16_t timeout);
   bool readack();
 
-  uint8_t _currentReader = -1;
   Adafruit_SPIDevice *spi_dev = NULL;
   Adafruit_I2CDevice *i2c_dev = NULL;
   HardwareSerial *ser_dev = NULL;

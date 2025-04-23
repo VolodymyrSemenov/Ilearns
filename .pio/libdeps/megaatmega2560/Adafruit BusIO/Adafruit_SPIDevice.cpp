@@ -11,11 +11,11 @@
  *    @param  dataMode The SPI mode to use, defaults to SPI_MODE0
  *    @param  theSPI The SPI bus to use, defaults to &theSPI
  */
-Adafruit_SPIDevice::Adafruit_SPIDevice(uint8_t *decoderPins, uint32_t freq,
+Adafruit_SPIDevice::Adafruit_SPIDevice(int8_t cspin, uint32_t freq,
                                        BusIOBitOrder dataOrder,
                                        uint8_t dataMode, SPIClass *theSPI) {
 #ifdef BUSIO_HAS_HW_SPI
-  _decoderPins = decoderPins;                                      
+  _cs = cspin;
   _sck = _mosi = _miso = -1;
   _spi = theSPI;
   _begun = false;
@@ -89,14 +89,14 @@ Adafruit_SPIDevice::~Adafruit_SPIDevice() {
  *    @return Always returns true because there's no way to test success of SPI
  * init
  */
-bool Adafruit_SPIDevice::begin() {
-  for(int i = 0; i < NUM_DECODER_PINS; i++) {
-    pinMode(_decoderPins[i], OUTPUT);
+bool Adafruit_SPIDevice::begin(void) {
+  if (_cs != -1) {
+    pinMode(_cs, OUTPUT);
+    digitalWrite(_cs, HIGH);
   }
-  setDecoderHigh();
+
   if (_spi) { // hardware SPI
 #ifdef BUSIO_HAS_HW_SPI
-    // Serial.println("made it here");
     _spi->begin();
 #endif
   } else {
@@ -303,24 +303,10 @@ void Adafruit_SPIDevice::endTransaction(void) {
  *    @brief  Assert/Deassert the CS pin if it is defined
  *    @param  value The state the CS is set to
  */
-void Adafruit_SPIDevice::setDecoderLow() {
-  digitalWrite(_decoderPins[0], LOW);
-}
-
-
-void Adafruit_SPIDevice::setDecoderHigh() {
-  digitalWrite(_decoderPins[0], HIGH);
-}
-
-void Adafruit_SPIDevice::setCurrentReader(int readerNum) {
-  Serial.print("Setting Reader "); Serial.println(readerNum);
-
-  for (int i=0; i<NUM_DECODER_PINS; i++){
-    digitalWrite(_decoderPins[i+1], bitRead(readerNum, i));
-    delay(5);
-    // Serial.print(bitRead(readerNum, NUM_DECODER_PINS-i-1));
+void Adafruit_SPIDevice::setChipSelect(int value) {
+  if (_cs != -1) {
+    digitalWrite(_cs, value);
   }
-  // Serial.println("");
 }
 
 /*!
@@ -331,7 +317,7 @@ void Adafruit_SPIDevice::setCurrentReader(int readerNum) {
  */
 void Adafruit_SPIDevice::beginTransactionWithAssertingCS() {
   beginTransaction();
-  setDecoderLow();
+  setChipSelect(LOW);
 }
 
 /*!
@@ -339,10 +325,9 @@ void Adafruit_SPIDevice::beginTransactionWithAssertingCS() {
  *            with deasserting the CS pin
  */
 void Adafruit_SPIDevice::endTransactionWithDeassertingCS() {
-  setDecoderHigh();
+  setChipSelect(HIGH);
   endTransaction();
 }
-
 
 /*!
  *    @brief  Write a buffer or two to the SPI device, with transaction
@@ -359,6 +344,7 @@ bool Adafruit_SPIDevice::write(const uint8_t *buffer, size_t len,
                                const uint8_t *prefix_buffer,
                                size_t prefix_len) {
   beginTransactionWithAssertingCS();
+
   // do the writing
 #if defined(ARDUINO_ARCH_ESP32)
   if (_spi) {

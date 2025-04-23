@@ -3,15 +3,25 @@
  **************************************************************************/
 
 // #include <audio_config.ino>
+#include <constants.h>
+#include <structures.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_PN532.h>
+#include <FastLED.h>
 
 // Declare external buttons (defined in the main file)
-extern const int end_game_button;
-extern const int skip_button;
-extern const int repeat_button;
-extern const int hint_button;
+// extern const int end_game_button;
+// extern const int skip_button;
+// extern const int repeat_button;
+// extern const int hint_button;
 
 extern int game_state;
 extern bool game_over;
+
+// extern CRGB letter_crgb_leds[];
+// extern CRGB number_crgb_leds[];
+// extern Adafruit_PN532 nfc;
 
 // --- Decoder Selection Function ---
 const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
@@ -52,12 +62,12 @@ String readWandTag() {
 // --- Game Functions ---
 String getRandomNumber() {
   int index = random(0, num_numbers);
-  return String(numbers[index].character);
+  return String(game_pieces.numbers[index].character);
 }
 
 bool checkRFIDTagMatch_Number(String currentNumber, String readTag) {
   for (int i = 0; i < num_numbers; i++) {
-    if (String(numbers[i].character) == currentNumber) {
+    if (String(game_pieces.numbers[i].character) == currentNumber) {
       String expectedTag = "tag" + String(i + 1);
       Serial.print("Expected tag: ");
       Serial.println(expectedTag);
@@ -77,7 +87,7 @@ void begin_game_find_numbers() {
     Serial.println("Starting Find Numbers Game...");
 
     for (int i=0; i<maxCorrect; i++){
-      random_numbers_list[i] = getRandomNumber
+      random_numbers_list[i] = getRandomNumber();
 
     }
     
@@ -88,7 +98,7 @@ void begin_game_find_numbers() {
       Serial.println(randomNumber);
       
       // Play audio prompt (gameState 1: Number Pointing)
-      playLetterAudio(randomNumber, 1);
+      // playLetterAudio(randomNumber, 1);
       
       String tagBeingRead;
       while (true) {
@@ -103,7 +113,7 @@ void begin_game_find_numbers() {
         }
         if (digitalRead(repeat_button) == LOW) {
           Serial.println("Repeat button pressed. Replaying audio.");
-          playLetterAudio(randomNumber, 1);
+          // playLetterAudio(randomNumber, 1);
           delay(500);
         }
         

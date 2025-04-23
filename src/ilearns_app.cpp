@@ -1,7 +1,8 @@
 /**************************************************************************
  * Integrated Game Code
 **************************************************************************/
-
+#include <constants.h>
+#include <structures.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
@@ -15,135 +16,23 @@
 // #include <../games/find_letters_spoken.ino>
 // #include <../games/find_letters_annunciation.ino>
 // #include <../games/find_numbers.ino>
-#include <button_handler.cpp>
+#include <button_handler.h>
+
+
+void PiecesToEEPROM();
 
 
 // -------------------------
-// Pin Definitions & Constants
-// -------------------------
-
-// Difficulty Switch / Rocker for selecting between games
-const int annunciation_pin = 9;
-
-// BUTTONS
-// Left side
-const int letter_ordering_button   = 10; // left red
-const int letter_wand_button      = 11; // left blue
-const int number_ordering_button   = 12; // left yellow
-const int number_wand_button      = 13; // left green
-// Right side
-const int hint_button             = 18; // right yellow
-const int end_game_button          = 19; // right red
-const int repeat_button           = 20; // right white
-const int skip_button             = 21; // right green
-
-// Decoder Pins
-uint8_t decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
-
-// LEDs
-// Left side (+23 offset from their respective button pins)
-const int letter_ordering_led   = 33; 
-const int letter_wand_led      = 34;
-const int number_ordering_led   = 35;
-const int number_wand_led      = 36;
-
-// WS2811 LED strips
-#define LED_PIN_LETTERS 38   // WS2811 data pin for letter LEDs
-#define LED_PIN_NUMBERS 39   // WS2811 data pin for number LEDs
-
-// Right side (+23 offset from their respective button pins)
-const int end_game_led       = 41; 
-const int skip_led          = 42;
-const int repeat_led        = 43;
-const int extra_led         = 44;
-
-// Recalibrate Button Pin
-const int recalibrate_button    = 46;
-
-
-// -------------------------
-// Game Constant Values
-// -------------------------
-#define WIDTH_PER_PIECE 3   // Number of WS2811 LEDs per game piece
-#define BRIGHTNESS 128 // Brightness of the LEDs (0-255)
-#define ARCADE_LED_OFFSET 23 // Offset for arcade buttons
-
-const int num_letters = 26;
-const int num_numbers = 21;
-const int num_letter_leds = num_letters * WIDTH_PER_PIECE;
-const int num_number_leds = num_numbers * WIDTH_PER_PIECE;
-
-// void PiecesToEEPROM();
-// void generatePositions();
-
-
-// -------------------------
-// Game State Variables
+// Game State Variables from constants and structures headers
 // -------------------------
 int game_state = 0; // Game state variable
 bool game_over = false;
 
-
-// -------------------------
-// Data Structures
-// -------------------------
-
-// Each game piece stores a character, NFC UID, a decoder value, and LED positions.
-struct gamePiece {
-    // char character[3];    // e.g., "A", "B", ... or "20", "1", etc.
-    byte character;
-    uint8_t uid[7];       // NFC tag unique ID (if assigned)
-    int decoder_value;    // Value read from an RFID decoder
-    int positions[WIDTH_PER_PIECE]; // LED indices for this piece on the strip
-};
-
-// Global arrays for game pieces (letters and numbers)
-// gamePiece letters[num_letters];
-// gamePiece numbers[num_numbers];
-
-// LED arrays for FastLED (each strip holds all LEDs for that group)
+GamePieces game_pieces;
 CRGB letter_crgb_leds[num_letter_leds];
 CRGB number_crgb_leds[num_number_leds];
+Adafruit_PN532 nfc(53, &SPI);
 
-
-// -------------------------
-// NFC (PN532) Setup
-// -------------------------
-
-// Using SPI with a custom set of decoder pins for this example.
-Adafruit_PN532 nfc(decoderPins, &SPI, 10);
-
-
-// -------------------------
-// EEPROM Handling
-// -------------------------
-
-// We combine both sets of game pieces into one struct for EEPROM storage.
-struct GamePieces {
-    gamePiece letters[num_letters];
-    gamePiece numbers[num_numbers];
-};
-
-GamePieces gamePiecesGlobal;  // global copy for EEPROM read/write
-
-// This stub function attempts to read a card for each game piece slot (total 47).
-// It then updates the gamePiecesGlobal with the new UID values.
-void recalibrate_game_pieces() {
-    uint8_t uid[7];
-    uint8_t uidLength;
-    // There are 47 pieces total: 26 letters + 21 numbers.
-    for (int i = 0; i < 47; i++) {
-        bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);
-        if (success) {
-            if (i < num_letters) {
-                memcpy(gamePiecesGlobal.letters[i].uid, uid, uidLength);
-            } else {
-                memcpy(gamePiecesGlobal.numbers[i - num_letters].uid, uid, uidLength);
-            }
-        }
-    }
-    PiecesToEEPROM();
-}
 
 // Subroutine to start a rainbow LED dance when game_over is true.
 // New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
@@ -163,6 +52,46 @@ void startLEDRainbowDance() {
     // After 5 seconds, clear the LEDs
     FastLED.clear();
     FastLED.show();
+}
+
+
+// Print a single game piece
+void print_single_game_piece(GamePiece game_piece){
+    Serial.print("\nCharacter: "); 
+    Serial.println(game_piece.character);
+
+    Serial.print("UID: "); 
+    for (uint8_t j = 0; j < MAX_UID_LENGTH; j++) {
+        Serial.print(game_piece.uid[j], HEX);
+        Serial.print(" ");
+    }
+    Serial.println("");
+
+    Serial.print("Positions: "); 
+    for (int j = 0; j < WIDTH_PER_PIECE; j++) {
+        Serial.print(game_piece.positions[j]); 
+        Serial.print(" ");
+    }
+    Serial.println();
+
+    Serial.print("Decoder Value: "); 
+    Serial.println(game_piece.decoder_value);
+    Serial.println();
+}
+
+
+// Print game pieces to Serial for debugging
+void print_game_pieces() {
+
+    Serial.println("\nLetter Game Pieces:");
+    for (int i = 0; i < num_letters; i++) {
+        print_single_game_piece(game_pieces.letters[i]);
+    }
+
+    Serial.println("\nNumber Game Pieces:");
+    for (int i = 0; i < num_numbers; i++) {
+        print_single_game_piece(game_pieces.numbers[i]);
+    }
 }
 
 
@@ -213,18 +142,43 @@ void enable_interrupts(){
 
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
 void initialize_led_strips() {
-    FastLED.addLeds<WS2811, LED_PIN_LETTERS, RGB>(letter_crgb_leds, num_letter_leds);
-    FastLED.addLeds<WS2811, LED_PIN_NUMBERS, RGB>(number_crgb_leds, num_number_leds);
-    FastLED.show();
+    FastLED.addLeds<WS2811, letter_led_strip, RGB>(letter_crgb_leds, num_letter_leds);
+    FastLED.addLeds<WS2811, number_led_strip, RGB>(number_crgb_leds, num_number_leds);
+    for (int i = 0; i < num_letter_leds; i++) {
+        letter_crgb_leds[i] = CRGB::Black;
+    }
     FastLED.setBrightness(128);
+
+    FastLED.show();
+    delay(500);
 }
 
 
-// Read the GamePieces struct from EEPROM
-GamePieces PiecesFromEEPROM() {
-    GamePieces gp;
-    EEPROM.get(0, gp);
-    return gp;
+// Set the color of a game piece and display it on the LED strip
+void set_and_display_gamepiece_color(GamePiece game_piece, CRGB color) {
+
+    Serial.println("set gp color");
+    int indice = game_piece.decoder_value;
+    Serial.println(indice);
+    Serial.println(num_letters);
+
+    if (indice < num_letters){
+        Serial.println("set gp color if");
+        Serial.println(game_piece.positions[0]);
+        for (int i=game_piece.positions[0]; i<game_piece.positions[2]; i++){
+            Serial.print("i="); Serial.println(i);
+            letter_crgb_leds[i] = color;
+        }
+    }
+
+    else {
+        Serial.println("set gp color else");
+        for (int i=game_piece.positions[0]; i<game_piece.positions[2]; i++){
+            number_crgb_leds[i] = color;
+        }
+    }
+
+    FastLED.show();  // Update the LEDs
 }
 
 
@@ -234,58 +188,111 @@ void generatePositions(int baseIndex, int positions[]) {
         positions[i] = baseIndex + i;
     }
 }
+
+
+// Populate a single GamePiece struct
+GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value, uint8_t uid[], int i) {
+    game_piece.character = character_value;
+    memcpy(game_piece.uid, uid, MAX_UID_LENGTH);
+    game_piece.decoder_value = i;
+    generatePositions(i * WIDTH_PER_PIECE, game_piece.positions);
+
+    return game_piece;
+}
  
 
 // Generate the gamePiece structures for letters (A-Z) and numbers (0-20)
-void generateGamePieceStructures() {
-    int lower_case_ascii_offset = 97; // ASCII value for 'a'
+void generate_game_pieces_structure() {
+    int lower_case_ascii_offset = 97; // ASCII value for 'a'. Could also directly use 'a'
+    uint8_t uidLength;
+
     // Letters
     for (int i = 0; i < num_letters; i++) {
-        // Use uppercase letters – adjust if you prefer lowercase
-        // snprintf(letters[i].character, sizeof(letters[i].character), "%c", 'a' + i);
-        gamePiecesGlobal.letters[i].character = lower_case_ascii_offset + i;
-        memset(gamePiecesGlobal.letters[i].uid, 0, sizeof(gamePiecesGlobal.letters[i].uid));
-        gamePiecesGlobal.letters[i].decoder_value = i;
-        generatePositions(i * WIDTH_PER_PIECE, gamePiecesGlobal.letters[i].positions);
+        uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
+        Serial.print("Waiting for letter "); Serial.println(char(lower_case_ascii_offset + i));
+
+        // print_single_game_piece(game_pieces.letters[i]);
+
+        // for (int i = 0; i < num_letter_leds; i++) {
+        //     letter_crgb_leds[i] = CRGB::Yellow;
+        // }
+        // FastLED.show();
+        int next_starting_position = 0;
+        if (i>0){
+            next_starting_position = game_pieces.letters[i-1].positions[0] + WIDTH_PER_PIECE;
+        }
+
+        for (int i=next_starting_position; i<next_starting_position+2; i++){
+            Serial.print("i="); Serial.println(i);
+            letter_crgb_leds[i] = CRGB::Yellow;
+        }
+
+        set_and_display_gamepiece_color(game_pieces.letters[i], CRGB::Yellow);
+        Serial.println("color should bw yellow");
+
+        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
+            delay(50);  // avoid overwhelming the RFID reader
+        }
+
+        game_pieces.letters[i] = generate_single_game_piece(game_pieces.letters[i], lower_case_ascii_offset + i, uid, i);
+        print_single_game_piece(game_pieces.letters[i]);
+        set_and_display_gamepiece_color(game_pieces.letters[i], CRGB::Green);
+        // for (int i = 0; i < num_letter_leds; i++) {
+        //     letter_crgb_leds[i] = CRGB::Green;
+        // }
+        // FastLED.show();
+
+        Serial.println("color should bw green");
+        delay(1000);
     }
+
     // Numbers
     for (int i = 0; i < num_numbers; i++) {
-        // snprintf(numbers[i].character, sizeof(numbers[i].character), "%d", i);
-        gamePiecesGlobal.numbers[i].character = i;
-        memset(gamePiecesGlobal.numbers[i].uid, 0, sizeof(gamePiecesGlobal.numbers[i].uid));
-        gamePiecesGlobal.numbers[i].decoder_value = i;
-        generatePositions(i * WIDTH_PER_PIECE, gamePiecesGlobal.numbers[i].positions);
+        uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
+
+        set_and_display_gamepiece_color(game_pieces.numbers[i], CRGB::Yellow);
+
+        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
+            delay(50);  // avoid overwhelming the RFID reader
+        }
+
+        generate_single_game_piece(game_pieces.numbers[i], i, uid, i);
+        set_and_display_gamepiece_color(game_pieces.numbers[i], CRGB::Green);
+        delay(1000);
     }
 }
 
 
-// Write entire GamePieces struct to EEPROM (starting at address 0)
+// Write entire GamePieces struct to EEPROM (at game_pieces_address)
 void PiecesToEEPROM() {
-    EEPROM.put(0, gamePiecesGlobal);
+    EEPROM.put(eeprom_valid_bit_address, 1);
+    EEPROM.put(eeprom_game_pieces_address, game_pieces);
 }
 
 
-// Print game pieces to Serial for debugging
-void printGamePieces() {
-    Serial.println("Letter Game Pieces:");
-    for (int i = 0; i < num_letters; i++) {
-        Serial.print("Character: "); Serial.println(gamePiecesGlobal.letters[i].character);
-        Serial.print("Positions: "); 
-        for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-            Serial.print(gamePiecesGlobal.letters[i].positions[j]); 
-            Serial.print(" ");
-        }
-        Serial.println();
+// Read the GamePieces struct from EEPROM
+GamePieces PiecesFromEEPROM() {
+    GamePieces gp;
+    EEPROM.get(eeprom_game_pieces_address, gp);
+    return gp;
+}
+
+
+// Recalibrate game pieces and write to EEPROM
+void recalibrate_game_pieces() {
+    generate_game_pieces_structure();
+    PiecesToEEPROM();
+}
+
+
+// Populate GamePieces struct 
+void populate_game_pieces_structure(){
+    int valid_bit = EEPROM.read(eeprom_valid_bit_address);
+    if (valid_bit == 1){
+        game_pieces = PiecesFromEEPROM();
     }
-    Serial.println("Number Game Pieces:");
-    for (int i = 0; i < num_numbers; i++) {
-        Serial.print("Character: "); Serial.println(gamePiecesGlobal.numbers[i].character);
-        Serial.print("Positions: "); 
-        for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-            Serial.print(gamePiecesGlobal.numbers[i].positions[j]); 
-            Serial.print(" ");
-        }
-        Serial.println();
+    else {
+        recalibrate_game_pieces();
     }
 }
 
@@ -306,58 +313,21 @@ void setup() {
     Serial.println("Initializing LED strips");
     initialize_led_strips();
     
-    // Initialize NFC reader
     nfc.begin();
     nfc.setPassiveActivationRetries(0xFF);
+    uint32_t versiondata = nfc.getFirmwareVersion();
+    if (!versiondata) {
+        Serial.println("Didn't find PN532 board");
+        while (1); // Halt
+    }
     Serial.println("NFC reader initialized.");
 
+    
     Serial.println("EEPROM Initializing");
-    GamePieces stored = PiecesFromEEPROM();
-    if (stored.letters[0].character[0] != 0) {
-        Serial.println("EEPROM empty, generating game pieces...");
-        generateGamePieceStructures();
-        // Copy into global structure for EEPROM storage
-        // for (int i = 0; i < num_letters; i++) {
-        //     gamePiecesGlobal.letters[i] = letters[i];
-        // }
-        // for (int i = 0; i < num_numbers; i++) {
-        //     gamePiecesGlobal.numbers[i] = numbers[i];
-        // }
-        PiecesToEEPROM();
-    } else {
-        Serial.println("Loaded game pieces from EEPROM.");
-        // Copy stored values into our working arrays
-        for (int i = 0; i < num_letters; i++) {
-            gamePiecesGlobal.letters[i] = stored.letters[i];
-        }
-        for (int i = 0; i < num_numbers; i++) {
-            gamePiecesGlobal.numbers[i] = stored.numbers[i];
-        }
-    }
-    printGamePieces();
+    recalibrate_game_pieces();
+    print_game_pieces();
 
     Serial.println("Press a button to start a game.");
-}
-
-// This stub function attempts to read a card for each game piece slot (total 47).
-// It then updates the gamePiecesGlobal with the new UID values.
-void recalibrateGamePieces() {
-    uint8_t uid[7];
-    uint8_t uidLength;
-    // There are 47 pieces total: 26 letters + 21 numbers.
-    for (int i = 0; i < 47; i++) {
-        bool success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 50);
-        if (success) {
-            if (i < num_letters) {
-                memcpy(gamePiecesGlobal.letters[i].uid, uid, uidLength);
-            } else {
-                memcpy(gamePiecesGlobal.numbers[i - num_letters].uid, uid, uidLength);
-            }
-            Serial.print("scanned i="); Serial.print(i);
-            delay(250);
-        }
-    }
-    PiecesToEEPROM();
 }
 
 
@@ -402,7 +372,7 @@ void loop() {
 
     // Check if recalibrate is being held down
 //     if(digitalRead(recalibrate_button_led) == LOW){
-//         recalibrateGamePieces();
+//         recalibrate_game_pieces();
 //     }
 
 //     delay(100);

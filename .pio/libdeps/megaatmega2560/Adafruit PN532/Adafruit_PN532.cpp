@@ -73,7 +73,7 @@ byte pn532response_firmwarevers[] = {
 
 // If using Native Port on Arduino Zero or Due define as SerialUSB
 #define PN532DEBUGPRINT Serial ///< Fixed name for debug Serial instance
-//#define PN532DEBUGPRINT SerialUSB ///< Fixed name for debug Serial instance
+// #define PN532DEBUGPRINT SerialUSB ///< Fixed name for debug Serial instance
 
 #define PN532_PACKBUFFSIZ 64                ///< Packet buffer size in bytes
 byte pn532_packetbuffer[PN532_PACKBUFFSIZ]; ///< Packet buffer used in various
@@ -120,12 +120,11 @@ Adafruit_PN532::Adafruit_PN532(uint8_t irq, uint8_t reset, TwoWire *theWire)
     @param  theSPI    pointer to the SPI bus to use
 */
 /**************************************************************************/
-Adafruit_PN532::Adafruit_PN532(uint8_t *decoderPins, uint32_t spi_speed, SPIClass *theSPI, uint8_t reset) {
-  spi_dev = new Adafruit_SPIDevice(decoderPins, spi_speed, SPI_BITORDER_LSBFIRST,
+Adafruit_PN532::Adafruit_PN532(uint8_t ss, SPIClass *theSPI) {
+  _cs = ss;
+  spi_dev = new Adafruit_SPIDevice(ss, 1000000, SPI_BITORDER_LSBFIRST,
                                    SPI_MODE0, theSPI);
-  _reset = reset;
 }
-
 
 /**************************************************************************/
 /*!
@@ -199,7 +198,7 @@ void Adafruit_PN532::wakeup(void) {
   // interface specific wakeups - each one is unique!
   if (spi_dev) {
     // hold CS low for 2ms
-    spi_dev -> setDecoderLow();
+    digitalWrite(_cs, LOW);
     delay(2);
   } else if (ser_dev) {
     uint8_t w[3] = {0x55, 0x00, 0x00};
@@ -236,11 +235,6 @@ void Adafruit_PN532::PrintHex(const byte *data, const uint32_t numBytes) {
   PN532DEBUGPRINT.println();
 }
 
-void Adafruit_PN532::setCurrentReader(int readerNum) {
-  _currentReader = readerNum;
-  spi_dev -> setCurrentReader(readerNum);
-  wakeup();
-}
 /**************************************************************************/
 /*!
     @brief  Prints a hexadecimal value in plain characters, along with
@@ -332,7 +326,7 @@ bool Adafruit_PN532::sendCommandCheckAck(uint8_t *cmd, uint8_t cmdlen,
   // I2C works without using IRQ pin by polling for RDY byte
   // seems to work best with some delays between transactions
   uint8_t SLOWDOWN = 0;
-  if (i2c_dev)
+  if (i2c_dev || spi_dev) // SPI and I2C need 1ms slow for page reads
     SLOWDOWN = 1;
 
   // write the command
@@ -573,7 +567,6 @@ bool Adafruit_PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid,
     return 0x0; // no cards read
   }
 
-  // Serial.println("made it here");
   return readDetectedPassiveTargetID(uid, uidLength);
 }
 
