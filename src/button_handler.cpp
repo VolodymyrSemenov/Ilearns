@@ -1,37 +1,11 @@
 #include <button_handler.h>
 
-// #define letter_ordering_button 1
-// #define letter_wand_button 2
-// #define number_ordering_button 3
-// #define number_wand_button 4
-// #define hint_button 5
-// #define end_game_button 6
-// #define repeat_button 7
-// #define skip_button 8
-
-// extern const int annunciation_pin;
-// extern const int letter_ordering_button;
-// extern const int letter_wand_button;
-// extern const int number_ordering_button;
-// extern const int number_wand_button;
-
-// extern const int hint_button;
-// extern const int end_game_button;
-// extern const int repeat_button;
-// extern const int skip_button;
-
-// extern const int recalibrate_button;
-
-extern int game_state;
-extern bool game_over;
-
 // game state:
 // 0 - waiting for a game to start
 // 1 - letter ordering game
-// 2 - letter wand game spoken
-// 3 - letter wand game annunciated
-// 4 - number ordering game
-// 5 - number wand game spoken
+// 2 - letter wand game
+// 3 - number ordering game
+// 4 - number wand game
 
 
 
@@ -48,11 +22,15 @@ void deilluminate_button_led(int button_number){
 }
 
 
-// Proper arcade button lighting 
+// Proper arcade button lighting during game_states
 void button_led_handler(int button_number){
+
+    // on falling edges (button presses)
     if (digitalRead(button_number) == 0){
         illuminate_button_led(button_number);
     }
+
+    // on rising edges (button release)
     else{
         if (button_number-9 != game_state){
             deilluminate_button_led(button_number);

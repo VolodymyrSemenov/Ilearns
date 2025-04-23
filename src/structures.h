@@ -1,7 +1,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-#include <Arduino.h>
+
 #include <constants.h>
 #include <FastLED.h>
 #include <Adafruit_PN532.h>

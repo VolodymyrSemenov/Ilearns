@@ -1,21 +1,9 @@
 /**************************************************************************
  * Integrated Game Code
 **************************************************************************/
-#include <constants.h>
 #include <structures.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_PN532.h>
-#include <FastLED.h>
 #include <EEPROM.h>
 #include <EnableInterrupt.h>
-
-// Include Game Logic
-// #include <../games/letter_ordering.ino>
-// #include <../games/number_ordering.ino>
-// #include <../games/find_letters_spoken.ino>
-// #include <../games/find_letters_annunciation.ino>
-// #include <../games/find_numbers.ino>
 #include <button_handler.h>
 
 
