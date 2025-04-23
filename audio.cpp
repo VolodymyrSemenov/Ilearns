@@ -20,16 +20,19 @@ int sample_size = 0;
 int samples_count = 0;
 
 int swapFile;
-char tempLetter = 'A';
 char tempNumber0 = '0';
 char tempNumber1 = '1';
 int tempNumber = 0;
+
+String tempLetter = "10";
+String currentAudio = "";
+
 String USBLetterPoint = "/usb/Point-Letter-Split-wav/pLett";
 String USBLetterSound = "/usb/Letter-Sound-Split-wav/sLett";
 String USBNumberPoint = "/usb/Point-Number-Split-wav/pNum";
 String wav = ".wav";
 
-int gameState = 2;
+int gameState = 1;
 boolean played = false;
 
 void setup() {
@@ -64,22 +67,11 @@ void loop() {
 
   if (buttonState == 1) {
     played = false;
-    Serial.println("Increment clicked");
-    tempLetter++;
-    tempNumber1++;
-    if(tempNumber0 == '2' && tempNumber1 == '1'){
-      tempNumber0 = '0';
-    }
-    if(tempNumber1 == '9' + 1){
-      tempNumber0 += 1;
-      tempNumber1 = '0';
-    }
-    if(tempLetter == 'Z' + 1){
-      tempLetter = 'A';
-    }
+    Serial.println("Button Clicked");
     delay(500);
     configFile(gameState, tempLetter);
   } 
+
 }
 
 void playAudioFile(){
@@ -104,14 +96,14 @@ void playAudioFile(){
     if(feof(file)){
       fclose(file);
       played = true;
-      Serial.println("played");
+      Serial.println("Finished Playing: " + currentAudio);
       configFile(gameState, tempLetter);
     }
   }
 }
 
 
-void configFile(int gameState, char tempLetter) {
+void configFile(int gameState, String tempLetter) {
   /* 16-bit PCM Mono 16kHz realigned noise reduction */
   // test 8bit "usb/pLettA_8bit_test.wav"
 
@@ -120,7 +112,7 @@ void configFile(int gameState, char tempLetter) {
 
   switch(gameState){
   case 1:  //Number Pointing
-    result = USBNumberPoint + tempNumber0 + tempNumber1 + wav;
+    result = USBNumberPoint + tempLetter + wav;
     file = fopen(result.c_str(), "rb");
     break;
 
@@ -138,7 +130,9 @@ void configFile(int gameState, char tempLetter) {
   default:
     
     break;
-}
+  }
+
+  currentAudio = result;
 
   if (file == nullptr) {
     Serial.print("Error opening audio file: ");
