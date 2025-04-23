@@ -36,6 +36,7 @@ String wav = ".wav";
 int gameState = 1;
 bool played = false;
 
+
 void setup() {
   Serial.begin(115200);
   while (!Serial);
@@ -58,6 +59,7 @@ void setup() {
   configFile(gameState, tempLetter);
 }
 
+
 //converts digital to analog
 void loop() {
   if(played == false){
@@ -74,6 +76,7 @@ void loop() {
   } 
 
 }
+
 
 void playAudioFile(){
   if (dac0.available() && !feof(file)) {
@@ -106,8 +109,6 @@ void playAudioFile(){
 
 void configFile(int gameState, String tempLetter) {
   /* 16-bit PCM Mono 16kHz realigned noise reduction */
-  // test 8bit "usb/pLettA_8bit_test.wav"
-
 
   String result = "";
 
@@ -160,31 +161,6 @@ void configFile(int gameState, String tempLetter) {
   wav_header_t header;
   fread(&header, sizeof(header), 1, file);
 
-  //Serial.println("WAV File Header read:");
-  //char msg[64] = { 0 };
-  //snprintf(msg, sizeof(msg), "File Type: %s", header.chunkID);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "File Size: %ld", header.chunkSize);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "WAV Marker: %s", header.format);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Format Name: %s", header.subchunk1ID);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Format Length: %ld", header.subchunk1Size);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Format Type: %hd", header.audioFormat);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Number of Channels: %hd", header.numChannels);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Sample Rate: %ld", header.sampleRate);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Sample Rate * Bits/Sample * Channels / 8: %ld", header.byteRate);
-  //Serial.println(msg); 
-  //snprintf(msg, sizeof(msg), "Bits per Sample * Channels / 8: %hd", header.blockAlign);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Bits per Sample: %hd", header.bitsPerSample);
-  //Serial.println(msg);
-
   /* Find the data section of the WAV file. */
   struct chunk_t {
     char ID[4];
@@ -192,13 +168,9 @@ void configFile(int gameState, String tempLetter) {
   };
 
   chunk_t chunk;
-  //snprintf(msg, sizeof(msg), "id\t" "size");
-  //Serial.println(msg);
   /* Find data chunk. */
   while (true) {
     fread(&chunk, sizeof(chunk), 1, file);
-    //snprintf(msg, sizeof(msg), "%c%c%c%c\t" "%li", chunk.ID[0], chunk.ID[1], chunk.ID[2], chunk.ID[3], chunk.size);
-    //Serial.println(msg);
     if (*(unsigned int *)&chunk.ID == 0x61746164)
       break;
     /* Skip chunk data bytes. */
@@ -208,10 +180,6 @@ void configFile(int gameState, String tempLetter) {
   /* Determine number of samples. */
   sample_size = header.bitsPerSample / 8;
   samples_count = chunk.size * 8 / header.bitsPerSample;
-  //snprintf(msg, sizeof(msg), "Sample size = %i", sample_size);
-  //Serial.println(msg);
-  //snprintf(msg, sizeof(msg), "Samples count = %i", samples_count);
-  //Serial.println(msg);
 
   /* Configure the advanced DAC. */
   if (!dac0.begin(AN_RESOLUTION_12, header.sampleRate, 256, 16)) {
