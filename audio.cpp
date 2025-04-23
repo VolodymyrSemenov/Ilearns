@@ -1,9 +1,15 @@
-/*
- * GIGA R1 - Audio Playback
- * Simple wav format audio playback via 12-Bit DAC output by reading from a USB drive.
- * In order for this sketch to work you need to rename 'USB_DRIVE' to the name of your USB stick drive.
- * Furthermore you need to store the provided audio file AUDIO_SAMPLE.wav on it.
-*/
+/**************************************************************************
+ * Audio Configuration
+ * 
+ * This file configures audio playback from a USB drive using the AdvancedDAC.
+ * It opens and streams a WAV file corresponding to a given letter or number,
+ * based on the game state:
+ * 
+ *   GameState 1: Number Pointing – plays a file from USBNumberPoint.
+ *   GameState 2: Letter Pointing – plays a file from USBLetterPoint.
+ *   GameState 3: Letter Sounding  – plays a file from USBLetterSound.
+ * 
+ **************************************************************************/
 
 #include <Arduino_AdvancedAnalog.h>
 #include <DigitalOut.h>
@@ -19,11 +25,6 @@ FILE *file = nullptr;
 int sample_size = 0;
 int samples_count = 0;
 
-int swapFile;
-char tempNumber0 = '0';
-char tempNumber1 = '1';
-int tempNumber = 0;
-
 String tempLetter = "10";
 String currentAudio = "";
 
@@ -33,7 +34,7 @@ String USBNumberPoint = "/usb/Point-Number-Split-wav/pNum";
 String wav = ".wav";
 
 int gameState = 1;
-boolean played = false;
+bool played = false;
 
 void setup() {
   Serial.begin(115200);
