@@ -67,15 +67,14 @@ void loop() {
     playAudioFile();
   }
 
-  int buttonState = digitalRead(PC_13);
-
-  if (buttonState == 1) {
-    played = false;
-    Serial.println("Button Clicked");
+  if (Serial1.available()) {
+    String toSound = Serial1.readString();
+    int gameState = (int) toSound.charAt(0);
+    String tempLetter = toSound.substring(1);
+    Serial.println("Serial receiverd");
     delay(500);
     configFile(gameState, tempLetter);
   } 
-
 }
 
 
