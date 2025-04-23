@@ -28,6 +28,7 @@ int samples_count = 0;
 String tempLetter = "10";
 String currentAudio = "";
 
+ // Define the USB paths for each type of audio file.
 String USBLetterPoint = "/usb/Point-Letter-Split-wav/pLett";
 String USBLetterSound = "/usb/Letter-Sound-Split-wav/sLett";
 String USBNumberPoint = "/usb/Point-Number-Split-wav/pNum";
@@ -107,11 +108,12 @@ void playAudioFile(){
 }
 
 
+ // Opens and configures the audio file for the given input.
+ // For gameState 1 (Number Pointing), tempInput should be a digit character (or you may extend to a String if needed).
+ // For gameState 2 (Letter Pointing) or 3 (Letter Sounding), tempInput is the letter.
 void configFile(int gameState, String tempLetter) {
   /* 16-bit PCM Mono 16kHz realigned noise reduction */
-
   String result = "";
-
   switch(gameState){
   case 1:  //Number Pointing
     result = USBNumberPoint + tempLetter + wav;
@@ -144,6 +146,7 @@ void configFile(int gameState, String tempLetter) {
 
   Serial.println("Opening audio file: " + result);   //Show current audio file
 
+  // Read WAV header
   struct wav_header_t {
     char chunkID[4];              //"RIFF" = 0x46464952
     unsigned long chunkSize;      //28 [+ sizeof(wExtraFormatBytes) + wExtraFormatBytes] + sum(sizeof(chunk.id) + sizeof(chunk.size) + chunk.size)
