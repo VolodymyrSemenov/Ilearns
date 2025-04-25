@@ -17,6 +17,8 @@
 #include <FATFileSystem.h>
 
 AdvancedDAC dac0(A12);
+AdvancedDAC dac1(A13);
+
 
 USBHostMSD msd;
 mbed::FATFileSystem usb("usb");
@@ -40,6 +42,7 @@ bool played = false;
 
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(115200);
   while (!Serial);
 
   /* Enable power for HOST USB connector. */
@@ -63,15 +66,22 @@ void setup() {
 
 //converts digital to analog
 void loop() {
+  
   if(played == false){
     playAudioFile();
+    return;
   }
 
-  if (Serial1.available()) {
-    String toSound = Serial1.readString();
-    int gameState = (int) toSound.charAt(0);
-    String tempLetter = toSound.substring(1);
+  if (Serial1.available() && played == true) {
     Serial.println("Serial receiverd");
+    played = false;
+    Serial.println("test");
+    String toSound = Serial1.readStringUntil(0);
+    Serial.println(toSound);
+    gameState = (int) toSound.charAt(0);
+    String tempLetter = toSound.substring(1);
+    Serial.println("test2");
+
     delay(500);
     configFile(gameState, tempLetter);
   } 
@@ -79,23 +89,25 @@ void loop() {
 
 
 void playAudioFile(){
-  if (dac0.available() && !feof(file)) {
+  if (dac1.available() && !feof(file)) {
     /* Read data from file. */
     uint16_t sample_data[256] = { 0 };
     fread(sample_data, sample_size, 256, file);
 
     /* Get a free buffer for writing. */
-    SampleBuffer buf = dac0.dequeue();
-
+    SampleBuffer buf0 = dac0.dequeue();
+    SampleBuffer buf1 = dac1.dequeue();
     /* Write data to buffer. */
-    for (size_t i = 0; i < buf.size(); i++) {
+    for (size_t i = 0; i < buf0.size(); i++) {
       /* Scale down to 12 bit. */
       uint16_t const dac_val = ((static_cast<unsigned int>(sample_data[i]) + 32768) >> 4) & 0x0fff;
-      buf[i] = dac_val;
+      buf0[i] = dac_val;
+      buf1[i] = dac_val;
     }
 
     /* Write the buffer to DAC. */
-    dac0.write(buf);
+    dac1.write(buf1);
+    dac0.write(buf0);
 
     if(feof(file)){
       fclose(file);
@@ -185,6 +197,10 @@ void configFile(int gameState, String tempLetter) {
 
   /* Configure the advanced DAC. */
   if (!dac0.begin(AN_RESOLUTION_12, header.sampleRate, 256, 16)) {
+    //Serial.println("Failed to start DAC1 !");
+    return;
+  }
+  if (!dac1.begin(AN_RESOLUTION_12, header.sampleRate, 256, 16)) {
     //Serial.println("Failed to start DAC1 !");
     return;
   }
