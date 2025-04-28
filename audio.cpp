@@ -27,7 +27,7 @@ FILE *file = nullptr;
 int sample_size = 0;
 int samples_count = 0;
 
-String tempLetter = "10";
+String tempLetter = "";
 String currentAudio = "";
 
  // Define the USB paths for each type of audio file.
@@ -36,8 +36,8 @@ String USBLetterSound = "/usb/Letter-Sound-Split-wav/sLett";
 String USBNumberPoint = "/usb/Point-Number-Split-wav/pNum";
 String wav = ".wav";
 
-int gameState = 1;
-bool played = false;
+int gameState;
+bool played = true;
 
 
 void setup() {
@@ -60,31 +60,26 @@ void setup() {
     Serial.println(rc_mount);
     return;
   }
-  configFile(gameState, tempLetter);
+
 }
 
 
 //converts digital to analog
 void loop() {
+    if(played == false){
+      playAudioFile();
+      return;
+    }
+
+    if (Serial1.available() && played == true) {
+      Serial.println("Serial Recieved");
+      played = false;
+      String toOutput = Serial1.readString();
+
+      delay(500);
+      configFile(toOutput);
+    }
   
-  if(played == false){
-    playAudioFile();
-    return;
-  }
-
-  if (Serial1.available() && played == true) {
-    Serial.println("Serial receiverd");
-    played = false;
-    Serial.println("test");
-    String toSound = Serial1.readStringUntil(0);
-    Serial.println(toSound);
-    gameState = (int) toSound.charAt(0);
-    String tempLetter = toSound.substring(1);
-    Serial.println("test2");
-
-    delay(500);
-    configFile(gameState, tempLetter);
-  } 
 }
 
 
@@ -113,7 +108,6 @@ void playAudioFile(){
       fclose(file);
       played = true;
       Serial.println("Finished Playing: " + currentAudio);
-      configFile(gameState, tempLetter);
     }
   }
 }
@@ -122,22 +116,29 @@ void playAudioFile(){
  // Opens and configures the audio file for the given input.
  // For gameState 1 (Number Pointing), tempInput should be a digit character (or you may extend to a String if needed).
  // For gameState 2 (Letter Pointing) or 3 (Letter Sounding), tempInput is the letter.
-void configFile(int gameState, String tempLetter) {
+void configFile(String toOutput) {
   /* 16-bit PCM Mono 16kHz realigned noise reduction */
   String result = "";
+  char gameState = toOutput.charAt(0);
+  String tempLetter = toOutput.substring(1, 2);
+  Serial.println("tempLetter: " + tempLetter);
+  Serial.println(gameState);
+  Serial.println("toOutput: " + toOutput);
+
+
   switch(gameState){
-  case 1:  //Number Pointing
+  case '4':  //Number Pointing, a-
     result = USBNumberPoint + tempLetter + wav;
     file = fopen(result.c_str(), "rb");
     break;
 
-  case 2:  //Letter Pointing
+  case '2':  //Letter Pointing
     //tempLetter++;
     result = USBLetterPoint + tempLetter + wav;
     file = fopen(result.c_str(), "rb");
     break;
 
-  case 3:  //Letter Sounding
+  case '5':  //Letter Sounding
     result = USBLetterSound + tempLetter + wav;
     file = fopen(result.c_str(), "rb");
     break;
@@ -197,7 +198,7 @@ void configFile(int gameState, String tempLetter) {
 
   /* Configure the advanced DAC. */
   if (!dac0.begin(AN_RESOLUTION_12, header.sampleRate, 256, 16)) {
-    //Serial.println("Failed to start DAC1 !");
+    //Serial.println("Failed to start DAC0 !");
     return;
   }
   if (!dac1.begin(AN_RESOLUTION_12, header.sampleRate, 256, 16)) {
