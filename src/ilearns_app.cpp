@@ -169,7 +169,7 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
     game_piece.character = character_value;
     memcpy(game_piece.uid, uid, MAX_UID_LENGTH);
     game_piece.decoder_value = i;
-    generatePositions(i * WIDTH_PER_PIECE, game_piece.positions);
+    generatePositions(FRONT_OF_LED_STRIP_OFFSET + i * WIDTH_PER_PIECE, game_piece.positions);
 
     return game_piece;
 }

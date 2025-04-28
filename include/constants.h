@@ -53,6 +53,7 @@ constexpr int BLANK_LEDS_BETWEEN_PIECE = 1; // Number of blank LEDs between game
 constexpr int BRIGHTNESS = 128; // Brightness of the LEDs (0-255)
 constexpr int ARCADE_LED_OFFSET = 23; // Offset for arcade buttons
 constexpr int MAX_UID_LENGTH = 7; // Maximum UID length for NFC tags
+constexpr int FRONT_OF_LED_STRIP_OFFSET = 25; // offset of number of leds between arduino and the first tile (same for both letters and numbers)
 
 constexpr int num_letters = 26;
 constexpr int num_numbers = 21;
