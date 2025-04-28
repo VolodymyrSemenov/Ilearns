@@ -1,6 +1,7 @@
-#pragma once
+#ifndef BUTTON_HANDLER_H
+#define BUTTON_HANDLER_H
+
 #include <Arduino.h>
-#include "constants.h"  // make sure this contains pin and state constants
 
 // LED control
 void illuminate_button_led(int button_number);
@@ -20,3 +21,6 @@ void end_game_button_handler();
 void repeat_button_handler();
 void skip_button_handler();
 void recalibrate_button_handler();
+
+
+#endif

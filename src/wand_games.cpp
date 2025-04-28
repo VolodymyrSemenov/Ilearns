@@ -1,0 +1,133 @@
+/**************************************************************************
+ * Find Numbers Game
+ **************************************************************************/
+
+// #include <audio_config.ino>
+#include <constants.h>
+#include <structures.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_PN532.h>
+#include <FastLED.h>
+#include <../src/ilearns_app.cpp>
+// #include <audio_config.cpp>
+
+
+// Return true if the game piece is in a list of game pieces
+bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]) {
+  for (int i = 0; i < sizeof(list_of_game_pieces); i++) {
+    if (list_of_game_pieces[i].character == game_piece.character) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+// Get a random game piece from the list that's not in the random game pieces list
+GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[]) {
+  int random_index = random(0, max_size);
+
+  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list)) {
+    random_index = random(0, max_size);
+  } 
+  return game_piece_list[random_index];
+}
+
+
+
+String get_random_number() {
+
+  int index = random(0, num_numbers);
+  return String(game_pieces.numbers[index].character);
+}
+
+
+bool uids_match(uint8_t uid1[], uint8_t uid2[]) {
+  for (uint8_t i = 0; i < MAX_UID_LENGTH; i++) {
+    if (uid1[i] != uid2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time=250) {
+    for (int i = 0; i < number_of_flashes; i++) {
+        illuminate_single_game_piece(game_piece, color);
+        delay(delay_time);
+        illuminate_single_game_piece(game_piece, CRGB::Black);
+        delay(delay_time);
+    }
+}
+
+
+
+void send_serial_audio_command(GamePiece game_piece) {
+  String game_piece_character_string;
+
+  if (game_state == 4){
+    game_piece_character_string = String((char)game_piece.character);
+  }
+  else{
+    game_piece_character_string = String(game_piece.character);
+  }
+  Serial.println(game_piece_character_string);
+
+  // Play audio to giga over serial
+  Serial1.print(game_piece_character_string);   // Send character first
+  Serial1.print(",");      // Separator
+  Serial1.println(game_state); // Send game state
+}
+
+
+
+void begin_wand_game() {
+  game_over = false;
+
+  while (!game_over){
+    int correct_selections = 0;
+    const int max_correct = 5;
+    GamePiece random_game_pieces_list[max_correct];
+
+    Serial.println("Starting Find Numbers Game...");
+
+    
+    for (int i=0; i<max_correct; i++){
+      if (game_state == 4){
+        random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.numbers, random_game_pieces_list);
+      }
+      else{
+        random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.letters, random_game_pieces_list);
+      }
+
+    }
+    
+    while (correct_selections < max_correct) {
+      GamePiece current_game_piece = random_game_pieces_list[correct_selections];
+      Serial.print("Find the following tile: ");
+      Serial.println(current_game_piece.character);
+
+      send_serial_audio_command(current_game_piece);
+
+      uint8_t uidLength;
+      uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
+      while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
+          delay(50);  // avoid overwhelming the RFID reader
+      }
+
+      if (uids_match(uid, current_game_piece.uid)) {
+        flash_tile_location(current_game_piece, CRGB::Green, 2);
+        illuminate_single_game_piece(current_game_piece, CRGB::Green);
+        correct_selections++;
+      }
+      else{
+        flash_tile_location(current_game_piece, CRGB::Red, 2);
+        Serial.println("Incorrect selection. Try again!");
+      }
+    }
+    game_over = true;
+    Serial.println("Game complete: 5 correct selections achieved!");
+  }
+}

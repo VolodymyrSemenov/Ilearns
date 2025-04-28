@@ -7,9 +7,6 @@
 #include <button_handler.h>
 
 
-void PiecesToEEPROM();
-
-
 // -------------------------
 // Game State Variables from constants and structures headers
 // -------------------------
@@ -143,30 +140,19 @@ void initialize_led_strips() {
 
 
 // Set the color of a game piece and display it on the LED strip
-void set_and_display_gamepiece_color(GamePiece game_piece, CRGB color) {
+void illuminate_single_game_piece(GamePiece game_piece, CRGB color) {
 
-    Serial.println("set gp color");
     int indice = game_piece.decoder_value;
-    Serial.println(indice);
-    Serial.println(num_letters);
 
-    if (indice < num_letters){
-        Serial.println("set gp color if");
-        Serial.println(game_piece.positions[0]);
-        for (int i=game_piece.positions[0]; i<game_piece.positions[2]; i++){
-            Serial.print("i="); Serial.println(i);
+    for (int i=game_piece.positions[0]; i<game_piece.positions[WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE]; i++){
+        if (indice < num_letters){
             letter_crgb_leds[i] = color;
         }
-    }
-
-    else {
-        Serial.println("set gp color else");
-        for (int i=game_piece.positions[0]; i<game_piece.positions[2]; i++){
+        else{
             number_crgb_leds[i] = color;
         }
     }
-
-    FastLED.show();  // Update the LEDs
+    FastLED.show(); // Display updated leds
 }
 
 
@@ -187,6 +173,32 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
 
     return game_piece;
 }
+
+
+void illuminate_next_letter_tile_location(int tile_index, CRGB color) {
+    int next_starting_position = 0;
+    if (tile_index > 0) {
+        next_starting_position = game_pieces.letters[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
+    }
+
+    for (int i = next_starting_position; i < next_starting_position + WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE; i++) {
+        letter_crgb_leds[i] = color;
+    }
+    FastLED.show();
+}
+
+
+void illuminate_next_number_tile_location(int tile_index, CRGB color) {
+    int next_starting_position = 0;
+    if (tile_index > 0) {
+        next_starting_position = game_pieces.numbers[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
+    }
+
+    for (int i = next_starting_position; i < next_starting_position + WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE; i++) {
+        number_crgb_leds[i] = color;
+    }
+    FastLED.show();
+}
  
 
 // Generate the gamePiece structures for letters (A-Z) and numbers (0-20)
@@ -197,40 +209,17 @@ void generate_game_pieces_structure() {
     // Letters
     for (int i = 0; i < num_letters; i++) {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
-        Serial.print("Waiting for letter "); Serial.println(char(lower_case_ascii_offset + i));
-
-        // print_single_game_piece(game_pieces.letters[i]);
-
-        // for (int i = 0; i < num_letter_leds; i++) {
-        //     letter_crgb_leds[i] = CRGB::Yellow;
-        // }
-        // FastLED.show();
-        int next_starting_position = 0;
-        if (i>0){
-            next_starting_position = game_pieces.letters[i-1].positions[0] + WIDTH_PER_PIECE;
-        }
-
-        for (int i=next_starting_position; i<next_starting_position+2; i++){
-            Serial.print("i="); Serial.println(i);
-            letter_crgb_leds[i] = CRGB::Yellow;
-        }
-
-        set_and_display_gamepiece_color(game_pieces.letters[i], CRGB::Yellow);
-        Serial.println("color should bw yellow");
+        
+        illuminate_next_letter_tile_location(i, CRGB::Yellow);
 
         while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
             delay(50);  // avoid overwhelming the RFID reader
         }
 
         game_pieces.letters[i] = generate_single_game_piece(game_pieces.letters[i], lower_case_ascii_offset + i, uid, i);
-        print_single_game_piece(game_pieces.letters[i]);
-        set_and_display_gamepiece_color(game_pieces.letters[i], CRGB::Green);
-        // for (int i = 0; i < num_letter_leds; i++) {
-        //     letter_crgb_leds[i] = CRGB::Green;
-        // }
-        // FastLED.show();
+        illuminate_single_game_piece(game_pieces.letters[i], CRGB::Green);
 
-        Serial.println("color should bw green");
+        print_single_game_piece(game_pieces.letters[i]);
         delay(1000);
     }
 
@@ -238,14 +227,16 @@ void generate_game_pieces_structure() {
     for (int i = 0; i < num_numbers; i++) {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
 
-        set_and_display_gamepiece_color(game_pieces.numbers[i], CRGB::Yellow);
+        illuminate_next_number_tile_location(i, CRGB::Yellow);
 
         while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
             delay(50);  // avoid overwhelming the RFID reader
         }
 
-        generate_single_game_piece(game_pieces.numbers[i], i, uid, i);
-        set_and_display_gamepiece_color(game_pieces.numbers[i], CRGB::Green);
+        game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i);
+        illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
+
+        print_single_game_piece(game_pieces.letters[i]);
         delay(1000);
     }
 }

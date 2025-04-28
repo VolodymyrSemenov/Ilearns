@@ -1,4 +1,9 @@
+// #include <button_handler.h>
+#include <games.h>
 #include <button_handler.h>
+#include <constants.h>
+#include <games.h>
+#include <ilearns_app.h>
 
 // game state:
 // 0 - waiting for a game to start
@@ -6,6 +11,8 @@
 // 2 - letter wand game
 // 3 - number ordering game
 // 4 - number wand game
+
+// 5 - letter wand game spoken
 
 
 
@@ -42,6 +49,7 @@ void button_led_handler(int button_number){
 // Begins proper game based on game_state and button pressed
 void state_button_handler(int button_pressed) {
     if (game_state == 0){
+        game_over = 0;
         switch (button_pressed){
             case letter_wand_button:
                 // Easy (spoken) mode for switch flipped to 0; i.e. pull up resistor makes pin high
@@ -55,10 +63,11 @@ void state_button_handler(int button_pressed) {
                 }
 
             case number_wand_button:
-                break;
-                // begin_game_find_numbers();
+                begin_wand_game();
 
-            // case recalibrate_button:
+            case recalibrate_button:
+                recalibrate_game_pieces();
+                break;
                 
 
             default:
