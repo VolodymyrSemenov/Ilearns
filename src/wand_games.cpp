@@ -9,7 +9,8 @@
 #include <SPI.h>
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
-#include <../src/ilearns_app.cpp>
+#include <ilearns_app.h>
+// #include <../src/ilearns_app.cpp>
 // #include <audio_config.cpp>
 
 
@@ -68,6 +69,7 @@ void send_serial_audio_command(GamePiece game_piece) {
   String game_piece_character_string;
 
   if (game_state == 4){
+    // Convert number as bytes to String
     game_piece_character_string = String((char)game_piece.character);
   }
   else{

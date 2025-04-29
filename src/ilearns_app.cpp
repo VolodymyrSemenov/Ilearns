@@ -105,7 +105,7 @@ void set_pin_modes(){
     pinMode(end_game_led, OUTPUT);
     pinMode(skip_led, OUTPUT);
     pinMode(repeat_led, OUTPUT);
-    pinMode(extra_led, OUTPUT);
+    pinMode(skip_led, OUTPUT);
 }
 
 

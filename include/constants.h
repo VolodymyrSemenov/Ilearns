@@ -36,10 +36,10 @@ constexpr int letter_led_strip = 38;   // WS2811 data pin for letter LEDs
 constexpr int number_led_strip = 39;   // WS2811 data pin for number LEDs
 
 // Right side (+23 offset from their respective button pins)
-constexpr int end_game_led = 41; 
-constexpr int skip_led = 42;
+constexpr int hint_led = 41; 
+constexpr int end_game_led = 42;
 constexpr int repeat_led = 43;
-constexpr int extra_led = 44;
+constexpr int skip_led = 44;
 
 // Recalibrate Button Pin
 constexpr int recalibrate_button    = 46;
