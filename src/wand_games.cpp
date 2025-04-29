@@ -78,9 +78,9 @@ void send_serial_audio_command(GamePiece game_piece) {
   Serial.println(game_piece_character_string);
 
   // Play audio to giga over serial
-  Serial1.print(game_piece_character_string);   // Send character first
-  Serial1.print(",");      // Separator
-  Serial1.println(game_state); // Send game state
+  // Serial1.print(",");      // Separator
+  Serial1.print(game_state); // Send game state
+  Serial1.println(game_piece_character_string);   // Send character first
 }
 
 

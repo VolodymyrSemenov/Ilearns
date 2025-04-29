@@ -18,13 +18,13 @@
 
 
 
-// Illuminates a given button
-void illuminate_button_led(int button_number){
+// Illuminates a given arcade button led
+void illuminate_arcade_led(int button_number){
     digitalWrite(button_number+ARCADE_LED_OFFSET, HIGH);
 }
 
-// Turns off a given button
-void deilluminate_button_led(int button_number){
+// Turns off a given arcade button led
+void deilluminate_arcade_led(int button_number){
     digitalWrite(button_number+ARCADE_LED_OFFSET, LOW);
 }
 
@@ -34,13 +34,13 @@ void button_led_handler(int button_number){
 
     // on falling edges (button presses)
     if (digitalRead(button_number) == 0){
-        illuminate_button_led(button_number);
+        illuminate_arcade_led(button_number);
     }
 
     // on rising edges (button release)
     else{
-        if (button_number-9 != game_state){
-            deilluminate_button_led(button_number);
+        if (button_number-OFFSET_BETWEEN_ARCADE_BUTTON_AND_GAMESTATE != game_state){
+            deilluminate_arcade_led(button_number);
         }
     }
 }

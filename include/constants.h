@@ -54,12 +54,13 @@ constexpr int BRIGHTNESS = 128; // Brightness of the LEDs (0-255)
 constexpr int ARCADE_LED_OFFSET = 23; // Offset for arcade buttons
 constexpr int MAX_UID_LENGTH = 7; // Maximum UID length for NFC tags
 constexpr int FRONT_OF_LED_STRIP_OFFSET = 25; // offset of number of leds between arduino and the first tile (same for both letters and numbers)
+constexpr int OFFSET_BETWEEN_ARCADE_BUTTON_AND_GAMESTATE = 9; // Distance between arcade button pin and LED strip
 
 constexpr int num_letters = 26;
 constexpr int num_numbers = 21;
 
-constexpr int num_letter_leds = num_letters * WIDTH_PER_PIECE;
-constexpr int num_number_leds = num_numbers * WIDTH_PER_PIECE;
+constexpr int num_letter_leds = num_letters * WIDTH_PER_PIECE +FRONT_OF_LED_STRIP_OFFSET;
+constexpr int num_number_leds = num_numbers * WIDTH_PER_PIECE +FRONT_OF_LED_STRIP_OFFSET;
 
 constexpr int eeprom_valid_bit_address = 0; // Value of 1 indicates valid EEPROM data
 constexpr int eeprom_game_pieces_address = eeprom_valid_bit_address + 1; // Address to store game pieces in EEPROM

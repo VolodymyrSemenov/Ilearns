@@ -19,6 +19,27 @@ CRGB number_crgb_leds[num_number_leds];
 Adafruit_PN532 nfc(53, &SPI);
 
 
+// Set the color of a game piece and display it on the LED strip
+void illuminate_single_game_piece(GamePiece game_piece, CRGB color) {
+
+    int indice = game_piece.decoder_value;
+    Serial.println(indice);
+
+    for (int i=game_piece.positions[0]; i<game_piece.positions[WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE]; i++){
+        if (indice < num_letters){
+            Serial.println("Letter");
+            letter_crgb_leds[i] = color;
+        }
+        else{
+            Serial.println("Number");
+            number_crgb_leds[i] = color;
+        }
+        Serial.println(i);
+    }
+    FastLED.show(); // Display updated leds
+}
+
+
 // Subroutine to start a rainbow LED dance when game_over is true.
 // New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
 void startLEDRainbowDance() {
@@ -139,23 +160,6 @@ void initialize_led_strips() {
 }
 
 
-// Set the color of a game piece and display it on the LED strip
-void illuminate_single_game_piece(GamePiece game_piece, CRGB color) {
-
-    int indice = game_piece.decoder_value;
-
-    for (int i=game_piece.positions[0]; i<game_piece.positions[WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE]; i++){
-        if (indice < num_letters){
-            letter_crgb_leds[i] = color;
-        }
-        else{
-            number_crgb_leds[i] = color;
-        }
-    }
-    FastLED.show(); // Display updated leds
-}
-
-
 // Given a base index, fill the positions array for a game piece.
 void generatePositions(int baseIndex, int positions[]) {
     for (int i = 0; i < WIDTH_PER_PIECE; i++) {
@@ -165,10 +169,10 @@ void generatePositions(int baseIndex, int positions[]) {
 
 
 // Populate a single GamePiece struct
-GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value, uint8_t uid[], int i) {
+GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value, uint8_t uid[], int decoder_value, int i) {
     game_piece.character = character_value;
     memcpy(game_piece.uid, uid, MAX_UID_LENGTH);
-    game_piece.decoder_value = i;
+    game_piece.decoder_value = decoder_value;
     generatePositions(FRONT_OF_LED_STRIP_OFFSET + i * WIDTH_PER_PIECE, game_piece.positions);
 
     return game_piece;
@@ -176,10 +180,16 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
 
 
 void illuminate_next_letter_tile_location(int tile_index, CRGB color) {
-    int next_starting_position = 0;
+    int next_starting_position = FRONT_OF_LED_STRIP_OFFSET;
+    // Serial.println("illuminate next Letter");
+    // Serial.println(tile_index);
+    // Serial.println(game_pieces.letters[tile_index - 1].positions[0]);
+
     if (tile_index > 0) {
         next_starting_position = game_pieces.letters[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
     }
+
+    Serial.println(next_starting_position);
 
     for (int i = next_starting_position; i < next_starting_position + WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE; i++) {
         letter_crgb_leds[i] = color;
@@ -189,7 +199,7 @@ void illuminate_next_letter_tile_location(int tile_index, CRGB color) {
 
 
 void illuminate_next_number_tile_location(int tile_index, CRGB color) {
-    int next_starting_position = 0;
+    int next_starting_position = FRONT_OF_LED_STRIP_OFFSET;
     if (tile_index > 0) {
         next_starting_position = game_pieces.numbers[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
     }
@@ -209,14 +219,18 @@ void generate_game_pieces_structure() {
     // Letters
     for (int i = 0; i < num_letters; i++) {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
-        
+        Serial.println(i);
+        Serial.println(FRONT_OF_LED_STRIP_OFFSET);
         illuminate_next_letter_tile_location(i, CRGB::Yellow);
+
+        Serial.println("size of letter_crgb_leds");
+        Serial.println(sizeof(letter_crgb_leds)/3);
 
         while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
             delay(50);  // avoid overwhelming the RFID reader
         }
 
-        game_pieces.letters[i] = generate_single_game_piece(game_pieces.letters[i], lower_case_ascii_offset + i, uid, i);
+        game_pieces.letters[i] = generate_single_game_piece(game_pieces.letters[i], lower_case_ascii_offset + i, uid, i, i);
         illuminate_single_game_piece(game_pieces.letters[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.letters[i]);
@@ -233,10 +247,10 @@ void generate_game_pieces_structure() {
             delay(50);  // avoid overwhelming the RFID reader
         }
 
-        game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i);
+        game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i+num_letters, i);
         illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
 
-        print_single_game_piece(game_pieces.letters[i]);
+        print_single_game_piece(game_pieces.numbers[i]);
         delay(1000);
     }
 }
@@ -303,7 +317,8 @@ void setup() {
 
     
     Serial.println("EEPROM Initializing");
-    recalibrate_game_pieces();
+    populate_game_pieces_structure();
+    // recalibrate_game_pieces();
     print_game_pieces();
 
     Serial.println("Press a button to start a game.");
