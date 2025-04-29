@@ -10,9 +10,8 @@
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
 #include <ilearns_app.h>
-// #include <../src/ilearns_app.cpp>
-// #include <audio_config.cpp>
 
+#include <illumination.h>
 
 // Return true if the game piece is in a list of game pieces
 bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]) {
@@ -51,16 +50,6 @@ bool uids_match(uint8_t uid1[], uint8_t uid2[]) {
     }
   }
   return true;
-}
-
-
-void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time=250) {
-    for (int i = 0; i < number_of_flashes; i++) {
-        illuminate_single_game_piece(game_piece, color);
-        delay(delay_time);
-        illuminate_single_game_piece(game_piece, CRGB::Black);
-        delay(delay_time);
-    }
 }
 
 

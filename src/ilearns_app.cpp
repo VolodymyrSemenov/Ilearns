@@ -6,6 +6,9 @@
 #include <EnableInterrupt.h>
 #include <button_handler.h>
 
+#include <printing.h>
+#include <illumination.h>
+
 
 // -------------------------
 // Game State Variables from constants and structures headers
@@ -19,86 +22,6 @@ CRGB number_crgb_leds[num_number_leds];
 Adafruit_PN532 nfc(53, &SPI);
 
 
-// Set the color of a game piece and display it on the LED strip
-void illuminate_single_game_piece(GamePiece game_piece, CRGB color) {
-
-    int indice = game_piece.decoder_value;
-    Serial.println(indice);
-
-    for (int i=game_piece.positions[0]; i<game_piece.positions[WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE]; i++){
-        if (indice < num_letters){
-            Serial.println("Letter");
-            letter_crgb_leds[i] = color;
-        }
-        else{
-            Serial.println("Number");
-            number_crgb_leds[i] = color;
-        }
-        Serial.println(i);
-    }
-    FastLED.show(); // Display updated leds
-}
-
-
-// Subroutine to start a rainbow LED dance when game_over is true.
-// New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
-void startLEDRainbowDance() {
-    unsigned long startTime = millis(); // Record the start time
-
-    // Run a rainbow pattern for 5 seconds.
-    while (millis() - startTime < 5000) {
-        static uint8_t hue = 0;
-        fill_rainbow(letter_crgb_leds, num_letter_leds, hue, 8);
-        fill_rainbow(number_crgb_leds, num_number_leds, hue, 8);
-        FastLED.show();
-        hue += 5; // Gradually shift colors
-        delay(50);
-    }
-
-    // After 5 seconds, clear the LEDs
-    FastLED.clear();
-    FastLED.show();
-}
-
-
-// Print a single game piece
-void print_single_game_piece(GamePiece game_piece){
-    Serial.print("\nCharacter: "); 
-    Serial.println(game_piece.character);
-
-    Serial.print("UID: "); 
-    for (uint8_t j = 0; j < MAX_UID_LENGTH; j++) {
-        Serial.print(game_piece.uid[j], HEX);
-        Serial.print(" ");
-    }
-    Serial.println("");
-
-    Serial.print("Positions: "); 
-    for (int j = 0; j < WIDTH_PER_PIECE; j++) {
-        Serial.print(game_piece.positions[j]); 
-        Serial.print(" ");
-    }
-    Serial.println();
-
-    Serial.print("Decoder Value: "); 
-    Serial.println(game_piece.decoder_value);
-    Serial.println();
-}
-
-
-// Print game pieces to Serial for debugging
-void print_game_pieces() {
-
-    Serial.println("\nLetter Game Pieces:");
-    for (int i = 0; i < num_letters; i++) {
-        print_single_game_piece(game_pieces.letters[i]);
-    }
-
-    Serial.println("\nNumber Game Pieces:");
-    for (int i = 0; i < num_numbers; i++) {
-        print_single_game_piece(game_pieces.numbers[i]);
-    }
-}
 
 
 
@@ -176,38 +99,6 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
     generatePositions(FRONT_OF_LED_STRIP_OFFSET + i * WIDTH_PER_PIECE, game_piece.positions);
 
     return game_piece;
-}
-
-
-void illuminate_next_letter_tile_location(int tile_index, CRGB color) {
-    int next_starting_position = FRONT_OF_LED_STRIP_OFFSET;
-    // Serial.println("illuminate next Letter");
-    // Serial.println(tile_index);
-    // Serial.println(game_pieces.letters[tile_index - 1].positions[0]);
-
-    if (tile_index > 0) {
-        next_starting_position = game_pieces.letters[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
-    }
-
-    Serial.println(next_starting_position);
-
-    for (int i = next_starting_position; i < next_starting_position + WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE; i++) {
-        letter_crgb_leds[i] = color;
-    }
-    FastLED.show();
-}
-
-
-void illuminate_next_number_tile_location(int tile_index, CRGB color) {
-    int next_starting_position = FRONT_OF_LED_STRIP_OFFSET;
-    if (tile_index > 0) {
-        next_starting_position = game_pieces.numbers[tile_index - 1].positions[0] + WIDTH_PER_PIECE;
-    }
-
-    for (int i = next_starting_position; i < next_starting_position + WIDTH_PER_PIECE-BLANK_LEDS_BETWEEN_PIECE; i++) {
-        number_crgb_leds[i] = color;
-    }
-    FastLED.show();
 }
  
 
@@ -306,6 +197,7 @@ void setup() {
     Serial.println("Initializing LED strips");
     initialize_led_strips();
     
+    Serial.println("Initializing NFC reader");
     nfc.begin();
     nfc.setPassiveActivationRetries(0xFF);
     uint32_t versiondata = nfc.getFirmwareVersion();
@@ -318,7 +210,6 @@ void setup() {
     
     Serial.println("EEPROM Initializing");
     populate_game_pieces_structure();
-    // recalibrate_game_pieces();
     print_game_pieces();
 
     Serial.println("Press a button to start a game.");
