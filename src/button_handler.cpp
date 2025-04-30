@@ -11,10 +11,12 @@ bool state_button_handler(int button_pressed)
 {
     if (digitalRead(button_pressed))
     {
+        Serial.println("iluminating");
         illuminate_arcade_led(button_pressed);
     }
     else
     {
+        Serial.println("deiluminating");
         deilluminate_arcade_led(button_pressed);
     }
     // Disregard mutliple button presses with 0.1s
@@ -80,7 +82,7 @@ bool state_button_handler(int button_pressed)
         }
         utility_button_pressed = END_GAME_BUTTON_PIN;
         break;
-    case RECALIBRATE_BUTTON:
+    case RECALIBRATE_BUTTON_PIN:
         game_state = RECALIBRATING_STATE;
         break;
 
@@ -91,65 +93,65 @@ bool state_button_handler(int button_pressed)
     return true;
 }
 
-void LETTER_ORDERING_BUTTON_PIN_handler()
+void letter_ordering_button_handler()
 {
     if (state_button_handler(LETTER_ORDERING_BUTTON_PIN))
     {
         Serial.println("Letter Ordering Button Pressed");
     }
 }
-void LETTER_WAND_BUTTON_PIN_handler()
+void letter_wand_button_handler()
 {
     if (state_button_handler(LETTER_WAND_BUTTON_PIN))
     {
         Serial.println("Letter Wand Button Pressed");
     }
 }
-void NUMBER_ORDERING_BUTTON_PIN_handler()
+void number_ordering_button_handler()
 {
     if (state_button_handler(NUMBER_ORDERING_BUTTON_PIN))
     {
         Serial.println("Number Ordering Button Pressed");
     }
 }
-void NUMBER_WAND_BUTTON_PIN_handler()
+void number_wand_button_handler()
 {
     if (state_button_handler(NUMBER_WAND_BUTTON_PIN))
     {
         Serial.println("Number Wand Button Pressed");
     }
 }
-void HINT_BUTTON_PIN_handler()
+void hint_game_button_handler()
 {
     if (state_button_handler(HINT_BUTTON_PIN))
     {
         Serial.println("Hint Button Pressed");
     }
 }
-void END_GAME_BUTTON_PIN_handler()
+void end_game_button_handler()
 {
     if (state_button_handler(END_GAME_BUTTON_PIN))
     {
         Serial.println("End Game Button Pressed");
     }
 }
-void REPEAT_BUTTON_PIN_handler()
+void repeat_button_handler()
 {
     if (state_button_handler(REPEAT_BUTTON_PIN))
     {
         Serial.println("Repeat Button Pressed");
     }
 }
-void SKIP_BUTTON_PIN_handler()
+void skip_button_handler()
 {
     if (state_button_handler(SKIP_BUTTON_PIN))
     {
         Serial.println("Skip Button Pressed");
     }
 }
-void RECALIBRATE_BUTTON_handler()
+void recalibrate_button_handler()
 {
-    if (state_button_handler(RECALIBRATE_BUTTON))
+    if (state_button_handler(RECALIBRATE_BUTTON_PIN))
     {
         Serial.println("Recalibrate button pressed");
     }

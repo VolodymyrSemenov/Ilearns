@@ -37,13 +37,13 @@ void set_pin_modes()
     pinMode(HINT_BUTTON_PIN, INPUT_PULLUP);
 
     pinMode(ENUNCIATION_PIN, INPUT_PULLUP);
-    pinMode(RECALIBRATE_BUTTON, INPUT_PULLUP);
+    pinMode(RECALIBRATE_BUTTON_PIN, INPUT_PULLUP);
 
     // Set led pins as outputs
-    pinMode(letter_ordering_led, OUTPUT);
-    pinMode(number_ordering_led, OUTPUT);
-    pinMode(letter_wand_led, OUTPUT);
-    pinMode(number_wand_led, OUTPUT);
+    pinMode(LETTER_ORDERING_LED_PIN, OUTPUT);
+    pinMode(NUMBER_ORDERING_LED_PIN, OUTPUT);
+    pinMode(LETTER_WAND_LED_PIN, OUTPUT);
+    pinMode(NUMBER_WAND_LED_PIN, OUTPUT);
 
     pinMode(END_GAME_LED_PIN, OUTPUT);
     pinMode(SKIP_LED_PIN, OUTPUT);
@@ -54,25 +54,25 @@ void set_pin_modes()
 // Enables interrupts on buttons
 void enable_interrupts()
 {
-    enableInterrupt(LETTER_ORDERING_BUTTON_PIN, LETTER_ORDERING_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(LETTER_WAND_BUTTON_PIN, LETTER_WAND_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, NUMBER_ORDERING_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(NUMBER_WAND_BUTTON_PIN, NUMBER_WAND_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(HINT_BUTTON_PIN, HINT_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(END_GAME_BUTTON_PIN, END_GAME_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(REPEAT_BUTTON_PIN, REPEAT_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(SKIP_BUTTON_PIN, SKIP_BUTTON_PIN_handler, CHANGE);
-    enableInterrupt(RECALIBRATE_BUTTON, RECALIBRATE_BUTTON_handler, CHANGE);
+    enableInterrupt(LETTER_ORDERING_BUTTON_PIN, letter_ordering_button_handler, CHANGE);
+    enableInterrupt(LETTER_WAND_BUTTON_PIN, letter_wand_button_handler, CHANGE);
+    enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, number_ordering_button_handler, CHANGE);
+    enableInterrupt(NUMBER_WAND_BUTTON_PIN, number_wand_button_handler, CHANGE);
+    enableInterrupt(HINT_BUTTON_PIN, hint_game_button_handler, CHANGE);
+    enableInterrupt(END_GAME_BUTTON_PIN, end_game_button_handler, CHANGE);
+    enableInterrupt(REPEAT_BUTTON_PIN, repeat_button_handler, CHANGE);
+    enableInterrupt(SKIP_BUTTON_PIN, skip_button_handler, CHANGE);
+    enableInterrupt(RECALIBRATE_BUTTON_PIN, recalibrate_button_handler, CHANGE);
 
-    // enableInterrupt(LETTER_ORDERING_BUTTON_PIN, LETTER_ORDERING_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, NUMBER_ORDERING_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(LETTER_WAND_BUTTON_PIN, LETTER_WAND_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(NUMBER_WAND_BUTTON_PIN, NUMBER_WAND_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(HINT_BUTTON_PIN, HINT_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(END_GAME_BUTTON_PIN, END_GAME_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(REPEAT_BUTTON_PIN, REPEAT_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(SKIP_BUTTON_PIN, SKIP_BUTTON_PIN_handler_rising, RISING);
-    // enableInterrupt(RECALIBRATE_BUTTON, RECALIBRATE_BUTTON_handler_rising, RISING);
+    // enableInterrupt(LETTER_ORDERING_BUTTON_PIN, letter_ordering_button_handler_rising, RISING);
+    // enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, number_ordering_button_handler_rising, RISING);
+    // enableInterrupt(LETTER_WAND_BUTTON_PIN, letter_wand_button_handler_rising, RISING);
+    // enableInterrupt(NUMBER_WAND_BUTTON_PIN, number_wand_button_handler_rising, RISING);
+    // enableInterrupt(HINT_BUTTON_PIN, hint_game_button_handler_rising, RISING);
+    // enableInterrupt(END_GAME_BUTTON_PIN, end_game_button_handler_rising, RISING);
+    // enableInterrupt(REPEAT_BUTTON_PIN, repeat_button_handler_rising, RISING);
+    // enableInterrupt(SKIP_BUTTON_PIN, skip_button_handler_rising, RISING);
+    // enableInterrupt(RECALIBRATE_BUTTON_PIN, recalibrate_button_handler_rising, RISING);
 }
 
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
@@ -121,11 +121,10 @@ void get_random_seed()
 void setup()
 {
     Serial.begin(115200);
-    illuminate_board_on_power_up();
 
     Serial.println("Initializing LED strips");
     initialize_led_strips();
-    // illuminate_setup_progress();
+    illuminate_board_on_power_up();
 
     Serial.println("EEPROM Initializing");
     populate_game_pieces_structure();
@@ -150,7 +149,6 @@ void setup()
     delay(1500);
 
     Serial.println("Press a button to start a game.");
-    // illuminate_all_arcade_leds(HIGH);
 }
 
 
@@ -159,7 +157,7 @@ bool arcade_leds_on = false;
 unsigned long last_flash_time = 0;
 int pressed_button = -1;
 
-const int flash_interval = 5000; // ms
+const int flash_interval = 1000; // ms
 
 // --- Arcade Flashing Logic Function ---
 void flash_game_arcade_leds() {
@@ -191,7 +189,6 @@ void loop()
         case GAME_OVER_STATE:
             startLEDRainbowDance();
             game_state = WAITING_STATE;
-            // delay(5000);
             break;
         
         case RECALIBRATING_STATE:
@@ -213,13 +210,12 @@ void loop()
             break;
 
         case WAITING_STATE:
-            rainbow_dance();
             flash_game_arcade_leds();
             break;
 
         case LETTER_ORDERING_STATE:
-            Serial.println("Starting letter ordering game");
-            order_letter();
+            // Serial.println("Starting letter ordering game");
+            // order_letter();
             game_state = GAME_OVER_STATE;
             break;
     }
