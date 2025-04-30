@@ -10,8 +10,7 @@
 // -------------------------
 // Game State Variables from constants and structures headers
 // -------------------------
-int game_state = 0; // Game state variable
-bool game_over = false;
+volatile int game_state = 0; // Game state variable
 
 GamePieces game_pieces;
 CRGB letter_crgb_leds[num_letter_leds];
@@ -295,8 +294,8 @@ void populate_game_pieces_structure(){
 // -------------------------
 
 void setup() {
-    Serial.begin(9600);
-
+    Serial.begin(115200);
+    
     Serial.println("Setting pin modes");
     set_pin_modes();
 
@@ -318,7 +317,6 @@ void setup() {
     
     Serial.println("EEPROM Initializing");
     populate_game_pieces_structure();
-    // recalibrate_game_pieces();
     print_game_pieces();
 
     Serial.println("Press a button to start a game.");
@@ -330,44 +328,13 @@ void setup() {
 // -------------------------
 
 void loop() {
-    // Game Buttons
-    // int button_number;
-    // if (check_button_pressed(button_number)) {
-    //     switch (button_number) {
-    //         case letter_ordering_button:
-    //             begin_game_letter_ordering();
-    //             break;
-    //         case number_ordering_button:
-    //             begin_game_number_ordering();
-    //             break;
-    //         case letter_wand_button:
-    //             // Check the annunciation rocker switch to choose between games.
-    //             // If annunciation_pin reads LOW, select the annunciation game.
-    //             if (digitalRead(annunciation_pin) == LOW) {
-    //                 begin_game_find_letters_annunciation();
-    //             } else {
-    //                 begin_game_find_letters_spoken();
-    //             }
-    //             break;
-    //         case number_wand_button:
-    //             begin_game_find_numbers();
-    //             break;
-    //         default:
-    //             Serial.println("Unknown button pressed.");
-    //     }
-    //     delay(1000); // Basic debounce/delay between games
-        
-        // After a game ends, if game_over is true, start the LED rainbow dance.
-        if (game_over) {
-            startLEDRainbowDance();
-            game_over = false; // Reset the flag
-        }
+    Serial.println(game_state);
+    if (game_state == GAME_OVER_STATE) {
+        startLEDRainbowDance();
+        game_state = WAITING_STATE;
     }
-
-    // Check if recalibrate is being held down
-//     if(digitalRead(recalibrate_button_led) == LOW){
-//         recalibrate_game_pieces();
-//     }
-
-//     delay(100);
-// }
+    if (game_state == RECALIBRATING_STATE) {
+        recalibrate_game_pieces();
+        game_state = WAITING_STATE;
+    }
+}

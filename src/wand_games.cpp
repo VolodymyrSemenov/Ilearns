@@ -38,7 +38,6 @@ GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[],
 
 
 String get_random_number() {
-
   int index = random(0, num_numbers);
   return String(game_pieces.numbers[index].character);
 }
@@ -86,8 +85,7 @@ void send_serial_audio_command(GamePiece game_piece) {
 
 
 void begin_wand_game() {
-  game_over = false;
-
+  bool game_over = false;
   while (!game_over){
     int correct_selections = 0;
     const int max_correct = 5;

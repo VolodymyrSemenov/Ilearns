@@ -21,6 +21,14 @@ constexpr int end_game_button = 19; // right red
 constexpr int repeat_button = 20; // right white
 constexpr int skip_button = 21; // right green
 
+constexpr int WAITING_STATE  = 0;
+constexpr int LETTER_ORDERING_STATE = 1;
+constexpr int LETTER_WAND_STATE = 2;
+constexpr int NUMBER_ORDERING_STATE = 3;
+constexpr int NUMBER_WAND_STATE = 4;
+constexpr int ENUNCIATION_STATE = 5;
+constexpr int GAME_OVER_STATE = 6;
+constexpr int RECALIBRATING_STATE = 7;
 // Decoder Pins
 constexpr int decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
 
@@ -65,12 +73,9 @@ constexpr int num_number_leds = num_numbers * WIDTH_PER_PIECE +FRONT_OF_LED_STRI
 constexpr int eeprom_valid_bit_address = 0; // Value of 1 indicates valid EEPROM data
 constexpr int eeprom_game_pieces_address = eeprom_valid_bit_address + 1; // Address to store game pieces in EEPROM
 
-
 // -------------------------
 // Game State Variables
 // -------------------------
-extern bool game_over;
-extern int game_state;
-
+extern volatile int game_state;
 
 #endif
