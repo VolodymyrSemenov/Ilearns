@@ -5,6 +5,8 @@
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
 #include <illumination.h>
+#include <order.h>
+
 
 void order_letter(){
     int correct_selections = 0;
@@ -12,9 +14,10 @@ void order_letter(){
 
     
     while(max_correct > correct_selections){
-        GamePiece currentLetter[correct_selections];
+        GamePieces currentList;
+        GamePiece currentLetter = currentList.letters[correct_selections];
 
-        flash_tile_location(current_game_piece, CRGB::Yellow, 2);
+        flash_tile_location(currentLetter, CRGB::Yellow, 2);
         illuminate_single_game_piece(currentLetter, CRGB::Yellow);
         
         uint8_t uidLength;
@@ -26,13 +29,13 @@ void order_letter(){
         if(uids_match(uid, currentLetter.uid)){
             correct_selections += 1;
 
-            flash_tile_location(current_game_piece, CRGB::Green, 2);
+            flash_tile_location(currentLetter, CRGB::Green, 2);
             illuminate_single_game_piece(currentLetter, CRGB::Green);
             
-        }else if{(uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid)){
+        }else if(uid_is_uid_of_previous_gamepiece(correct_selections, currentList.letters, uid)){
             continue; // Don't flash the tile if it's already green
         }else{
-            flash_tile_location(current_game_piece, CRGB::Red, 2);
+            flash_tile_location(currentLetter, CRGB::Red, 2);
             illuminate_single_game_piece(currentLetter, CRGB::Red);
         }
     }
