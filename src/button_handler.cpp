@@ -86,8 +86,9 @@ bool state_button_handler(int button_pressed)
         utility_button_pressed = END_GAME_BUTTON_PIN;
         break;
     case RECALIBRATE_BUTTON:
-        // game_state = RECALIBRATING_STATE;
+        game_state = RECALIBRATING_STATE;
         break;
+        
     default:
         Serial.println("Error, this wasn't supposed to happen");
         break;

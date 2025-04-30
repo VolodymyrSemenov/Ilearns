@@ -9,6 +9,7 @@
 #include <printing.h>
 #include <illumination.h>
 #include <recalibrate.h>
+#include <order.h>
 
 // -------------------------
 // Game State Variables from constants and structures headers
@@ -180,6 +181,7 @@ void flash_game_arcade_leds() {
 
 void loop()
 {
+    // order_letter();
     static int previous_state = game_state;
     if (game_state != previous_state) {
         Serial.print("Switching State: ");
@@ -214,5 +216,8 @@ void loop()
     {
         rainbow_dance();
         flash_game_arcade_leds();
+    }
+    if (game_state == LETTER_ORDERING_STATE) {
+        order_letter();
     }
 }

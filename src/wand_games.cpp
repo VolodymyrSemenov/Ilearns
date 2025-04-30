@@ -62,12 +62,7 @@ void send_serial_audio_command(GamePiece game_piece)
   {
     game_piece_character_string = String(game_piece.character);
   }
-  Serial.println(game_piece_character_string);
-
-  // Play audio to giga over serial
-  // Serial1.print(",");      // Separator
-  Serial1.print(game_state);                    // Send game state
-  Serial1.println(game_piece_character_string); // Send character first
+  // Serial1.println()
 }
 
 // Given a uid, return its gamepiece
@@ -104,13 +99,14 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
 
 void generate_random_seed()
 {
-    unsigned long seed = 0;
-    for (int i = 0; i < 4; i++) {
-      seed ^= analogRead(i);
-      delay(10);
-    }
-    seed^=micros();
-    randomSeed(seed);
+  unsigned long seed = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    seed ^= analogRead(i);
+    delay(10);
+  }
+  seed ^= micros();
+  randomSeed(seed);
 }
 
 void begin_wand_game()
@@ -127,7 +123,6 @@ void begin_wand_game()
   generate_random_seed();
 
   illuminate_active_game_arcade_led();
-
 
   for (int i = 0; i < max_correct; i++)
   {

@@ -21,6 +21,7 @@
 //         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
 //         while(!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)){
 //             delay(50); // avoid overwhelming the RFID reader
+            Serial.println("penis");
 //         }
 
 //         if(uids_match(uid, currentLetter.uid)){
