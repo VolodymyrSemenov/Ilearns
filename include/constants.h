@@ -6,6 +6,9 @@
 // Pin Definitions & Constants
 // -------------------------
 
+// Recalibrate Button Pin
+constexpr int recalibrate_button = 2;   
+
 // Difficulty Switch / Rocker for selecting between games
 constexpr int annunciation_pin = 9;
 
@@ -48,9 +51,6 @@ constexpr int hint_led = 41;
 constexpr int end_game_led = 42;
 constexpr int repeat_led = 43;
 constexpr int skip_led = 44;
-
-// Recalibrate Button Pin
-constexpr int recalibrate_button    = 46;
 
 
 // -------------------------
