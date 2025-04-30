@@ -186,33 +186,35 @@ void loop()
         Serial.println(game_state);
         previous_state = game_state;
     }
-    if (game_state == GAME_OVER_STATE)
-    {
-        startLEDRainbowDance();
-        game_state = WAITING_STATE;
-        // delay(5000);
-    }
-    if (game_state == RECALIBRATING_STATE)
-    {
-        Serial.println("Starting recalibration");
-        recalibrate_game_pieces();
-        game_state = WAITING_STATE;
-    }
-    if (game_state == LETTER_WAND_STATE)
-    {
-        Serial.println("Starting letter wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
-    }
-    if (game_state == NUMBER_WAND_STATE)
-    {
-        Serial.println("Starting number wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
-    }
-    if (game_state == WAITING_STATE)
-    {
-        rainbow_dance();
-        flash_game_arcade_leds();
+    switch (game_state) {
+        case GAME_OVER_STATE:
+            startLEDRainbowDance();
+            game_state = WAITING_STATE;
+            // delay(5000);
+            break;
+        
+        case RECALIBRATING_STATE:
+    
+            Serial.println("Starting recalibration");
+            recalibrate_game_pieces();
+            game_state = WAITING_STATE;
+            break;
+        case LETTER_WAND_STATE:
+    
+            Serial.println("Starting letter wand game");
+            begin_wand_game();
+            game_state = GAME_OVER_STATE;
+            break;
+    
+        case NUMBER_WAND_STATE:
+            Serial.println("Starting number wand game");
+            begin_wand_game();
+            game_state = GAME_OVER_STATE;
+            break;
+
+        case WAITING_STATE:
+            rainbow_dance();
+            flash_game_arcade_leds();
+            break;
     }
 }
