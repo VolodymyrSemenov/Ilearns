@@ -95,7 +95,7 @@ bool state_button_handler(int button_pressed)
     return true;
 }
 
-void LETTER_ORDERING_BUTTON_PIN_handler()
+void letter_ordering_button_handler()
 {
     if (state_button_handler(LETTER_ORDERING_BUTTON_PIN))
     {
@@ -103,7 +103,7 @@ void LETTER_ORDERING_BUTTON_PIN_handler()
         // illuminate_arcade_led(LETTER_ORDERING_BUTTON_PIN);
     }
 }
-void LETTER_WAND_BUTTON_PIN_handler()
+void letter_wand_button_handler()
 {
     if (state_button_handler(LETTER_WAND_BUTTON_PIN))
     {
@@ -111,7 +111,7 @@ void LETTER_WAND_BUTTON_PIN_handler()
         // illuminate_arcade_led(LETTER_WAND_BUTTON_PIN);
     }
 }
-void NUMBER_ORDERING_BUTTON_PIN_handler()
+void number_ordering_button_handler()
 {
     if (state_button_handler(NUMBER_ORDERING_BUTTON_PIN))
     {
@@ -119,7 +119,7 @@ void NUMBER_ORDERING_BUTTON_PIN_handler()
         // illuminate_arcade_led(NUMBER_ORDERING_BUTTON_PIN);
     }
 }
-void NUMBER_WAND_BUTTON_PIN_handler()
+void number_wand_button_handler()
 {
     if (state_button_handler(NUMBER_WAND_BUTTON_PIN))
     {
@@ -127,7 +127,7 @@ void NUMBER_WAND_BUTTON_PIN_handler()
         // illuminate_arcade_led(NUMBER_WAND_BUTTON_PIN);
     }
 }
-void HINT_BUTTON_PIN_handler()
+void hint_button_handler()
 {
     if (state_button_handler(HINT_BUTTON_PIN))
     {
@@ -135,7 +135,7 @@ void HINT_BUTTON_PIN_handler()
         // illuminate_arcade_led(HINT_BUTTON_PIN);
     }
 }
-void END_GAME_BUTTON_PIN_handler()
+void end_game_button_handler()
 {
     if (state_button_handler(END_GAME_BUTTON_PIN))
     {
@@ -143,7 +143,7 @@ void END_GAME_BUTTON_PIN_handler()
         // illuminate_arcade_led(END_GAME_BUTTON_PIN);
     }
 }
-void REPEAT_BUTTON_PIN_handler()
+void repeat_button_handler()
 {
     if (state_button_handler(REPEAT_BUTTON_PIN))
     {
@@ -151,7 +151,7 @@ void REPEAT_BUTTON_PIN_handler()
         // illuminate_arcade_led(REPEAT_BUTTON_PIN);
     }
 }
-void SKIP_BUTTON_PIN_handler()
+void skip_button_handler()
 {
     if (state_button_handler(SKIP_BUTTON_PIN))
     {
@@ -159,88 +159,11 @@ void SKIP_BUTTON_PIN_handler()
         // illuminate_arcade_led(SKIP_BUTTON_PIN);
     }
 }
-void RECALIBRATE_BUTTON_handler()
+void recalibrate_button_handler()
 {
     if (state_button_handler(RECALIBRATE_BUTTON))
     {
         Serial.println("Recalibrate button pressed");
         // illuminate_arcade_led(RECALIBRATE_BUTTON);
-    }
-}
-
-
-
-
-
-
-void LETTER_ORDERING_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(LETTER_ORDERING_BUTTON_PIN))
-    {
-        Serial.println("Letter Ordering Button Released");
-        // illuminate_arcade_led(LETTER_ORDERING_BUTTON_PIN);
-    }
-}
-void NUMBER_ORDERING_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(NUMBER_ORDERING_BUTTON_PIN))
-    {
-        Serial.println("Number Ordering Button Released");
-        // illuminate_arcade_led(NUMBER_ORDERING_BUTTON_PIN);
-    }
-}
-void LETTER_WAND_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(LETTER_WAND_BUTTON_PIN))
-    {
-        Serial.println("Letter Wand Button Released");
-        // illuminate_arcade_led(LETTER_WAND_BUTTON_PIN);
-    }
-}
-void NUMBER_WAND_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(NUMBER_WAND_BUTTON_PIN))
-    {
-        Serial.println("Number Wand Button Released");
-        // illuminate_arcade_led(NUMBER_WAND_BUTTON_PIN);
-    }
-}
-void HINT_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(HINT_BUTTON_PIN))
-    {
-        Serial.println("Hint Button Released");
-        // illuminate_arcade_led(HINT_BUTTON_PIN);
-    }
-}
-void END_GAME_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(END_GAME_BUTTON_PIN))
-    {
-        Serial.println("End Game Button Released");
-        // illuminate_arcade_led(END_GAME_BUTTON_PIN);
-    }
-}
-void REPEAT_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(REPEAT_BUTTON_PIN))
-    {
-        Serial.println("Repeat Button Released");
-        // illuminate_arcade_led(REPEAT_BUTTON_PIN);
-    }
-}
-void SKIP_BUTTON_PIN_handler_rising()
-{
-    if (state_button_handler(SKIP_BUTTON_PIN))
-    {
-        Serial.println("Skip Button Released");
-        // illuminate_arcade_led(SKIP_BUTTON_PIN);
-    }
-}
-void RECALIBRATE_BUTTON_handler_rising()
-{
-    if (state_button_handler(RECALIBRATE_BUTTON))
-    {
-        Serial.println("Recalibrate button pressed");
     }
 }
