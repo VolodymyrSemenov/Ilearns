@@ -21,4 +21,7 @@ void illuminate_next_letter_tile_location(int tile_index, CRGB color);
 // For recalibrate
 void illuminate_next_number_tile_location(int tile_index, CRGB color);
 
+void fill_letters_solid(CRGB color);
+void fill_numbers_solid(CRGB color);
+
 #endif

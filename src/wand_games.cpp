@@ -15,7 +15,7 @@
 
 // Return true if the game piece is in a list of game pieces
 bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]) {
-  for (int i = 0; i < sizeof(list_of_game_pieces); i++) {
+  for (int i = 0; i < sizeof(list_of_game_pieces)/sizeof(GamePiece); i++) {
     if (list_of_game_pieces[i].character == game_piece.character) {
       return true;
     }
@@ -72,6 +72,31 @@ void send_serial_audio_command(GamePiece game_piece) {
 }
 
 
+// Given a uid, return its gamepiece
+GamePiece get_gamepiece_by_uid(uint8_t uid[]) {
+  for (int i = 0; i < num_letters; i++) {
+    if (uids_match(game_pieces.letters[i].uid, uid)) {
+      return game_pieces.letters[i];
+    }
+  }
+  for (int i = 0; i < num_numbers; i++) {
+    if (uids_match(game_pieces.numbers[i].uid, uid)) {
+      return game_pieces.numbers[i];
+    }
+  }
+  return GamePiece(); // Return an empty GamePiece if not found
+}
+
+
+bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_game_pieces_list[], uint8_t uid[]) {
+  for (int i=0; i<correct_selections; i++){
+    if (uids_match(uid, random_game_pieces_list[i].uid)){
+      return true;
+    }
+  }
+}
+
+
 
 void begin_wand_game() {
   bool game_over = false;
@@ -86,15 +111,18 @@ void begin_wand_game() {
     for (int i=0; i<max_correct; i++){
       if (game_state == 4){
         random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.numbers, random_game_pieces_list);
+        fill_letters_solid(CRGB::Yellow);
       }
       else{
         random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.letters, random_game_pieces_list);
+        fill_numbers_solid(CRGB::Yellow);
       }
 
     }
     
     while (correct_selections < max_correct) {
       GamePiece current_game_piece = random_game_pieces_list[correct_selections];
+
       Serial.print("Find the following tile: ");
       Serial.println(current_game_piece.character);
 
@@ -111,8 +139,15 @@ void begin_wand_game() {
         illuminate_single_game_piece(current_game_piece, CRGB::Green);
         correct_selections++;
       }
+
+      // Don't flash the tile if it's already green
+      else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid)){
+        break;
+      }
+
       else{
-        flash_tile_location(current_game_piece, CRGB::Red, 2);
+        GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);
+        flash_tile_location(incorrect_gamepiece, CRGB::Red, 2);
         Serial.println("Incorrect selection. Try again!");
       }
     }

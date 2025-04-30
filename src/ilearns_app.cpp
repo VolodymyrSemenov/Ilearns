@@ -207,9 +207,12 @@ void setup() {
     populate_game_pieces_structure();
     print_game_pieces();
 
+    fill_letters_solid(CRGB::Blue);
+    fill_numbers_solid(CRGB::Red);
+    delay(1000);
+
     Serial.println("Press a button to start a game.");
 }
-
 
 // -------------------------
 // Arduino Loop

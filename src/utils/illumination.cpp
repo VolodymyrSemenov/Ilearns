@@ -1,6 +1,23 @@
 #include <structures.h>
 
 
+void fill_letters_solid(CRGB color){
+    for (int i=FRONT_OF_LED_STRIP_OFFSET; i<num_letter_leds; i+=3){
+        letter_crgb_leds[i] = color;
+        letter_crgb_leds[i+1] = color;
+        letter_crgb_leds[i+2] = CRGB::Black;
+    }
+    FastLED.show();
+}
+
+void fill_numbers_solid(CRGB color){
+    for (int i=FRONT_OF_LED_STRIP_OFFSET; i<num_number_leds; i+=3){
+        number_crgb_leds[i] = color;
+        number_crgb_leds[i+1] = color;
+        number_crgb_leds[i+2] = CRGB::Black;
+    }
+    FastLED.show();
+}
 
 
 
@@ -37,17 +54,55 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
 
 // Subroutine to start a rainbow LED dance when game_over is true.
 // New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
+// void startLEDRainbowDance() {
+//     unsigned long startTime = millis(); // Record the start time
+
+//     // Run a rainbow pattern for 5 seconds.
+//     while (millis() - startTime < 5000) {
+//         static uint8_t hue = 0;
+//         fill_rainbow(letter_crgb_leds, num_letter_leds, hue, 8);
+//         fill_rainbow(number_crgb_leds, num_number_leds, hue, 8);
+//         FastLED.show();
+//         hue += 5; // Gradually shift colors
+//         delay(50);
+//     }
+
+//     // After 5 seconds, clear the LEDs
+//     FastLED.clear();
+//     FastLED.show();
+// }
+
+
+
 void startLEDRainbowDance() {
     unsigned long startTime = millis(); // Record the start time
+    static uint8_t hue = 0;
 
     // Run a rainbow pattern for 5 seconds.
     while (millis() - startTime < 5000) {
-        static uint8_t hue = 0;
-        fill_rainbow(letter_crgb_leds, num_letter_leds, hue, 8);
-        fill_rainbow(number_crgb_leds, num_number_leds, hue, 8);
+        uint8_t currentHue = hue;
+        int hue_increase = 16;
+
+        // Animate only active letter LEDs (2-on, 1-off pattern)
+        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_letter_leds; i += 3) {
+            letter_crgb_leds[i] = CHSV(currentHue, 255, 255);
+            letter_crgb_leds[i+1] = CHSV(currentHue + 8, 255, 255);
+            letter_crgb_leds[i+2] = CRGB::Black;
+            currentHue += hue_increase;
+        }
+
+        // Animate only active number LEDs (same pattern)
+        currentHue = hue;
+        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_number_leds; i += 3) {
+            number_crgb_leds[i] = CHSV(currentHue, 255, 255);
+            number_crgb_leds[i+1] = CHSV(currentHue + 8, 255, 255);
+            number_crgb_leds[i+2] = CRGB::Black;
+            currentHue -= hue_increase;
+        }
+
         FastLED.show();
-        hue += 5; // Gradually shift colors
-        delay(50);
+        hue += 5; // Shift hue for next loop
+        delay(15);
     }
 
     // After 5 seconds, clear the LEDs
