@@ -23,7 +23,6 @@ bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]
   return false;
 }
 
-
 // Get a random game piece from the list that's not in the random game pieces list
 GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[]) {
   int random_index = random(0, max_size);
@@ -94,6 +93,7 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
       return true;
     }
   }
+  return false;
 }
 
 
@@ -107,9 +107,8 @@ void begin_wand_game() {
 
     Serial.println("Starting Find Numbers Game...");
 
-    
     for (int i=0; i<max_correct; i++){
-      if (game_state == 4){
+      if (game_state == NUMBER_ORDERING_STATE){
         random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.numbers, random_game_pieces_list);
         fill_letters_solid(CRGB::Yellow);
       }
@@ -142,7 +141,7 @@ void begin_wand_game() {
 
       // Don't flash the tile if it's already green
       else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid)){
-        break;
+        continue;
       }
 
       else{
@@ -154,4 +153,5 @@ void begin_wand_game() {
     game_over = true;
     Serial.println("Game complete: 5 correct selections achieved!");
   }
+  game_state = GAME_OVER_STATE;
 }

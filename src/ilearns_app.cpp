@@ -5,7 +5,7 @@
 #include <EEPROM.h>
 #include <EnableInterrupt.h>
 #include <button_handler.h>
-
+#include <games.h>
 #include <printing.h>
 #include <illumination.h>
 
@@ -225,7 +225,18 @@ void loop() {
         game_state = WAITING_STATE;
     }
     if (game_state == RECALIBRATING_STATE) {
+        Serial.println("Starting recalibration");
         recalibrate_game_pieces();
+        game_state = WAITING_STATE;
+    }
+    if (game_state == LETTER_WAND_STATE) {
+        Serial.println("Starting letter wand");
+        begin_wand_game();
+        game_state = WAITING_STATE;
+    }
+    if (game_state == NUMBER_WAND_STATE) {
+        Serial.println("Starting number wand");
+        begin_wand_game();
         game_state = WAITING_STATE;
     }
 }
