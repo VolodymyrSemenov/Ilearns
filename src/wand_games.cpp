@@ -23,21 +23,15 @@ bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]
   return false;
 }
 
+
 // Get a random game piece from the list that's not in the random game pieces list
-GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[]) {
+GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[], int max_correct) {
   int random_index = random(0, max_size);
 
-  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, sizeof(random_game_pieces_list))) {
+  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, max_correct)) {
     random_index = random(0, max_size);
   } 
   return game_piece_list[random_index];
-}
-
-
-
-String get_random_number() {
-  int index = random(0, num_numbers);
-  return String(game_pieces.numbers[index].character);
 }
 
 
@@ -109,12 +103,12 @@ void begin_wand_game() {
 
     for (int i=0; i<max_correct; i++){
       if (game_state == NUMBER_ORDERING_STATE){
-        random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.numbers, random_game_pieces_list);
-        fill_letters_solid(CRGB::Yellow);
+        random_game_pieces_list[i] = get_unique_random_gamepiece(num_numbers, game_pieces.numbers, random_game_pieces_list, max_correct);
+        fill_numbers_solid(CRGB::Yellow);
       }
       else{
-        random_game_pieces_list[i] = get_unique_random_gamepiece(max_correct, game_pieces.letters, random_game_pieces_list);
-        fill_numbers_solid(CRGB::Yellow);
+        random_game_pieces_list[i] = get_unique_random_gamepiece(num_letters, game_pieces.letters, random_game_pieces_list, max_correct);
+        fill_letters_solid(CRGB::Yellow);
       }
 
     }
@@ -147,6 +141,7 @@ void begin_wand_game() {
       else{
         GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);
         flash_tile_location(incorrect_gamepiece, CRGB::Red, 2);
+        illuminate_single_game_piece(incorrect_gamepiece, CRGB::Yellow);
         Serial.println("Incorrect selection. Try again!");
       }
     }
