@@ -143,8 +143,7 @@ void setup()
     initialize_wand_reader();
     illuminate_setup_progress();
 
-    
-    print_game_pieces();
+    // print_game_pieces();
 
     delay(250);
     fill_board_solid(CRGB::Green);
@@ -160,7 +159,7 @@ bool arcade_leds_on = false;
 unsigned long last_flash_time = 0;
 int pressed_button = -1;
 
-const int flash_interval = 1000; // ms
+const int flash_interval = 5000; // ms
 
 // --- Arcade Flashing Logic Function ---
 void flash_game_arcade_leds() {
@@ -181,43 +180,47 @@ void flash_game_arcade_leds() {
 
 void loop()
 {
-    // order_letter();
     static int previous_state = game_state;
     if (game_state != previous_state) {
         Serial.print("Switching State: ");
         Serial.println(game_state);
         previous_state = game_state;
     }
-    if (game_state == GAME_OVER_STATE)
-    {
-        startLEDRainbowDance();
-        game_state = WAITING_STATE;
-        // delay(5000);
-    }
-    if (game_state == RECALIBRATING_STATE)
-    {
-        Serial.println("Starting recalibration");
-        recalibrate_game_pieces();
-        game_state = WAITING_STATE;
-    }
-    if (game_state == LETTER_WAND_STATE)
-    {
-        Serial.println("Starting letter wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
-    }
-    if (game_state == NUMBER_WAND_STATE)
-    {
-        Serial.println("Starting number wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
-    }
-    if (game_state == WAITING_STATE)
-    {
-        rainbow_dance();
-        flash_game_arcade_leds();
-    }
-    if (game_state == LETTER_ORDERING_STATE) {
-        order_letter();
+    
+    switch(game_state) {
+        case GAME_OVER_STATE:
+            startLEDRainbowDance();
+            game_state = WAITING_STATE;
+            // delay(5000);
+            break;
+        
+        case RECALIBRATING_STATE:
+            Serial.println("Starting recalibration");
+            recalibrate_game_pieces();
+            game_state = WAITING_STATE;
+            break;
+
+        case LETTER_WAND_STATE:
+            Serial.println("Starting letter wand game");
+            begin_wand_game();
+            game_state = GAME_OVER_STATE;
+            break;
+
+        case NUMBER_WAND_STATE:
+            Serial.println("Starting number wand game");
+            begin_wand_game();
+            game_state = GAME_OVER_STATE;
+            break;
+
+        case WAITING_STATE:
+            rainbow_dance();
+            flash_game_arcade_leds();
+            break;
+
+        case LETTER_ORDERING_STATE:
+            Serial.println("Starting letter ordering game");
+            order_letter();
+            game_state = GAME_OVER_STATE;
+            break;
     }
 }
