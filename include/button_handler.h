@@ -9,7 +9,7 @@ void deilluminate_button_led(int button_number);
 void button_led_handler(int button_number);
 
 // Game state handling
-void state_button_handler(int button_pressed);
+bool state_button_handler(int button_pressed);
 
 // Button press handlers
 void letter_ordering_button_handler();

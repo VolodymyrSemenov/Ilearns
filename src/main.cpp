@@ -77,7 +77,6 @@ void initialize_led_strips()
     FastLED.setBrightness(128);
 
     FastLED.show();
-    delay(500);
 }
 
 // Given a base index, fill the positions array for a game piece.
@@ -205,8 +204,9 @@ void setup()
     if (!versiondata)
     {
         Serial.println("Didn't find PN532 board");
-        while (1)
-            ; // Halt
+        while (true)
+        {
+        }; // Halt
     }
     Serial.println("NFC reader initialized.");
 
@@ -216,14 +216,18 @@ void setup()
 
     fill_letters_solid(CRGB::Blue);
     fill_numbers_solid(CRGB::Red);
-    delay(1000);
 
     Serial.println("Press a button to start a game.");
 }
 
 void loop()
 {
-    Serial.println(game_state);
+    static int previous_state = game_state;
+    if (game_state != previous_state) {
+        Serial.print("Switching State: ");
+        Serial.println(game_state);
+        previous_state = game_state;
+    }
     if (game_state == GAME_OVER_STATE)
     {
         startLEDRainbowDance();
@@ -237,13 +241,13 @@ void loop()
     }
     if (game_state == LETTER_WAND_STATE)
     {
-        Serial.println("Starting letter wand");
+        Serial.println("Starting letter wand game");
         begin_wand_game();
         game_state = GAME_OVER_STATE;
     }
     if (game_state == NUMBER_WAND_STATE)
     {
-        Serial.println("Starting number wand");
+        Serial.println("Starting number wand game");
         begin_wand_game();
         game_state = GAME_OVER_STATE;
     }

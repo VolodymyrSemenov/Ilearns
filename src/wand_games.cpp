@@ -107,11 +107,10 @@ void begin_wand_game()
   const int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
 
-  Serial.println("Starting Find Numbers Game...");
 
   for (int i = 0; i < max_correct; i++)
   {
-    if (game_state == NUMBER_ORDERING_STATE)
+    if (game_state == NUMBER_WAND_STATE)
     {
       random_game_pieces_list[i] = get_unique_random_gamepiece(num_numbers, game_pieces.numbers, random_game_pieces_list, max_correct);
       fill_numbers_solid(CRGB::Yellow);

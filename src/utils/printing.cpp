@@ -3,7 +3,7 @@
 
 // Print a single game piece
 void print_single_game_piece(GamePiece game_piece){
-    Serial.print("\nCharacter: "); 
+    Serial.print("Character: "); 
     Serial.println(game_piece.character);
 
     Serial.print("UID: "); 
@@ -13,16 +13,12 @@ void print_single_game_piece(GamePiece game_piece){
     }
     Serial.println("");
 
-    Serial.print("Positions: "); 
+    Serial.print("LED Positions: "); 
     for (int j = 0; j < WIDTH_PER_PIECE; j++) {
         Serial.print(game_piece.positions[j]); 
         Serial.print(" ");
     }
-    Serial.println();
-
-    Serial.print("Decoder Value: "); 
-    Serial.println(game_piece.decoder_value);
-    Serial.println();
+    Serial.print("\n\n");
 }
 
 

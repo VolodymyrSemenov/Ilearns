@@ -35,13 +35,15 @@ void button_led_handler(int button_number)
 }
 
 // Begins proper game based on game_state and button pressed
-void state_button_handler(int button_pressed)
+// Returns false if button pressed too quickly
+// Returns true if valid button press
+bool state_button_handler(int button_pressed)
 {
     // Disregard mutliple button presses with 0.1s
     static int previous_press_time = 0;
     if ((millis() - previous_press_time) < 100)
     {
-        return;
+        return false;
     }
     previous_press_time = millis();
 
@@ -96,59 +98,69 @@ void state_button_handler(int button_pressed)
         Serial.println("Error, this wasn't supposed to happen");
         break;
     }
+    return true;
 }
 
 void letter_ordering_button_handler()
 {
-    // Handle letter ordering button press
-    Serial.println("Letter Ordering Button Pressed");
-    state_button_handler(letter_ordering_button);
+    if (state_button_handler(letter_ordering_button))
+    {
+        Serial.println("Letter Ordering Button Pressed");
+    }
 }
 void letter_wand_button_handler()
 {
-    // Handle letter wand button press
-    Serial.println("Letter Wand Button Pressed");
-    state_button_handler(letter_wand_button);
+    if (state_button_handler(letter_wand_button))
+    {
+        Serial.println("Letter Wand Button Pressed");
+    }
 }
 void number_ordering_button_handler()
 {
-    // Handle number ordering button press
-    Serial.println("Number Ordering Button Pressed");
-    state_button_handler(number_ordering_button);
+    if (state_button_handler(number_ordering_button))
+    {
+        Serial.println("Number Ordering Button Pressed");
+    }
 }
 void number_wand_button_handler()
 {
-    // Handle number wand button press
-    Serial.println("Number Wand Button Pressed");
-    state_button_handler(number_wand_button);
+    if (state_button_handler(number_wand_button))
+    {
+        Serial.println("Number Wand Button Pressed");
+    }
 }
 void hint_button_handler()
 {
-    // Handle hint button press
-    Serial.println("Hint Button Pressed");
-    state_button_handler(hint_button);
+    if (state_button_handler(hint_button))
+    {
+        Serial.println("Hint Button Pressed");
+    }
 }
 void end_game_button_handler()
 {
-    // Handle end game button press
-    Serial.println("End Game Button Pressed");
-    state_button_handler(end_game_button);
+    if (state_button_handler(end_game_button))
+    {
+        Serial.println("End Game Button Pressed");
+    }
 }
 void repeat_button_handler()
 {
-    // Handle repeat button press
-    Serial.println("Repeat Button Pressed");
-    state_button_handler(repeat_button);
+    if (state_button_handler(repeat_button))
+    {
+        Serial.println("Repeat Button Pressed");
+    }
 }
 void skip_button_handler()
 {
-    // Handle skip button press
-    Serial.println("Skip Button Pressed");
-    state_button_handler(skip_button);
+    if (state_button_handler(skip_button))
+    {
+        Serial.println("Skip Button Pressed");
+    }
 }
 void recalibrate_button_handler()
 {
-    // Handle recalibrate button press
-    Serial.println("Recalibrate button pressed");
-    state_button_handler(recalibrate_button);
+    if (state_button_handler(recalibrate_button))
+    {
+        Serial.println("Recalibrate button pressed");
+    }
 }
