@@ -22,5 +22,4 @@ void repeat_button_handler();
 void skip_button_handler();
 void recalibrate_button_handler();
 
-
 #endif

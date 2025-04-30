@@ -3,7 +3,6 @@
 
 #include <structures.h>
 
-
 // Print a single game piece
 void print_single_game_piece(GamePiece game_piece);
 

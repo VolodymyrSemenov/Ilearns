@@ -16,7 +16,6 @@
 // // const int num_letter_leds = sizeof(letters) / sizeof(letters[0]);
 // // const int num_number_leds = sizeof(numbers) / sizeof(numbers[0]);
 
-
 // // Define the struct to store letter data
 // struct gamePiece {
 //   char character[3]; // The letter (a-z, 0-20)
@@ -37,7 +36,6 @@
 // // CRGB letter_crgb_leds[num_letters];
 // // CRGB number_crgb_leds[num_numbers];
 // CRGB leds[2];
-
 
 // // Initialize FastLED
 // void setup() {
@@ -76,8 +74,8 @@
 
 // // Fills gamepiece structure for each letter
 // void generate_letter_gamepiece_structures(gamePiece letters[]) {
-//   char letters_list[num_letter_leds][3] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};    
-  
+//   char letters_list[num_letter_leds][3] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+
 //   // Generate the letter game pieces
 //   for (int i = 0; i < num_letter_leds; i++) {
 //       Serial.println(i);
@@ -96,7 +94,7 @@
 // // Fills gamepiece structure for each number
 // void generate_number_gamepiece_structures(gamePiece numbers[]) {
 //   char numbers_list[num_number_leds][3] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
-  
+
 //   // Generate the number game pieces
 //   for (int i = 0; i < num_number_leds; i++) {
 //     strcpy(numbers[i].character, numbers_list[i]);
