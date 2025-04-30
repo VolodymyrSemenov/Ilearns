@@ -9,8 +9,6 @@
 #include <SPI.h>
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
-#include <ilearns_app.h>
-
 #include <illumination.h>
 
 // Return true if the game piece is in a list of game pieces
@@ -93,60 +91,48 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
 
 
 void begin_wand_game() {
-  bool game_over = false;
-  while (!game_over){
-    int correct_selections = 0;
-    const int max_correct = 5;
-    GamePiece random_game_pieces_list[max_correct];
+  int correct_selections = 0;
+  const int max_correct = 5;
+  GamePiece random_game_pieces_list[max_correct];
 
-    Serial.println("Starting Find Numbers Game...");
+  Serial.println("Starting Find Numbers Game...");
 
-    for (int i=0; i<max_correct; i++){
-      if (game_state == NUMBER_ORDERING_STATE){
-        random_game_pieces_list[i] = get_unique_random_gamepiece(num_numbers, game_pieces.numbers, random_game_pieces_list, max_correct);
-        fill_numbers_solid(CRGB::Yellow);
-      }
-      else{
-        random_game_pieces_list[i] = get_unique_random_gamepiece(num_letters, game_pieces.letters, random_game_pieces_list, max_correct);
-        fill_letters_solid(CRGB::Yellow);
-      }
-
+  for (int i=0; i<max_correct; i++){
+    if (game_state == NUMBER_ORDERING_STATE){
+      random_game_pieces_list[i] = get_unique_random_gamepiece(num_numbers, game_pieces.numbers, random_game_pieces_list, max_correct);
+      fill_numbers_solid(CRGB::Yellow);
+    } else {
+      random_game_pieces_list[i] = get_unique_random_gamepiece(num_letters, game_pieces.letters, random_game_pieces_list, max_correct);
+      fill_letters_solid(CRGB::Yellow);
     }
-    
-    while (correct_selections < max_correct) {
-      GamePiece current_game_piece = random_game_pieces_list[correct_selections];
-
-      Serial.print("Find the following tile: ");
-      Serial.println(current_game_piece.character);
-
-      send_serial_audio_command(current_game_piece);
-
-      uint8_t uidLength;
-      uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
-      while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
-          delay(50);  // avoid overwhelming the RFID reader
-      }
-
-      if (uids_match(uid, current_game_piece.uid)) {
-        flash_tile_location(current_game_piece, CRGB::Green, 2);
-        illuminate_single_game_piece(current_game_piece, CRGB::Green);
-        correct_selections++;
-      }
-
-      // Don't flash the tile if it's already green
-      else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid)){
-        continue;
-      }
-
-      else{
-        GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);
-        flash_tile_location(incorrect_gamepiece, CRGB::Red, 2);
-        illuminate_single_game_piece(incorrect_gamepiece, CRGB::Yellow);
-        Serial.println("Incorrect selection. Try again!");
-      }
-    }
-    game_over = true;
-    Serial.println("Game complete: 5 correct selections achieved!");
   }
-  game_state = GAME_OVER_STATE;
+
+  while (correct_selections < max_correct) {
+    GamePiece current_game_piece = random_game_pieces_list[correct_selections];
+
+    Serial.print("Find the following tile: ");
+    Serial.println(current_game_piece.character);
+
+    send_serial_audio_command(current_game_piece);
+
+    uint8_t uidLength;
+    uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
+    while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30)) {
+      delay(50);  // avoid overwhelming the RFID reader
+    }
+
+    if (uids_match(uid, current_game_piece.uid)) {
+      flash_tile_location(current_game_piece, CRGB::Green, 2);
+      illuminate_single_game_piece(current_game_piece, CRGB::Green);
+      correct_selections++;
+    } else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid)){
+      continue; // Don't flash the tile if it's already green
+    } else {
+      GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);
+      flash_tile_location(incorrect_gamepiece, CRGB::Red, 2);
+      illuminate_single_game_piece(incorrect_gamepiece, CRGB::Yellow);
+      Serial.println("Incorrect selection. Try again!");
+    }
+  }
+  Serial.println("Game complete: 5 correct selections achieved!");
 }

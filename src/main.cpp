@@ -26,7 +26,6 @@ void set_pin_modes(){
     // Initialize button pins with internal pullups
     pinMode(letter_ordering_button, INPUT_PULLUP);
     pinMode(number_ordering_button, INPUT_PULLUP);
-    pinMode(annunciation_pin, INPUT_PULLUP);
     pinMode(letter_wand_button, INPUT_PULLUP);
     pinMode(number_wand_button, INPUT_PULLUP);
     
@@ -34,6 +33,10 @@ void set_pin_modes(){
     pinMode(skip_button, INPUT_PULLUP);
     pinMode(repeat_button, INPUT_PULLUP);
     pinMode(hint_button, INPUT_PULLUP);
+
+
+    pinMode(annunciation_pin, INPUT_PULLUP);
+    pinMode(recalibrate_button, INPUT_PULLUP);
 
     // Set led pins as outputs
     pinMode(letter_ordering_led, OUTPUT);
@@ -120,7 +123,7 @@ void generate_game_pieces_structure() {
         illuminate_single_game_piece(game_pieces.letters[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.letters[i]);
-        delay(1000);
+        delay(500);
     }
 
     // Numbers
@@ -137,7 +140,7 @@ void generate_game_pieces_structure() {
         illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.numbers[i]);
-        delay(1000);
+        delay(500);
     }
 }
 
@@ -176,13 +179,9 @@ void populate_game_pieces_structure(){
 }
 
 
-// -------------------------
-// Arduino Setup
-// -------------------------
-
 void setup() {
     Serial.begin(115200);
-    
+
     Serial.println("Setting pin modes");
     set_pin_modes();
 
@@ -214,10 +213,6 @@ void setup() {
     Serial.println("Press a button to start a game.");
 }
 
-// -------------------------
-// Arduino Loop
-// -------------------------
-
 void loop() {
     Serial.println(game_state);
     if (game_state == GAME_OVER_STATE) {
@@ -232,11 +227,11 @@ void loop() {
     if (game_state == LETTER_WAND_STATE) {
         Serial.println("Starting letter wand");
         begin_wand_game();
-        game_state = WAITING_STATE;
+        game_state = GAME_OVER_STATE;
     }
     if (game_state == NUMBER_WAND_STATE) {
         Serial.println("Starting number wand");
         begin_wand_game();
-        game_state = WAITING_STATE;
+        game_state = GAME_OVER_STATE;
     }
 }

@@ -7,3 +7,5 @@
 .vscode/*
 .pio/*
 .pio/libdeps/
+.vscode/
+.pio/

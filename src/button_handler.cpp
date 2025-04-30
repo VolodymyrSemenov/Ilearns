@@ -1,18 +1,7 @@
-// #include <button_handler.h>
 #include <games.h>
 #include <button_handler.h>
 #include <constants.h>
 #include <games.h>
-#include <ilearns_app.h>
-
-// game state:
-// 0 - waiting for a game to start
-// 1 - letter ordering game
-// 2 - letter wand game
-// 3 - number ordering game
-// 4 - number wand game
-// 5 - enunciation game
-
 
 // Illuminates a given arcade button led
 void illuminate_arcade_led(int button_number){
@@ -82,9 +71,13 @@ void state_button_handler(int button_pressed) {
             break;
         case end_game_button:
             if (game_state != WAITING_STATE && game_state != RECALIBRATING_STATE) {
-            game_state = GAME_OVER_STATE;
-        }
+                game_state = GAME_OVER_STATE;
+            }
+            break;
+        case recalibrate_button:
+            game_state = RECALIBRATING_STATE;
         default:
+            Serial.println("Error, this wasn't supposed to happen");
             break;
     }
 }
