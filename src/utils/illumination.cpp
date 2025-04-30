@@ -99,7 +99,7 @@ void illuminate_setup_progress()
     
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
-    delay(500);
+    // delay(500);
 }
 
 void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250)

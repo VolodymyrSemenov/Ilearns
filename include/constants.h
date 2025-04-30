@@ -78,5 +78,6 @@ constexpr int EEPROM_GAME_PIECES_ADDRESS = EEPROM_VALID_BIT_ADDRESS + 1; // Addr
 // Game State Variables
 // -------------------------
 extern volatile int game_state;
+extern volatile int utility_button_pressed;
 
 #endif

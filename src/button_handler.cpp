@@ -12,7 +12,7 @@ bool state_button_handler(int button_pressed)
 
     // Disregard mutliple button presses with 0.1s
     static int previous_press_time = 0;
-    if ((millis() - previous_press_time) < 200)
+    if ((millis() - previous_press_time) < 100)
     {
         return false;
     }
@@ -20,8 +20,9 @@ bool state_button_handler(int button_pressed)
     // button_led_handler(button_pressed);
 
     Serial.println("Button Pressed");
-    Serial.println(digitalRead(button_pressed));
-    if (digitalRead(button_pressed) == LOW)
+    int button_press_voltage = digitalRead(button_pressed);
+    Serial.println(button_press_voltage);
+    if (button_press_voltage == 0)
     {
         illuminate_arcade_led(button_pressed);
     }
@@ -64,20 +65,29 @@ bool state_button_handler(int button_pressed)
             game_state = NUMBER_WAND_STATE;
         }
         break;
+
     case HINT_BUTTON_PIN:
+        utility_button_pressed = HINT_BUTTON_PIN;
         break;
+
     case REPEAT_BUTTON_PIN:
+        utility_button_pressed = REPEAT_BUTTON_PIN;
         break;
+
     case SKIP_BUTTON_PIN:
+        utility_button_pressed = SKIP_BUTTON_PIN;
         break;
+
     case END_GAME_BUTTON_PIN:
         if (game_state != WAITING_STATE && game_state != RECALIBRATING_STATE)
         {
             game_state = GAME_OVER_STATE;
         }
+        utility_button_pressed = END_GAME_BUTTON_PIN;
         break;
     case RECALIBRATE_BUTTON:
-        game_state = RECALIBRATING_STATE;
+        // game_state = RECALIBRATING_STATE;
+        break;
     default:
         Serial.println("Error, this wasn't supposed to happen");
         break;
@@ -90,7 +100,7 @@ void LETTER_ORDERING_BUTTON_PIN_handler()
     if (state_button_handler(LETTER_ORDERING_BUTTON_PIN))
     {
         Serial.println("Letter Ordering Button Pressed");
-        illuminate_arcade_led(LETTER_ORDERING_BUTTON_PIN);
+        // illuminate_arcade_led(LETTER_ORDERING_BUTTON_PIN);
     }
 }
 void LETTER_WAND_BUTTON_PIN_handler()

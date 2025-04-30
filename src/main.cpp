@@ -14,6 +14,7 @@
 // Game State Variables from constants and structures headers
 // -------------------------
 volatile int game_state = 0; // Game state variable
+volatile int utility_button_pressed = 0;
 
 GamePieces game_pieces;
 CRGB letter_crgb_leds[NUM_LETTER_LEDS];
