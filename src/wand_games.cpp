@@ -14,8 +14,8 @@
 #include <illumination.h>
 
 // Return true if the game piece is in a list of game pieces
-bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]) {
-  for (int i = 0; i < sizeof(list_of_game_pieces)/sizeof(GamePiece); i++) {
+bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[], int size_of_list_of_game_pieces) {
+  for (int i = 0; i < size_of_list_of_game_pieces; i++) {
     if (list_of_game_pieces[i].character == game_piece.character) {
       return true;
     }
@@ -27,7 +27,7 @@ bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]
 GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[]) {
   int random_index = random(0, max_size);
 
-  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list)) {
+  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, sizeof(random_game_pieces_list))) {
     random_index = random(0, max_size);
   } 
   return game_piece_list[random_index];
