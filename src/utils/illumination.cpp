@@ -85,12 +85,13 @@ void illuminate_board_on_power_up(){
 
 void illuminate_setup_progress()
 {
-    int base_letter_increment = 5;
-    int base_number_increment = 4;
+    Serial.println("illuminate setup progress");
+    int base_letter_increment = 6;
+    int base_number_increment = 5;
 
-    if (base_letter_setup_indice >=19){
-        base_letter_increment = 6;
-        base_number_increment = 5;
+    if (base_letter_setup_indice >=18){
+        base_letter_increment = 8;
+        base_number_increment = 6;
     }
 
     illuminate_range_of_letter_game_pieces(base_letter_setup_indice, base_letter_setup_indice+base_letter_increment, CRGB::Purple);
@@ -98,6 +99,7 @@ void illuminate_setup_progress()
     
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
+    delay(500);
 }
 
 void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250)
@@ -251,13 +253,18 @@ void illuminate_next_number_tile_location(int tile_index, CRGB color)
 
 // Illuminates a given arcade button led
 void illuminate_arcade_led(int button_number)
-{
+{   
+    Serial.println("Illuminating arcade led");
+    Serial.println(button_number+OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, HIGH);
+    delay(1000);
 }
 
 // Turns off a given arcade button led
 void deilluminate_arcade_led(int button_number)
 {
+    Serial.println("De illuminating arcade led");
+    Serial.println(button_number+OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, LOW);
 }
 
@@ -312,13 +319,19 @@ void illuminate_all_arcade_leds(int pin_value)
     digitalWrite(HINT_LED_PIN, pin_value);
 }
 
-void properly_illuminate_arcade_leds_for_game(){
-    illuminate_all_arcade_leds(LOW);
+void illuminate_active_game_arcade_led(){
+    // illuminate_all_arcade_leds(LOW);
+    Serial.println("properly illuminate arcade leds");
+    Serial.println("Game state");
+    Serial.println(game_state);
     if (game_state>=1 && game_state<=5){
         int button_to_illuminate = game_state + OFFSET_GAMESTATE_TO_ARCADE_BUTTON;
         if (game_state==5){
-            int button_to_illuminate = LETTER_WAND_BUTTON_PIN;
+            button_to_illuminate = LETTER_WAND_BUTTON_PIN;
         }
+        Serial.println("Button to illuminate");
+        Serial.println(button_to_illuminate);
+        illuminate_game_arcade_leds(LOW);
         illuminate_arcade_led(button_to_illuminate);
     }
 }

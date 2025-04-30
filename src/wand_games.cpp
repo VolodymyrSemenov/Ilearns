@@ -101,12 +101,26 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
   return false;
 }
 
+void generate_random_seed()
+{
+    unsigned long seed = 0;
+    for (int i = 0; i < 4; i++) {
+      seed ^= analogRead(i);
+      delay(10);
+    }
+    seed^=micros();
+    randomSeed(seed);
+}
+
 void begin_wand_game()
 {
   int correct_selections = 0;
   constexpr int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
-  properly_illuminate_arcade_leds_for_game();
+  generate_random_seed();
+  // illuminate_all_arcade_leds(LOW);
+  // illuminate_arcade_led(game_state+OFFSET_GAMESTATE_TO_ARCADE_LED);
+  illuminate_active_game_arcade_led();
 
 
   for (int i = 0; i < max_correct; i++)

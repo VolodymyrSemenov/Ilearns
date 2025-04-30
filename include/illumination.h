@@ -32,5 +32,5 @@ void button_led_handler(int button_number);
 void illuminate_game_arcade_leds(int pin_value);
 void illuminate_all_arcade_leds(int pin_value);
 void rainbow_dance(unsigned long delay_time = 50);
-void properly_illuminate_arcade_leds_for_game();
+void illuminate_active_game_arcade_led();
 #endif
