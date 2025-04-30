@@ -15,7 +15,6 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
 // New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
 void startLEDRainbowDance();
 
-
 // For recalibrate
 void illuminate_next_letter_tile_location(int tile_index, CRGB color);
 

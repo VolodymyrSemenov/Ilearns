@@ -20,10 +20,6 @@ CRGB letter_crgb_leds[num_letter_leds];
 CRGB number_crgb_leds[num_number_leds];
 Adafruit_PN532 nfc(53, &SPI);
 
-
-
-
-
 // Gives buttons pull up resistors and sets leds as outputs
 void set_pin_modes(){
 
