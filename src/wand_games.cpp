@@ -72,14 +72,14 @@ void send_serial_audio_command(GamePiece game_piece)
 // Given a uid, return its gamepiece
 GamePiece get_gamepiece_by_uid(uint8_t uid[])
 {
-  for (int i = 0; i < num_letters; i++)
+  for (int i = 0; i < NUM_LETTERS; i++)
   {
     if (uids_match(game_pieces.letters[i].uid, uid))
     {
       return game_pieces.letters[i];
     }
   }
-  for (int i = 0; i < num_numbers; i++)
+  for (int i = 0; i < NUM_NUMBERS; i++)
   {
     if (uids_match(game_pieces.numbers[i].uid, uid))
     {
@@ -104,7 +104,7 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
 void begin_wand_game()
 {
   int correct_selections = 0;
-  const int max_correct = 5;
+  constexpr int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
 
 
@@ -112,12 +112,12 @@ void begin_wand_game()
   {
     if (game_state == NUMBER_WAND_STATE)
     {
-      random_game_pieces_list[i] = get_unique_random_gamepiece(num_numbers, game_pieces.numbers, random_game_pieces_list, max_correct);
+      random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
       fill_numbers_solid(CRGB::Yellow);
     }
     else
     {
-      random_game_pieces_list[i] = get_unique_random_gamepiece(num_letters, game_pieces.letters, random_game_pieces_list, max_correct);
+      random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, random_game_pieces_list, max_correct);
       fill_letters_solid(CRGB::Yellow);
     }
   }

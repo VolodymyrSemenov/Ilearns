@@ -12,14 +12,14 @@ void button_led_handler(int button_number);
 bool state_button_handler(int button_pressed);
 
 // Button press handlers
-void letter_ordering_button_handler();
-void letter_wand_button_handler();
-void number_ordering_button_handler();
-void number_wand_button_handler();
-void hint_button_handler();
-void end_game_button_handler();
-void repeat_button_handler();
-void skip_button_handler();
-void recalibrate_button_handler();
+void LETTER_ORDERING_BUTTON_PIN_handler();
+void LETTER_WAND_BUTTON_PIN_handler();
+void NUMBER_ORDERING_BUTTON_PIN_handler();
+void NUMBER_WAND_BUTTON_PIN_handler();
+void HINT_BUTTON_PIN_handler();
+void END_GAME_BUTTON_PIN_handler();
+void REPEAT_BUTTON_PIN_handler();
+void SKIP_BUTTON_PIN_handler();
+void RECALIBRATE_BUTTON_handler();
 
 #endif

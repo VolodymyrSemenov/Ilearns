@@ -26,12 +26,12 @@ void print_single_game_piece(GamePiece game_piece){
 void print_game_pieces() {
 
     Serial.println("\nLetter Game Pieces:");
-    for (int i = 0; i < num_letters; i++) {
+    for (int i = 0; i < NUM_LETTERS; i++) {
         print_single_game_piece(game_pieces.letters[i]);
     }
 
     Serial.println("\nNumber Game Pieces:");
-    for (int i = 0; i < num_numbers; i++) {
+    for (int i = 0; i < NUM_NUMBERS; i++) {
         print_single_game_piece(game_pieces.numbers[i]);
     }
 }

@@ -11,10 +11,10 @@
 #include <FastLED.h>
 
 // Declare external buttons (defined in the main file)
-// extern const int end_game_button;
-// extern const int skip_button;
-// extern const int repeat_button;
-// extern const int hint_button;
+// extern const int END_GAME_BUTTON_PIN;
+// extern const int SKIP_BUTTON_PIN;
+// extern const int REPEAT_BUTTON_PIN;
+// extern const int HINT_BUTTON_PIN;
 
 extern int game_state;
 extern bool game_over;
@@ -24,7 +24,7 @@ extern bool game_over;
 // extern Adafruit_PN532 nfc;
 
 // --- Decoder Selection Function ---
-const int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
+constexpr int DECODER_PINS[6] = {10, 11, 12, 13, 14, 15}; // Replace with actual pins later
 void selectRFIDReader(int readerNumber) {
   for (int i = 0; i < 6; i++) {
     digitalWrite(DECODER_PINS[i], (readerNumber >> i) & 1);
@@ -61,12 +61,12 @@ String readWandTag() {
 
 // --- Game Functions ---
 String getRandomNumber() {
-  int index = random(0, num_numbers);
+  int index = random(0, NUM_NUMBERS);
   return String(game_pieces.numbers[index].character);
 }
 
 bool checkRFIDTagMatch_Number(String currentNumber, String readTag) {
-  for (int i = 0; i < num_numbers; i++) {
+  for (int i = 0; i < NUM_NUMBERS; i++) {
     if (String(game_pieces.numbers[i].character) == currentNumber) {
       String expectedTag = "tag" + String(i + 1);
       Serial.print("Expected tag: ");
@@ -82,7 +82,7 @@ void begin_game_find_numbers() {
 
   while (!game_over){
     int correctSelections = 0;
-    const int maxCorrect = 5;
+    constexpr int maxCorrect = 5;
     String random_numbers_list[maxCorrect];
     Serial.println("Starting Find Numbers Game...");
 
@@ -103,15 +103,15 @@ void begin_game_find_numbers() {
       String tagBeingRead;
       while (true) {
         // Check buttons while waiting:
-        if (digitalRead(end_game_button) == LOW) {
+        if (digitalRead(END_GAME_BUTTON_PIN) == LOW) {
           Serial.println("End Game button pressed. Exiting Find Numbers Game.");
           return;
         }
-        if (digitalRead(skip_button) == LOW) {
+        if (digitalRead(SKIP_BUTTON_PIN) == LOW) {
           Serial.println("Skip button pressed. Moving to next target.");
           break;
         }
-        if (digitalRead(repeat_button) == LOW) {
+        if (digitalRead(REPEAT_BUTTON_PIN) == LOW) {
           Serial.println("Repeat button pressed. Replaying audio.");
           // playLetterAudio(randomNumber, 1);
           delay(500);
@@ -126,17 +126,17 @@ void begin_game_find_numbers() {
         if (checkRFIDTagMatch_Number(randomNumber, tagBeingRead)) {
           Serial.println("Correct match!");
           correctSelections++;
-          fill_solid(number_crgb_leds, num_number_leds, CRGB::Green);
+          fill_solid(number_crgb_leds, NUM_NUMBER_LEDS, CRGB::Green);
           FastLED.show();
           break;  // Exit waiting loop if correct
         } else {
           Serial.println("Incorrect match, try again.");
-          fill_solid(number_crgb_leds, num_number_leds, CRGB::Red);
+          fill_solid(number_crgb_leds, NUM_NUMBER_LEDS, CRGB::Red);
           FastLED.show();
         }
         
         delay(1500);
-        fill_solid(number_crgb_leds, num_number_leds, CRGB::Black);
+        fill_solid(number_crgb_leds, NUM_NUMBER_LEDS, CRGB::Black);
         FastLED.show();
       }
     }

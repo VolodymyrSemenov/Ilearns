@@ -21,7 +21,7 @@
 
 //     bool game_complete = false;
 //     while (!game_complete) {
-//         if (digitalRead(end_game_button) == LOW) {
+//         if (digitalRead(END_GAME_BUTTON_PIN) == LOW) {
 //             Serial.println("End Game button pressed. Exiting Number Ordering Game.");
 //             return;
 //         }

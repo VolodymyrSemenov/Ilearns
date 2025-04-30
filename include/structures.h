@@ -17,14 +17,14 @@ struct GamePiece
 // We combine both sets of game pieces into one struct for EEPROM storage.
 struct GamePieces
 {
-    GamePiece letters[num_letters];
-    GamePiece numbers[num_numbers];
+    GamePiece letters[NUM_LETTERS];
+    GamePiece numbers[NUM_NUMBERS];
 };
 
 // Global variables (that are defined "somewhere")
 extern GamePieces game_pieces; // global copy for EEPROM read/write
-extern CRGB letter_crgb_leds[num_letter_leds];
-extern CRGB number_crgb_leds[num_number_leds];
+extern CRGB letter_crgb_leds[NUM_LETTER_LEDS];
+extern CRGB number_crgb_leds[NUM_NUMBER_LEDS];
 extern Adafruit_PN532 nfc;
 
 #endif

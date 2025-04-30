@@ -2,7 +2,7 @@
 
 void fill_letters_solid(CRGB color)
 {
-    for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_letter_leds; i += 3)
+    for (int i = FRONT_OF_LED_STRIP_OFFSET; i < NUM_LETTER_LEDS; i += 3)
     {
         letter_crgb_leds[i] = color;
         letter_crgb_leds[i + 1] = color;
@@ -13,7 +13,7 @@ void fill_letters_solid(CRGB color)
 
 void fill_numbers_solid(CRGB color)
 {
-    for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_number_leds; i += 3)
+    for (int i = FRONT_OF_LED_STRIP_OFFSET; i < NUM_NUMBER_LEDS; i += 3)
     {
         number_crgb_leds[i] = color;
         number_crgb_leds[i + 1] = color;
@@ -31,7 +31,7 @@ void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
 
     for (int i = game_piece.positions[0]; i < game_piece.positions[WIDTH_PER_PIECE - BLANK_LEDS_BETWEEN_PIECE]; i++)
     {
-        if (indice < num_letters)
+        if (indice < NUM_LETTERS)
         {
             Serial.println("Letter");
             letter_crgb_leds[i] = color;
@@ -65,8 +65,8 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
 //     // Run a rainbow pattern for 5 seconds.
 //     while (millis() - startTime < 5000) {
 //         static uint8_t hue = 0;
-//         fill_rainbow(letter_crgb_leds, num_letter_leds, hue, 8);
-//         fill_rainbow(number_crgb_leds, num_number_leds, hue, 8);
+//         fill_rainbow(letter_crgb_leds, NUM_LETTER_LEDS, hue, 8);
+//         fill_rainbow(number_crgb_leds, NUM_NUMBER_LEDS, hue, 8);
 //         FastLED.show();
 //         hue += 5; // Gradually shift colors
 //         delay(50);
@@ -89,7 +89,7 @@ void startLEDRainbowDance()
         int hue_increase = 16;
 
         // Animate only active letter LEDs (2-on, 1-off pattern)
-        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_letter_leds; i += 3)
+        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < NUM_LETTER_LEDS; i += 3)
         {
             letter_crgb_leds[i] = CHSV(currentHue, 255, 255);
             letter_crgb_leds[i + 1] = CHSV(currentHue + 8, 255, 255);
@@ -99,7 +99,7 @@ void startLEDRainbowDance()
 
         // Animate only active number LEDs (same pattern)
         currentHue = hue;
-        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < num_number_leds; i += 3)
+        for (int i = FRONT_OF_LED_STRIP_OFFSET; i < NUM_NUMBER_LEDS; i += 3)
         {
             number_crgb_leds[i] = CHSV(currentHue, 255, 255);
             number_crgb_leds[i + 1] = CHSV(currentHue + 8, 255, 255);

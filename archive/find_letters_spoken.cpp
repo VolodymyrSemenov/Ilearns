@@ -10,10 +10,10 @@
 // #include <FastLED.h>
 
 // // Declare external buttons (defined in the main file)
-// // extern const int end_game_button;
-// // extern const int skip_button;
-// // extern const int repeat_button;
-// // extern const int hint_button;
+// // extern const int END_GAME_BUTTON_PIN;
+// // extern const int SKIP_BUTTON_PIN;
+// // extern const int REPEAT_BUTTON_PIN;
+// // extern const int HINT_BUTTON_PIN;
 
 // // Game state
 // extern bool game_over;
@@ -56,12 +56,12 @@
 
 // // --- Game Functions ---
 // String getRandomLetter_Spoken() {
-//   int index = random(0, num_letters);
+//   int index = random(0, NUM_LETTERS);
 //   return String(letters[index].character);
 // }
 
 // bool checkRFIDTagMatch_Letter(char currentLetter, String readTag) {
-//   for (int i = 0; i < num_letters; i++) {
+//   for (int i = 0; i < NUM_LETTERS; i++) {
 //     if (letters[i].character[0] == currentLetter) {
 //       String expectedTag = "tag" + String(i + 1);
 //       Serial.print("Expected tag: ");
@@ -92,15 +92,15 @@
 //       String tagBeingRead;
 //       while (true) {
 //         // Check buttons while waiting:
-//         if (digitalRead(end_game_button) == LOW) {
+//         if (digitalRead(END_GAME_BUTTON_PIN) == LOW) {
 //           Serial.println("End Game button pressed. Exiting Find Letters Spoken Game.");
 //           return;
 //         }
-//         if (digitalRead(skip_button) == LOW) {
+//         if (digitalRead(SKIP_BUTTON_PIN) == LOW) {
 //           Serial.println("Skip button pressed. Moving to next target.");
 //           break;
 //         }
-//         if (digitalRead(repeat_button) == LOW) {
+//         if (digitalRead(REPEAT_BUTTON_PIN) == LOW) {
 //           Serial.println("Repeat button pressed. Replaying audio.");
 //           playLetterAudio(randomLetter, 2);
 //           delay(500);
@@ -115,17 +115,17 @@
 //         if (checkRFIDTagMatch_Letter(randomLetter.charAt(0), tagBeingRead)) {
 //           Serial.println("Correct match!");
 //           correctSelections++;
-//           fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Green);
+//           fill_solid(letter_crgb_leds, NUM_LETTER_LEDS, CRGB::Green);
 //           FastLED.show();
 //           break;  // Exit waiting loop if correct
 //         } else {
 //           Serial.println("Incorrect match, try again.");
-//           fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Red);
+//           fill_solid(letter_crgb_leds, NUM_LETTER_LEDS, CRGB::Red);
 //           FastLED.show();
 //         }
         
 //         delay(1500);
-//         fill_solid(letter_crgb_leds, num_letter_leds, CRGB::Black);
+//         fill_solid(letter_crgb_leds, NUM_LETTER_LEDS, CRGB::Black);
 //         FastLED.show();
 //       }
 //     }

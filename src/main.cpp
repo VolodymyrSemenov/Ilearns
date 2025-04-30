@@ -15,8 +15,8 @@
 volatile int game_state = 0; // Game state variable
 
 GamePieces game_pieces;
-CRGB letter_crgb_leds[num_letter_leds];
-CRGB number_crgb_leds[num_number_leds];
+CRGB letter_crgb_leds[NUM_LETTER_LEDS];
+CRGB number_crgb_leds[NUM_NUMBER_LEDS];
 Adafruit_PN532 nfc(53, &SPI);
 
 // Gives buttons pull up resistors and sets leds as outputs
@@ -24,18 +24,18 @@ void set_pin_modes()
 {
 
     // Initialize button pins with internal pullups
-    pinMode(letter_ordering_button, INPUT_PULLUP);
-    pinMode(number_ordering_button, INPUT_PULLUP);
-    pinMode(letter_wand_button, INPUT_PULLUP);
-    pinMode(number_wand_button, INPUT_PULLUP);
+    pinMode(LETTER_ORDERING_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(NUMBER_ORDERING_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(LETTER_WAND_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(NUMBER_WAND_BUTTON_PIN, INPUT_PULLUP);
 
-    pinMode(end_game_button, INPUT_PULLUP);
-    pinMode(skip_button, INPUT_PULLUP);
-    pinMode(repeat_button, INPUT_PULLUP);
-    pinMode(hint_button, INPUT_PULLUP);
+    pinMode(END_GAME_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(SKIP_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(REPEAT_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(HINT_BUTTON_PIN, INPUT_PULLUP);
 
-    pinMode(annunciation_pin, INPUT_PULLUP);
-    pinMode(recalibrate_button, INPUT_PULLUP);
+    pinMode(ENUNCIATION_PIN, INPUT_PULLUP);
+    pinMode(RECALIBRATE_BUTTON, INPUT_PULLUP);
 
     // Set led pins as outputs
     pinMode(letter_ordering_led, OUTPUT);
@@ -43,34 +43,34 @@ void set_pin_modes()
     pinMode(letter_wand_led, OUTPUT);
     pinMode(number_wand_led, OUTPUT);
 
-    pinMode(end_game_led, OUTPUT);
-    pinMode(skip_led, OUTPUT);
-    pinMode(repeat_led, OUTPUT);
-    pinMode(skip_led, OUTPUT);
+    pinMode(END_GAME_LED_PIN, OUTPUT);
+    pinMode(SKIP_LED_PIN, OUTPUT);
+    pinMode(REPEAT_LED_PIN, OUTPUT);
+    pinMode(SKIP_LED_PIN, OUTPUT);
 }
 
 // Enables interrupts on buttons
 void enable_interrupts()
 {
-    enableInterrupt(letter_ordering_button, letter_ordering_button_handler, FALLING);
-    enableInterrupt(letter_wand_button, letter_wand_button_handler, FALLING);
-    enableInterrupt(number_ordering_button, number_ordering_button_handler, FALLING);
-    enableInterrupt(number_wand_button, number_wand_button_handler, FALLING);
+    enableInterrupt(LETTER_ORDERING_BUTTON_PIN, LETTER_ORDERING_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(LETTER_WAND_BUTTON_PIN, LETTER_WAND_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, NUMBER_ORDERING_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(NUMBER_WAND_BUTTON_PIN, NUMBER_WAND_BUTTON_PIN_handler, FALLING);
 
-    enableInterrupt(hint_button, hint_button_handler, FALLING);
-    enableInterrupt(end_game_button, end_game_button_handler, FALLING);
-    enableInterrupt(repeat_button, repeat_button_handler, FALLING);
-    enableInterrupt(skip_button, skip_button_handler, FALLING);
+    enableInterrupt(HINT_BUTTON_PIN, HINT_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(END_GAME_BUTTON_PIN, END_GAME_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(REPEAT_BUTTON_PIN, REPEAT_BUTTON_PIN_handler, FALLING);
+    enableInterrupt(SKIP_BUTTON_PIN, SKIP_BUTTON_PIN_handler, FALLING);
 
-    enableInterrupt(recalibrate_button, recalibrate_button_handler, FALLING);
+    enableInterrupt(RECALIBRATE_BUTTON, RECALIBRATE_BUTTON_handler, FALLING);
 }
 
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
 void initialize_led_strips()
 {
-    FastLED.addLeds<WS2811, letter_led_strip, RGB>(letter_crgb_leds, num_letter_leds);
-    FastLED.addLeds<WS2811, number_led_strip, RGB>(number_crgb_leds, num_number_leds);
-    for (int i = 0; i < num_letter_leds; i++)
+    FastLED.addLeds<WS2811, LETTER_LED_STRIP_PIN, RGB>(letter_crgb_leds, NUM_LETTER_LEDS);
+    FastLED.addLeds<WS2811, NUMBER_LED_STRIP_PIN, RGB>(number_crgb_leds, NUM_NUMBER_LEDS);
+    for (int i = 0; i < NUM_LETTER_LEDS; i++)
     {
         letter_crgb_leds[i] = CRGB::Black;
     }
@@ -106,7 +106,7 @@ void generate_game_pieces_structure()
     uint8_t uidLength;
 
     // Letters
-    for (int i = 0; i < num_letters; i++)
+    for (int i = 0; i < NUM_LETTERS; i++)
     {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
         Serial.println(i);
@@ -129,7 +129,7 @@ void generate_game_pieces_structure()
     }
 
     // Numbers
-    for (int i = 0; i < num_numbers; i++)
+    for (int i = 0; i < NUM_NUMBERS; i++)
     {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
 
@@ -140,7 +140,7 @@ void generate_game_pieces_structure()
             delay(50); // avoid overwhelming the RFID reader
         }
 
-        game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i + num_letters, i);
+        game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i + NUM_LETTERS, i);
         illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.numbers[i]);
@@ -151,15 +151,15 @@ void generate_game_pieces_structure()
 // Write entire GamePieces struct to EEPROM (at game_pieces_address)
 void PiecesToEEPROM()
 {
-    EEPROM.put(eeprom_valid_bit_address, 1);
-    EEPROM.put(eeprom_game_pieces_address, game_pieces);
+    EEPROM.put(EEPROM_VALID_BIT_ADDRESS, 1);
+    EEPROM.put(EEPROM_GAME_PIECES_ADDRESS, game_pieces);
 }
 
 // Read the GamePieces struct from EEPROM
 GamePieces PiecesFromEEPROM()
 {
     GamePieces gp;
-    EEPROM.get(eeprom_game_pieces_address, gp);
+    EEPROM.get(EEPROM_GAME_PIECES_ADDRESS, gp);
     return gp;
 }
 
@@ -173,7 +173,7 @@ void recalibrate_game_pieces()
 // Populate GamePieces struct
 void populate_game_pieces_structure()
 {
-    int valid_bit = EEPROM.read(eeprom_valid_bit_address);
+    int valid_bit = EEPROM.read(EEPROM_VALID_BIT_ADDRESS);
     if (valid_bit == 1)
     {
         game_pieces = PiecesFromEEPROM();
