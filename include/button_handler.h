@@ -22,4 +22,14 @@ void REPEAT_BUTTON_PIN_handler();
 void SKIP_BUTTON_PIN_handler();
 void RECALIBRATE_BUTTON_handler();
 
+void LETTER_ORDERING_BUTTON_PIN_handler_rising();
+void NUMBER_ORDERING_BUTTON_PIN_handler_rising();
+void LETTER_WAND_BUTTON_PIN_handler_rising();
+void NUMBER_WAND_BUTTON_PIN_handler_rising();
+void HINT_BUTTON_PIN_handler_rising();
+void END_GAME_BUTTON_PIN_handler_rising();
+void REPEAT_BUTTON_PIN_handler_rising();
+void SKIP_BUTTON_PIN_handler_rising();
+void RECALIBRATE_BUTTON_handler_rising();
+
 #endif

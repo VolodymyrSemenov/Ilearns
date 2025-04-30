@@ -59,16 +59,17 @@ constexpr int decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
 constexpr int WIDTH_PER_PIECE = 3;                            // Number of WS2811 LEDs per game piece
 constexpr int BLANK_LEDS_BETWEEN_PIECE = 1;                   // Number of blank LEDs between game pieces
 constexpr int BRIGHTNESS = 128;                               // Brightness of the LEDs (0-255)
-constexpr int ARCADE_LED_OFFSET = 23;                         // Offset for arcade buttons
+constexpr int OFFSET_ARCADE_BUTTON_TO_ARCADE_LED = 23;                         // Offset for arcade buttons
 constexpr int MAX_UID_LENGTH = 7;                             // Maximum UID length for NFC tags
-constexpr int FRONT_OF_LED_STRIP_OFFSET = 25;                 // offset of number of leds between arduino and the first tile (same for both letters and numbers)
-constexpr int OFFSET_BETWEEN_ARCADE_BUTTON_AND_GAMESTATE = 9; // Distance between arcade button pin and LED strip
+constexpr int OFFSET_BLANK_WS2811_LEDS = 25;                 // offset of number of leds between arduino and the first tile (same for both letters and numbers)
+constexpr int OFFSET_GAMESTATE_TO_ARCADE_BUTTON = 9; // Distance between arcade button pin and LED strip
+constexpr int OFFSET_GAMESTATE_TO_ARCADE_LED = OFFSET_GAMESTATE_TO_ARCADE_BUTTON + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED; // Distance between arcade LED pin and LED strip
 
 constexpr int NUM_LETTERS = 26;
 constexpr int NUM_NUMBERS = 21;
 
-constexpr int NUM_LETTER_LEDS = NUM_LETTERS * WIDTH_PER_PIECE + FRONT_OF_LED_STRIP_OFFSET;
-constexpr int NUM_NUMBER_LEDS = NUM_NUMBERS * WIDTH_PER_PIECE + FRONT_OF_LED_STRIP_OFFSET;
+constexpr int NUM_LETTER_LEDS = NUM_LETTERS * WIDTH_PER_PIECE + OFFSET_BLANK_WS2811_LEDS;
+constexpr int NUM_NUMBER_LEDS = NUM_NUMBERS * WIDTH_PER_PIECE + OFFSET_BLANK_WS2811_LEDS;
 
 constexpr int EEPROM_VALID_BIT_ADDRESS = 0;                              // Value of 1 indicates valid EEPROM data
 constexpr int EEPROM_GAME_PIECES_ADDRESS = EEPROM_VALID_BIT_ADDRESS + 1; // Address to store game pieces in EEPROM

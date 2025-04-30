@@ -3,6 +3,7 @@
 #include "illumination.h"
 #include "printing.h"
 #include "EEPROM.h"
+#include "illumination.h"
 
 // Given a base index, fill the positions array for a game piece.
 void generatePositions(int baseIndex, int positions[])
@@ -19,7 +20,7 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
     game_piece.character = character_value;
     memcpy(game_piece.uid, uid, MAX_UID_LENGTH);
     game_piece.decoder_value = decoder_value;
-    generatePositions(FRONT_OF_LED_STRIP_OFFSET + i * WIDTH_PER_PIECE, game_piece.positions);
+    generatePositions(OFFSET_BLANK_WS2811_LEDS + i * WIDTH_PER_PIECE, game_piece.positions);
 
     return game_piece;
 }
@@ -35,7 +36,7 @@ void generate_game_pieces_structure()
     {
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0}; // Supports both 4-byte and 7-byte UIDs
         Serial.println(i);
-        Serial.println(FRONT_OF_LED_STRIP_OFFSET);
+        Serial.println(OFFSET_BLANK_WS2811_LEDS);
         illuminate_next_letter_tile_location(i, CRGB::Yellow);
 
         Serial.println("size of letter_crgb_leds");
@@ -91,6 +92,7 @@ GamePieces PiecesFromEEPROM()
 // Recalibrate game pieces and write to EEPROM
 void recalibrate_game_pieces()
 {
+    fill_board_solid(CRGB::Black);
     generate_game_pieces_structure();
     PiecesToEEPROM();
 }

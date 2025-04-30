@@ -106,6 +106,7 @@ void begin_wand_game()
   int correct_selections = 0;
   constexpr int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
+  properly_illuminate_arcade_leds_for_game();
 
 
   for (int i = 0; i < max_correct; i++)
@@ -113,11 +114,13 @@ void begin_wand_game()
     if (game_state == NUMBER_WAND_STATE)
     {
       random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
+      fill_board_solid(CRGB::Black);
       fill_numbers_solid(CRGB::Yellow);
     }
     else
     {
       random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, random_game_pieces_list, max_correct);
+      fill_board_solid(CRGB::Black);
       fill_letters_solid(CRGB::Yellow);
     }
   }
