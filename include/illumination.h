@@ -17,6 +17,8 @@ void rainbow_gradient_waiting(unsigned long delay_time = 50);
 
 void illuminate_next_letter_tile_location(int tile_index, CRGB color);
 void illuminate_next_number_tile_location(int tile_index, CRGB color);
+void flash_next_letter_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250);
+void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250);
 
 void fill_letters_solid(CRGB color);
 void fill_numbers_solid(CRGB color);

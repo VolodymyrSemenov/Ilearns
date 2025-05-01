@@ -4,6 +4,7 @@
 #include <structures.h>
 #include <illumination.h>
 #include <printing.h>
+#include <games.h>
 
 // Given a base index, fill the positions array for a game piece.
 void generate_positions(int baseIndex, int positions[])
@@ -42,16 +43,30 @@ void generate_game_pieces_structure()
         Serial.println("size of letter_crgb_leds");
         Serial.println(sizeof(letter_crgb_leds) / 3);
 
-        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30))
+        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30) && !utility_button_pressed)
         {
             delay(50); // avoid overwhelming the RFID reader
+        }
+
+        while (uid_is_uid_of_a_previous_gamepiece_in_list(i, game_pieces.letters, uid)){
+            nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30);
+            flash_next_letter_tile_location(i, CRGB::Red, 2);
+            illuminate_next_letter_tile_location(i, CRGB::Yellow);
+            delay(50);
+        }
+
+        if (utility_button_pressed){
+            if (utility_button_pressed == END_GAME_BUTTON_PIN){
+                utility_button_pressed = 0;
+                return;  
+            }
+            utility_button_pressed = 0;
         }
 
         game_pieces.letters[i] = generate_single_game_piece(game_pieces.letters[i], lower_case_ascii_offset + i, uid, i, i);
         illuminate_single_game_piece(game_pieces.letters[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.letters[i]);
-        // delay(500);
     }
 
     // Numbers
@@ -61,17 +76,39 @@ void generate_game_pieces_structure()
 
         illuminate_next_number_tile_location(i, CRGB::Yellow);
 
-        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30))
+        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30) && !utility_button_pressed)
         {
             delay(50); // avoid overwhelming the RFID reader
+        }
+
+        while (uid_is_uid_of_a_previous_gamepiece_in_list(NUM_LETTERS, game_pieces.letters, uid)){
+            nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30);
+            flash_next_number_tile_location(i, CRGB::Red, 2);
+            illuminate_next_number_tile_location(i, CRGB::Yellow);
+            delay(50);
+        }
+
+        while (uid_is_uid_of_a_previous_gamepiece_in_list(i, game_pieces.numbers, uid)){
+            nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30);
+            flash_next_number_tile_location(i, CRGB::Red, 2);
+            illuminate_next_number_tile_location(i, CRGB::Yellow);
+            delay(50);
+        }
+
+        if (utility_button_pressed){
+            if (utility_button_pressed == END_GAME_BUTTON_PIN){
+                utility_button_pressed = 0;
+                return;  
+            }
+            utility_button_pressed = 0;
         }
 
         game_pieces.numbers[i] = generate_single_game_piece(game_pieces.numbers[i], i, uid, i + NUM_LETTERS, i);
         illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.numbers[i]);
-        // delay(500);
     }
+    put_pieces_to_eeprom();
 }
 
 // Write entire GamePieces struct to EEPROM (at game_pieces_address)
@@ -94,7 +131,6 @@ void recalibrate_game_pieces()
 {
     fill_board_solid(CRGB::Black);
     generate_game_pieces_structure();
-    put_pieces_to_eeprom();
 }
 
 // Populate GamePieces struct

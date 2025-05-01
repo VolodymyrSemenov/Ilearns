@@ -41,7 +41,7 @@ void ordering_game()
             // flash_tile_location(current_game_piece, CRGB::Green, 2);
             illuminate_single_game_piece(current_game_piece, CRGB::Green);
         }
-        else if (uid_is_uid_of_previous_gamepiece(correct_selections, selected_pieces, uid))
+        else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, selected_pieces, uid))
         {
             continue; // Don't flash the tile if it's already green
         }

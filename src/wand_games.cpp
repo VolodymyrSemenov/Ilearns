@@ -93,7 +93,7 @@ GamePiece get_gamepiece_by_uid(uint8_t uid[])
   return GamePiece(); // Return an empty GamePiece if not found
 }
 
-bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_game_pieces_list[], uint8_t uid[])
+bool uid_is_uid_of_a_previous_gamepiece_in_list(int correct_selections, GamePiece random_game_pieces_list[], uint8_t uid[])
 {
   for (int i = 0; i < correct_selections; i++)
   {
@@ -231,7 +231,7 @@ void begin_wand_game()
       skip = 0; // Reset skip flag
     }
 
-    else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid) || repeat)
+    else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, random_game_pieces_list, uid) || repeat)
     {
       repeat = 0;
       continue; // Don't flash the tile if it's already green

@@ -200,6 +200,18 @@ void illuminate_next_letter_tile_location(int tile_index, CRGB color)
     FastLED.show();
 }
 
+
+void flash_next_letter_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250)
+{
+    for (int i=0; i < number_of_flashes; i++)
+    {
+        illuminate_next_letter_tile_location(tile_index, color);
+        delay(delay_time);
+        illuminate_next_letter_tile_location(tile_index, CRGB::Black);
+        delay(delay_time);
+    }
+}
+
 // For recalibrate
 void illuminate_next_number_tile_location(int tile_index, CRGB color)
 {
@@ -214,6 +226,18 @@ void illuminate_next_number_tile_location(int tile_index, CRGB color)
         number_crgb_leds[i] = color;
     }
     FastLED.show();
+}
+
+
+void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250)
+{
+    for (int i=0; i < number_of_flashes; i++)
+    {
+        illuminate_next_number_tile_location(tile_index, color);
+        delay(delay_time);
+        illuminate_next_number_tile_location(tile_index, CRGB::Black);
+        delay(delay_time);
+    }
 }
 
 // ARCADE BUTTONS
