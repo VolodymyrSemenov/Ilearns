@@ -9,7 +9,6 @@
 #include <printing.h>
 #include <illumination.h>
 #include <recalibrate.h>
-#include <order.h>
 
 // -------------------------
 // Game State Variables from constants and structures headers
@@ -97,12 +96,13 @@ void initialize_wand_reader()
     Serial.println("NFC reader initialized.");
 }
 
-void get_random_seed() 
+void get_random_seed()
 {
     unsigned long seed = 0;
-    for (int i = 0; i < 4; i++) {
-      seed ^= analogRead(i);
-      delay(10);
+    for (int i = 0; i < 4; i++)
+    {
+        seed ^= analogRead(i);
+        delay(10);
     }
     seed ^= micros();
     randomSeed(seed);
@@ -133,7 +133,6 @@ void setup()
     initialize_wand_reader();
     illuminate_setup_progress();
 
-    
     print_game_pieces();
 
     delay(250);
@@ -144,7 +143,6 @@ void setup()
     // illuminate_all_arcade_leds(HIGH);
 }
 
-
 bool flashing_active = true;
 bool arcade_leds_on = false;
 unsigned long last_flash_time = 0;
@@ -153,70 +151,77 @@ int pressed_button = -1;
 constexpr int flash_interval = 1000; // ms
 
 // --- Arcade Flashing Logic Function ---
-void flash_game_arcade_leds() {
-    if (!flashing_active) return;
+void flash_game_arcade_leds()
+{
+    if (!flashing_active)
+        return;
 
     // Flash LEDs on/off every 500ms
-    if (millis() - last_flash_time >= flash_interval) {
+    if (millis() - last_flash_time >= flash_interval)
+    {
         last_flash_time = millis();
-        if (arcade_leds_on) {
+        if (arcade_leds_on)
+        {
             illuminate_game_arcade_leds(LOW);
-        } else {
+        }
+        else
+        {
             illuminate_game_arcade_leds(HIGH);
         }
         arcade_leds_on = !arcade_leds_on;
     }
 }
 
-
 void loop()
 {
     static int previous_state = game_state;
-    if (game_state != previous_state) {
+    if (game_state != previous_state)
+    {
         Serial.print("Switching State: ");
         Serial.println(game_state);
         previous_state = game_state;
     }
-    switch (game_state) {
-        case GAME_OVER_STATE:
-            startLEDRainbowDance();
-            game_state = WAITING_STATE;
-            break;
-        
-        case RECALIBRATING_STATE:
-            Serial.println("Starting recalibration");
-            recalibrate_game_pieces();
-            game_state = WAITING_STATE;
-            break;
+    switch (game_state)
+    {
+    case GAME_OVER_STATE:
+        startLEDRainbowDance();
+        game_state = WAITING_STATE;
+        break;
 
-        case LETTER_WAND_STATE:
-            Serial.println("Starting letter wand game");
-            begin_wand_game();
-            game_state = GAME_OVER_STATE;
-            break;
-    
-        case NUMBER_WAND_STATE:
-            Serial.println("Starting number wand game");
-            begin_wand_game();
-            game_state = GAME_OVER_STATE;
-            break;
+    case RECALIBRATING_STATE:
+        Serial.println("Starting recalibration");
+        recalibrate_game_pieces();
+        game_state = WAITING_STATE;
+        break;
 
-        case LETTER_ORDERING_STATE:
-            Serial.println("Starting letter ordering game");
-            ordering_game();
-            game_state = GAME_OVER_STATE;
-            break;
+    case LETTER_WAND_STATE:
+        Serial.println("Starting letter wand game");
+        begin_wand_game();
+        game_state = GAME_OVER_STATE;
+        break;
 
-        case NUMBER_ORDERING_STATE:
+    case NUMBER_WAND_STATE:
+        Serial.println("Starting number wand game");
+        begin_wand_game();
+        game_state = GAME_OVER_STATE;
+        break;
 
-            Serial.println("Starting number ordering game");
-            ordering_game();
-            game_state = GAME_OVER_STATE;
-            break;
+    case LETTER_ORDERING_STATE:
+        Serial.println("Starting letter ordering game");
+        ordering_game();
+        game_state = GAME_OVER_STATE;
+        break;
 
-        case WAITING_STATE:
-            rainbow_dance();
-            illuminate_game_arcade_leds(HIGH);
-            break;
+    case NUMBER_ORDERING_STATE:
+
+        Serial.println("Starting number ordering game");
+        ordering_game();
+        game_state = GAME_OVER_STATE;
+        break;
+
+    case WAITING_STATE:
+        rainbow_dance();
+        illuminate_game_arcade_leds(HIGH);
+        break;
     }
 }

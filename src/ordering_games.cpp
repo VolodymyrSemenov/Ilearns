@@ -5,19 +5,22 @@
 #include <Adafruit_PN532.h>
 #include <FastLED.h>
 #include <illumination.h>
-#include <order.h>
+#include <games.h>
 
 void ordering_game()
 {
     int correct_selections = 0;
     int max_correct;
     GamePiece *selected_pieces;
-    if (game_state == LETTER_ORDERING_STATE){
+    if (game_state == LETTER_ORDERING_STATE)
+    {
         fill_letters_solid(CRGB::White);
         fill_numbers_solid(CRGB::Black);
         selected_pieces = game_pieces.letters;
         max_correct = 26;
-    } else {
+    }
+    else
+    {
         fill_numbers_solid(CRGB::White);
         fill_letters_solid(CRGB::Black);
         selected_pieces = game_pieces.numbers;

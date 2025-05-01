@@ -1,6 +1,5 @@
 #include <structures.h>
 
-
 int base_letter_setup_indice = 0;
 int base_number_setup_indice = 0;
 
@@ -56,7 +55,6 @@ void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
     FastLED.show(); // Display updated leds
 }
 
-
 void illuminate_range_of_letter_game_pieces(int first_indice, int last_indice, CRGB color)
 {
     for (int i = first_indice; i < last_indice; i++)
@@ -64,7 +62,6 @@ void illuminate_range_of_letter_game_pieces(int first_indice, int last_indice, C
         illuminate_single_game_piece(game_pieces.letters[i], color);
     }
 }
-
 
 void illuminate_range_of_number_game_pieces(int first_indice, int last_indice, CRGB color)
 {
@@ -74,9 +71,8 @@ void illuminate_range_of_number_game_pieces(int first_indice, int last_indice, C
     }
 }
 
-
-
-void illuminate_board_on_power_up(){
+void illuminate_board_on_power_up()
+{
     fill_board_solid(CRGB::Black);
     fill_board_solid(CRGB::Purple);
     delay(500);
@@ -89,14 +85,15 @@ void illuminate_setup_progress()
     int base_letter_increment = 6;
     int base_number_increment = 5;
 
-    if (base_letter_setup_indice >=18){
+    if (base_letter_setup_indice >= 18)
+    {
         base_letter_increment = 8;
         base_number_increment = 6;
     }
 
-    illuminate_range_of_letter_game_pieces(base_letter_setup_indice, base_letter_setup_indice+base_letter_increment, CRGB::Purple);
-    illuminate_range_of_number_game_pieces(base_number_setup_indice, base_number_setup_indice+base_number_increment, CRGB::Purple);
-    
+    illuminate_range_of_letter_game_pieces(base_letter_setup_indice, base_letter_setup_indice + base_letter_increment, CRGB::Purple);
+    illuminate_range_of_number_game_pieces(base_number_setup_indice, base_number_setup_indice + base_number_increment, CRGB::Purple);
+
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
     // delay(500);
@@ -112,9 +109,6 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
         delay(delay_time);
     }
 }
-
-
-
 
 void rainbow_dance(unsigned long delay_time = 50)
 {
@@ -247,15 +241,13 @@ void illuminate_next_number_tile_location(int tile_index, CRGB color)
     FastLED.show();
 }
 
-
-
 // ARCADE BUTTONS
 
 // Illuminates a given arcade button led
 void illuminate_arcade_led(int button_number)
-{   
+{
     Serial.println("Illuminating arcade led");
-    Serial.println(button_number+OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
+    Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, HIGH);
     delay(1000);
 }
@@ -264,7 +256,7 @@ void illuminate_arcade_led(int button_number)
 void deilluminate_arcade_led(int button_number)
 {
     Serial.println("De illuminating arcade led");
-    Serial.println(button_number+OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
+    Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, LOW);
 }
 
@@ -279,7 +271,7 @@ void button_led_handler(int button_number)
     // on falling edges (button presses)
     if (digitalRead(button_number) == FALLING)
     {
-        Serial.println("Button Pressed IF"); 
+        Serial.println("Button Pressed IF");
         illuminate_arcade_led(button_number);
     }
 
@@ -319,14 +311,17 @@ void illuminate_all_arcade_leds(int pin_value)
     digitalWrite(HINT_LED_PIN, pin_value);
 }
 
-void illuminate_active_game_arcade_led(){
+void illuminate_active_game_arcade_led()
+{
     // illuminate_all_arcade_leds(LOW);
     Serial.println("properly illuminate arcade leds");
     Serial.println("Game state");
     Serial.println(game_state);
-    if (game_state>=1 && game_state<=5){
+    if (game_state >= 1 && game_state <= 5)
+    {
         int button_to_illuminate = game_state + OFFSET_GAMESTATE_TO_ARCADE_BUTTON;
-        if (game_state==5){
+        if (game_state == 5)
+        {
             button_to_illuminate = LETTER_WAND_BUTTON_PIN;
         }
         Serial.println("Button to illuminate");

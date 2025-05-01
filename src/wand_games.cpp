@@ -104,13 +104,14 @@ bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_g
 
 void generate_random_seed()
 {
-    unsigned long seed = 0;
-    for (int i = 0; i < 4; i++) {
-      seed ^= analogRead(i);
-      delay(10);
-    }
-    seed^=micros();
-    randomSeed(seed);
+  unsigned long seed = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    seed ^= analogRead(i);
+    delay(10);
+  }
+  seed ^= micros();
+  randomSeed(seed);
 }
 
 void begin_wand_game()
@@ -118,16 +119,15 @@ void begin_wand_game()
   int correct_selections = 0;
   constexpr int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
-  
+
   constexpr int max_hints = 3; // plus the correct one
-  GamePiece hint_game_pieces_list[max_hints+1];
+  GamePiece hint_game_pieces_list[max_hints + 1];
   int hint = 0;
   int repeat = 0;
   int skip = 0;
   generate_random_seed();
 
   illuminate_active_game_arcade_led();
-
 
   for (int i = 0; i < max_correct; i++)
   {
@@ -162,61 +162,68 @@ void begin_wand_game()
 
     if (utility_button_pressed)
     {
-      switch (utility_button_pressed){
-        case HINT_BUTTON_PIN:
-          if (!hint){
+      switch (utility_button_pressed)
+      {
+      case HINT_BUTTON_PIN:
+        if (!hint)
+        {
 
-            Serial.println("Hint button pressed. Exiting game.");
-            if (game_state == NUMBER_WAND_STATE){
-              for (int i = 0; i < max_hints; i++)
-              {
-                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, hint_game_pieces_list, max_hints);
-              }
+          Serial.println("Hint button pressed. Exiting game.");
+          if (game_state == NUMBER_WAND_STATE)
+          {
+            for (int i = 0; i < max_hints; i++)
+            {
+              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, hint_game_pieces_list, max_hints);
             }
-
-            else{
-              for (int i = 0; i < max_hints; i++)
-              {
-                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, hint_game_pieces_list, max_hints);
-              }
-            }
-
-            // for (int i=0; i<sizeof(hint_game_pieces_list); i++){
-            //   print_single_game_piece(hint_game_pieces_list[i]);
-            // }
-
-            hint_game_pieces_list[max_hints] = current_game_piece;
-            for (int i = 0; i < max_hints + 1; i++){
-              illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
-            }
-            hint = 1;
           }
 
-          break;
+          else
+          {
+            for (int i = 0; i < max_hints; i++)
+            {
+              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, hint_game_pieces_list, max_hints);
+            }
+          }
 
-        case END_GAME_BUTTON_PIN:
-          Serial.println("End game button pressed. Exiting game.");
-          correct_selections = max_correct; // End the game
-          break;
+          // for (int i=0; i<sizeof(hint_game_pieces_list); i++){
+          //   print_single_game_piece(hint_game_pieces_list[i]);
+          // }
 
-        case REPEAT_BUTTON_PIN:
-          Serial.println("Repeat button pressed. Repeating audio");
-          send_serial_audio_command(current_game_piece);
-          repeat = 1;
-          break;
+          hint_game_pieces_list[max_hints] = current_game_piece;
+          for (int i = 0; i < max_hints + 1; i++)
+          {
+            illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
+          }
+          hint = 1;
+        }
 
-        case SKIP_BUTTON_PIN:
-          skip = 1;
-          Serial.println("Skip button pressed. Exiting game.");
-          break;
+        break;
+
+      case END_GAME_BUTTON_PIN:
+        Serial.println("End game button pressed. Exiting game.");
+        correct_selections = max_correct; // End the game
+        break;
+
+      case REPEAT_BUTTON_PIN:
+        Serial.println("Repeat button pressed. Repeating audio");
+        send_serial_audio_command(current_game_piece);
+        repeat = 1;
+        break;
+
+      case SKIP_BUTTON_PIN:
+        skip = 1;
+        Serial.println("Skip button pressed. Exiting game.");
+        break;
       }
       utility_button_pressed = 0; // Reset the button press
     }
 
     if (uids_match(uid, current_game_piece.uid) || skip)
     {
-      if (hint){
-        for (int i = 0; i < max_hints+1; i++){
+      if (hint)
+      {
+        for (int i = 0; i < max_hints + 1; i++)
+        {
           illuminate_single_game_piece(hint_game_pieces_list[i], CRGB::Yellow);
         }
         hint = 0;
@@ -227,7 +234,7 @@ void begin_wand_game()
       correct_selections++;
       skip = 0; // Reset skip flag
     }
-    
+
     else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid) || repeat)
     {
       repeat = 0;
