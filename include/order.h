@@ -3,7 +3,7 @@
 
 #include <structures.h>
 
-void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250);
+void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time);
 void illuminate_single_game_piece(GamePiece game_piece, CRGB color);
 
 bool uids_match(uint8_t uid1[], uint8_t uid2[]);

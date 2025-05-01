@@ -63,16 +63,6 @@ void enable_interrupts()
     enableInterrupt(REPEAT_BUTTON_PIN, repeat_button_handler, CHANGE);
     enableInterrupt(SKIP_BUTTON_PIN, skip_button_handler, CHANGE);
     enableInterrupt(RECALIBRATE_BUTTON, recalibrate_button_handler, CHANGE);
-
-    // enableInterrupt(LETTER_ORDERING_BUTTON_PIN, letter_ordering_button_handler_rising, RISING);
-    // enableInterrupt(NUMBER_ORDERING_BUTTON_PIN, number_ordering_button_handler_rising, RISING);
-    // enableInterrupt(LETTER_WAND_BUTTON_PIN, letter_wand_button_handler_rising, RISING);
-    // enableInterrupt(NUMBER_WAND_BUTTON_PIN, number_wand_button_handler_rising, RISING);
-    // enableInterrupt(HINT_BUTTON_PIN, hint_button_handler_rising, RISING);
-    // enableInterrupt(END_GAME_BUTTON_PIN, end_game_button_handler_rising, RISING);
-    // enableInterrupt(REPEAT_BUTTON_PIN, repeat_button_handler_rising, RISING);
-    // enableInterrupt(SKIP_BUTTON_PIN, skip_button_handler_rising, RISING);
-    // enableInterrupt(RECALIBRATE_BUTTON, recalibrate_button_handler_rising, RISING);
 }
 
 // Initialize both WS2811 LED strips (one for letters, one for numbers)
@@ -160,7 +150,7 @@ bool arcade_leds_on = false;
 unsigned long last_flash_time = 0;
 int pressed_button = -1;
 
-const int flash_interval = 1000; // ms
+constexpr int flash_interval = 1000; // ms
 
 // --- Arcade Flashing Logic Function ---
 void flash_game_arcade_leds() {
