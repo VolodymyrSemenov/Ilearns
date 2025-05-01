@@ -164,31 +164,34 @@ void begin_wand_game()
     {
       switch (utility_button_pressed){
         case HINT_BUTTON_PIN:
+          if (!hint){
 
-          Serial.println("Hint button pressed. Exiting game.");
-          if (game_state == NUMBER_WAND_STATE){
-            for (int i = 0; i < max_hints; i++)
-            {
-              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, hint_game_pieces_list, max_hints);
+            Serial.println("Hint button pressed. Exiting game.");
+            if (game_state == NUMBER_WAND_STATE){
+              for (int i = 0; i < max_hints; i++)
+              {
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, hint_game_pieces_list, max_hints);
+              }
             }
-          }
 
-          else{
-            for (int i = 0; i < max_hints; i++)
-            {
-              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, hint_game_pieces_list, max_hints);
+            else{
+              for (int i = 0; i < max_hints; i++)
+              {
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, hint_game_pieces_list, max_hints);
+              }
             }
+
+            // for (int i=0; i<sizeof(hint_game_pieces_list); i++){
+            //   print_single_game_piece(hint_game_pieces_list[i]);
+            // }
+
+            hint_game_pieces_list[max_hints] = current_game_piece;
+            for (int i = 0; i < max_hints + 1; i++){
+              illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
+            }
+            hint = 1;
           }
 
-          for (int i=0; i<sizeof(hint_game_pieces_list); i++){
-            print_single_game_piece(hint_game_pieces_list[i]);
-          }
-
-          hint_game_pieces_list[max_hints] = current_game_piece;
-          for (int i = 0; i < max_hints + 1; i++){
-            illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
-          }
-          hint = 1;
           break;
 
         case END_GAME_BUTTON_PIN:

@@ -43,15 +43,15 @@ void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
     {
         if (indice < NUM_LETTERS)
         {
-            Serial.println("Letter");
+            // Serial.println("Letter");
             letter_crgb_leds[i] = color;
         }
         else
         {
-            Serial.println("Number");
+            // Serial.println("Number");
             number_crgb_leds[i] = color;
         }
-        Serial.println(i);
+        // Serial.println(i);
     }
     FastLED.show(); // Display updated leds
 }

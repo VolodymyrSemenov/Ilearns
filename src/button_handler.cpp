@@ -67,23 +67,32 @@ bool state_button_handler(int button_pressed)
         break;
 
     case HINT_BUTTON_PIN:
-        utility_button_pressed = HINT_BUTTON_PIN;
+        if (digitalRead(!HINT_BUTTON_PIN)){
+            utility_button_pressed = HINT_BUTTON_PIN;
+        }
         break;
 
     case REPEAT_BUTTON_PIN:
-        utility_button_pressed = REPEAT_BUTTON_PIN;
+        if (digitalRead(!REPEAT_BUTTON_PIN)){
+            utility_button_pressed = REPEAT_BUTTON_PIN;
+        }
         break;
 
     case SKIP_BUTTON_PIN:
-        utility_button_pressed = SKIP_BUTTON_PIN;
+        if (digitalRead(!SKIP_BUTTON_PIN)){
+            utility_button_pressed = SKIP_BUTTON_PIN;
+        }
         break;
 
     case END_GAME_BUTTON_PIN:
+        if (digitalRead(!END_GAME_BUTTON_PIN)){
+            utility_button_pressed = END_GAME_BUTTON_PIN;
+        }
+        
         if (game_state != WAITING_STATE && game_state != RECALIBRATING_STATE)
         {
             game_state = GAME_OVER_STATE;
         }
-        utility_button_pressed = END_GAME_BUTTON_PIN;
         break;
     case RECALIBRATE_BUTTON:
         // game_state = RECALIBRATING_STATE;
