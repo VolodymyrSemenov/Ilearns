@@ -12,10 +12,10 @@
 //     Serial.println("Starting Letter Ordering Game...");
 
 //     // Turn off button LEDs of other games
-//     digitalWrite(number_ordering_led, LOW);
-//     digitalWrite(letter_wand_led, LOW);
-//     digitalWrite(number_wand_led, LOW);
-//     digitalWrite(letter_ordering_led, HIGH); // Turn on LED for this game
+//     digitalWrite(NUMBER_ORDERING_LED_PIN, LOW);
+//     digitalWrite(LETTER_WAND_LED_PIN, LOW);
+//     digitalWrite(NUMBER_WAND_LED_PIN, LOW);
+//     digitalWrite(LETTER_ORDER_LED_PIN, HIGH); // Turn on LED for this game
 
 //     char expectedLetters[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 //                               'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',

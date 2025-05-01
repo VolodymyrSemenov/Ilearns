@@ -300,18 +300,18 @@ void button_led_handler(int button_number)
 
 void illuminate_game_arcade_leds(int pin_value)
 {
-    digitalWrite(letter_ordering_led, pin_value);
-    digitalWrite(number_ordering_led, pin_value);
-    digitalWrite(letter_wand_led, pin_value);
-    digitalWrite(number_wand_led, pin_value);
+    digitalWrite(LETTER_ORDER_LED_PIN, pin_value);
+    digitalWrite(NUMBER_ORDERING_LED_PIN, pin_value);
+    digitalWrite(LETTER_WAND_LED_PIN, pin_value);
+    digitalWrite(NUMBER_WAND_LED_PIN, pin_value);
 }
 
 void illuminate_all_arcade_leds(int pin_value)
 {
-    digitalWrite(letter_ordering_led, pin_value);
-    digitalWrite(number_ordering_led, pin_value);
-    digitalWrite(letter_wand_led, pin_value);
-    digitalWrite(number_wand_led, pin_value);
+    digitalWrite(LETTER_ORDER_LED_PIN, pin_value);
+    digitalWrite(NUMBER_ORDERING_LED_PIN, pin_value);
+    digitalWrite(LETTER_WAND_LED_PIN, pin_value);
+    digitalWrite(NUMBER_WAND_LED_PIN, pin_value);
 
     digitalWrite(END_GAME_LED_PIN, pin_value);
     digitalWrite(SKIP_LED_PIN, pin_value);

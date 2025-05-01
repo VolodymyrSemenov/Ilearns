@@ -43,7 +43,7 @@ bool state_button_handler(int button_pressed)
     case LETTER_WAND_BUTTON_PIN:
         if (game_state == WAITING_STATE)
         {
-            if (digitalRead(ENUNCIATION_PIN))
+            if (digitalRead(ENUNCIATION_BUTTON_PIN))
             {
                 game_state = LETTER_WAND_STATE;
             }

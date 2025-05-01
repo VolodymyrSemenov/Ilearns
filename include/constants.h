@@ -9,7 +9,7 @@
 constexpr int RECALIBRATE_BUTTON = 2;
 
 // Difficulty Switch / Rocker for selecting between games
-constexpr int ENUNCIATION_PIN = 9;
+constexpr int ENUNCIATION_BUTTON_PIN = 9;
 
 // BUTTONS
 // Left side
@@ -25,10 +25,10 @@ constexpr int SKIP_BUTTON_PIN = 21;     // right green
 
 // LEDs
 // Left side (+23 offset from their respective button pins)
-constexpr int letter_ordering_led = 33;
-constexpr int letter_wand_led = 34;
-constexpr int number_ordering_led = 35;
-constexpr int number_wand_led = 36;
+constexpr int LETTER_ORDER_LED_PIN = 33;
+constexpr int LETTER_WAND_LED_PIN = 34;
+constexpr int NUMBER_ORDERING_LED_PIN = 35;
+constexpr int NUMBER_WAND_LED_PIN = 36;
 
 // WS2811 LED strips
 constexpr int LETTER_LED_STRIP_PIN = 38; // WS2811 data pin for letter LEDs

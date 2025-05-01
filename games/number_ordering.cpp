@@ -12,12 +12,12 @@
 //     Serial.println("Number Ordering Game Started");
 
 //     // Turn off LEDs of other games
-//     digitalWrite(letter_ordering_led, LOW);
-//     digitalWrite(letter_wand_led, LOW);
-//     digitalWrite(number_wand_led, LOW);
+//     digitalWrite(LETTER_ORDER_LED_PIN, LOW);
+//     digitalWrite(LETTER_WAND_LED_PIN, LOW);
+//     digitalWrite(NUMBER_WAND_LED_PIN, LOW);
 
 //     // Turn on number ordering LED
-//     digitalWrite(number_ordering_led, HIGH);
+//     digitalWrite(NUMBER_ORDERING_LED_PIN, HIGH);
 
 //     bool game_complete = false;
 //     while (!game_complete) {

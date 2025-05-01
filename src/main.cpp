@@ -35,14 +35,14 @@ void set_pin_modes()
     pinMode(REPEAT_BUTTON_PIN, INPUT_PULLUP);
     pinMode(HINT_BUTTON_PIN, INPUT_PULLUP);
 
-    pinMode(ENUNCIATION_PIN, INPUT_PULLUP);
+    pinMode(ENUNCIATION_BUTTON_PIN, INPUT_PULLUP);
     pinMode(RECALIBRATE_BUTTON, INPUT_PULLUP);
 
     // Set led pins as outputs
-    pinMode(letter_ordering_led, OUTPUT);
-    pinMode(number_ordering_led, OUTPUT);
-    pinMode(letter_wand_led, OUTPUT);
-    pinMode(number_wand_led, OUTPUT);
+    pinMode(LETTER_ORDER_LED_PIN, OUTPUT);
+    pinMode(NUMBER_ORDERING_LED_PIN, OUTPUT);
+    pinMode(LETTER_WAND_LED_PIN, OUTPUT);
+    pinMode(NUMBER_WAND_LED_PIN, OUTPUT);
 
     pinMode(END_GAME_LED_PIN, OUTPUT);
     pinMode(SKIP_LED_PIN, OUTPUT);
