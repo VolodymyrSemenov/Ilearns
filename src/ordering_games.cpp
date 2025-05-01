@@ -3,6 +3,7 @@
 
 void ordering_game()
 {
+    int skip = 0;
     int correct_selections = 0;
     int max_correct;
     GamePiece *selected_pieces;
@@ -20,7 +21,6 @@ void ordering_game()
         selected_pieces = game_pieces.numbers;
         max_correct = 21;
     }
-
     while (max_correct > correct_selections)
     {
         GamePiece current_game_piece = selected_pieces[correct_selections];
@@ -30,16 +30,35 @@ void ordering_game()
 
         uint8_t uidLength;
         uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
-        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30))
+        while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30) && !utility_button_pressed)
         {
             delay(20); // avoid overwhelming the RFID reader
         }
-
-        if (uids_match(uid, current_game_piece.uid))
+        
+        if (utility_button_pressed)
         {
+            switch (utility_button_pressed)
+            {
+            case END_GAME_BUTTON_PIN:
+                Serial.println("End game button pressed. Exiting game.");
+                correct_selections = max_correct; // End the game
+                break;
+
+            case SKIP_BUTTON_PIN:
+                skip = 1;
+                Serial.println("Skip button pressed.");
+                break;
+            }
+            utility_button_pressed = 0; // Reset the button press
+        }
+
+        if (uids_match(uid, current_game_piece.uid) || skip)
+        {
+            Serial.println("matched");
             correct_selections += 1;
             // flash_tile_location(current_game_piece, CRGB::Green, 2);
             illuminate_single_game_piece(current_game_piece, CRGB::Green);
+            skip = 0;
         }
         else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, selected_pieces, uid))
         {
@@ -51,4 +70,5 @@ void ordering_game()
             illuminate_single_game_piece(current_game_piece, CRGB::Yellow);
         }
     }
+    Serial.println("Order Game Complete");
 }
