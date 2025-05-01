@@ -191,17 +191,15 @@ void loop()
         case GAME_OVER_STATE:
             startLEDRainbowDance();
             game_state = WAITING_STATE;
-            // delay(5000);
             break;
         
         case RECALIBRATING_STATE:
-    
             Serial.println("Starting recalibration");
             recalibrate_game_pieces();
             game_state = WAITING_STATE;
             break;
+
         case LETTER_WAND_STATE:
-    
             Serial.println("Starting letter wand game");
             begin_wand_game();
             game_state = GAME_OVER_STATE;
@@ -214,14 +212,20 @@ void loop()
             break;
 
         case LETTER_ORDERING_STATE:
-            Serial.println("Starting letter wand game");
-            order_letter();
+            Serial.println("Starting letter ordering game");
+            ordering_game();
+            game_state = GAME_OVER_STATE;
+            break;
+
+        case NUMBER_ORDERING_STATE:
+
+            Serial.println("Starting number ordering game");
+            ordering_game();
             game_state = GAME_OVER_STATE;
             break;
 
         case WAITING_STATE:
             rainbow_dance();
-            // flash_game_arcade_leds();
             illuminate_game_arcade_leds(HIGH);
             break;
     }
