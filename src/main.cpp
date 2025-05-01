@@ -214,7 +214,8 @@ void loop()
 
         case WAITING_STATE:
             rainbow_dance();
-            flash_game_arcade_leds();
+            // flash_game_arcade_leds();
+            illuminate_game_arcade_leds(HIGH);
             break;
     }
 }
