@@ -116,7 +116,6 @@ void number_ordering_button_handler()
     if (state_button_handler(NUMBER_ORDERING_BUTTON_PIN))
     {
         Serial.println("Number Ordering Button Pressed");
-        // illuminate_arcade_led(NUMBER_ORDERING_BUTTON_PIN);
     }
 }
 void number_wand_button_handler()
@@ -124,7 +123,6 @@ void number_wand_button_handler()
     if (state_button_handler(NUMBER_WAND_BUTTON_PIN))
     {
         Serial.println("Number Wand Button Pressed");
-        // illuminate_arcade_led(NUMBER_WAND_BUTTON_PIN);
     }
 }
 void hint_button_handler()
@@ -132,7 +130,6 @@ void hint_button_handler()
     if (state_button_handler(HINT_BUTTON_PIN))
     {
         Serial.println("Hint Button Pressed");
-        // illuminate_arcade_led(HINT_BUTTON_PIN);
     }
 }
 void end_game_button_handler()
@@ -140,7 +137,6 @@ void end_game_button_handler()
     if (state_button_handler(END_GAME_BUTTON_PIN))
     {
         Serial.println("End Game Button Pressed");
-        // illuminate_arcade_led(END_GAME_BUTTON_PIN);
     }
 }
 void repeat_button_handler()
@@ -148,7 +144,6 @@ void repeat_button_handler()
     if (state_button_handler(REPEAT_BUTTON_PIN))
     {
         Serial.println("Repeat Button Pressed");
-        // illuminate_arcade_led(REPEAT_BUTTON_PIN);
     }
 }
 void skip_button_handler()
@@ -156,7 +151,6 @@ void skip_button_handler()
     if (state_button_handler(SKIP_BUTTON_PIN))
     {
         Serial.println("Skip Button Pressed");
-        // illuminate_arcade_led(SKIP_BUTTON_PIN);
     }
 }
 void recalibrate_button_handler()
@@ -164,6 +158,5 @@ void recalibrate_button_handler()
     if (state_button_handler(RECALIBRATE_BUTTON))
     {
         Serial.println("Recalibrate button pressed");
-        // illuminate_arcade_led(RECALIBRATE_BUTTON);
     }
 }

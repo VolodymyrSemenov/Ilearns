@@ -9,6 +9,7 @@
 #include <printing.h>
 #include <illumination.h>
 #include <recalibrate.h>
+#include <order.h>
 
 // -------------------------
 // Game State Variables from constants and structures headers
@@ -209,6 +210,12 @@ void loop()
         case NUMBER_WAND_STATE:
             Serial.println("Starting number wand game");
             begin_wand_game();
+            game_state = GAME_OVER_STATE;
+            break;
+
+        case LETTER_ORDERING_STATE:
+            Serial.println("Starting letter wand game");
+            order_letter();
             game_state = GAME_OVER_STATE;
             break;
 
