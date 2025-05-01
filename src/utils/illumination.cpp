@@ -249,7 +249,7 @@ void illuminate_arcade_led(int button_number)
     Serial.println("Illuminating arcade led");
     Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, HIGH);
-    delay(1000);
+    // delay(1000);
 }
 
 // Turns off a given arcade button led
@@ -314,7 +314,7 @@ void illuminate_all_arcade_leds(int pin_value)
 void illuminate_active_game_arcade_led()
 {
     // illuminate_all_arcade_leds(LOW);
-    Serial.println("properly illuminate arcade leds");
+    // Serial.println("properly illuminate arcade leds");
     Serial.println("Game state");
     Serial.println(game_state);
     if (game_state >= 1 && game_state <= 5)

@@ -51,7 +51,7 @@ void generate_game_pieces_structure()
         illuminate_single_game_piece(game_pieces.letters[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.letters[i]);
-        delay(500);
+        // delay(500);
     }
 
     // Numbers
@@ -70,7 +70,7 @@ void generate_game_pieces_structure()
         illuminate_single_game_piece(game_pieces.numbers[i], CRGB::Green);
 
         print_single_game_piece(game_pieces.numbers[i]);
-        delay(500);
+        // delay(500);
     }
 }
 
