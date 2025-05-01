@@ -7,7 +7,7 @@
 #include <illumination.h>
 #include <order.h>
 
-void order_letter()
+void ordering_game()
 {
     int correct_selections = 0;
     int max_correct = 26;
@@ -33,10 +33,10 @@ void order_letter()
             // flash_tile_location(current_game_piece, CRGB::Green, 2);
             illuminate_single_game_piece(current_game_piece, CRGB::Green);
         }
-        // else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid))
-        // {
-        //     continue; // Don't flash the tile if it's already green
-        // }
+        else if (uid_is_uid_of_previous_gamepiece(correct_selections, game_pieces.letters, uid))
+        {
+            continue; // Don't flash the tile if it's already green
+        }
         else
         {
             flash_tile_location(current_game_piece, CRGB::Red, 1);
