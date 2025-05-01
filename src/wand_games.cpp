@@ -1,14 +1,4 @@
-/**************************************************************************
- * Find Numbers Game
- **************************************************************************/
-
-// #include <audio_config.ino>
-#include <constants.h>
-#include <structures.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_PN532.h>
-#include <FastLED.h>
+#include <games.h>
 #include <illumination.h>
 #include <printing.h>
 

@@ -1,9 +1,9 @@
+#include <recalibrate.h>
+
+#include <EEPROM.h>
 #include <structures.h>
-#include <constants.h>
 #include <illumination.h>
 #include <printing.h>
-#include <EEPROM.h>
-#include <illumination.h>
 
 // Given a base index, fill the positions array for a game piece.
 void generate_positions(int baseIndex, int positions[])

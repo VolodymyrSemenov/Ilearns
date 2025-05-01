@@ -1,4 +1,5 @@
-#include <structures.h>
+#include <illumination.h>
+
 
 int base_letter_setup_indice = 0;
 int base_number_setup_indice = 0;
@@ -42,15 +43,12 @@ void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
     {
         if (indice < NUM_LETTERS)
         {
-            // Serial.println("Letter");
             letter_crgb_leds[i] = color;
         }
         else
         {
-            // Serial.println("Number");
             number_crgb_leds[i] = color;
         }
-        // Serial.println(i);
     }
     FastLED.show(); // Display updated leds
 }
@@ -96,7 +94,6 @@ void illuminate_setup_progress()
 
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
-    // delay(500);
 }
 
 void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250)
@@ -188,9 +185,6 @@ void rainbow_gradient_game_over(int delay_time = 15)
 void illuminate_next_letter_tile_location(int tile_index, CRGB color)
 {
     int next_starting_position = OFFSET_BLANK_WS2811_LEDS;
-    // Serial.println("illuminate next Letter");
-    // Serial.println(tile_index);
-    // Serial.println(game_pieces.letters[tile_index - 1].positions[0]);
 
     if (tile_index > 0)
     {
@@ -261,13 +255,6 @@ void button_led_handler(int button_number)
     {
         Serial.println("De illuminate");
         deilluminate_arcade_led(button_number);
-
-        // Serial.println("Button Pressed Else");
-        // if (button_number - OFFSET_GAMESTATE_TO_ARCADE_BUTTON != game_state)
-        // {
-        //     Serial.println("De illuminate");
-        //     deilluminate_arcade_led(button_number);
-        // }
     }
 }
 
@@ -294,10 +281,6 @@ void illuminate_all_arcade_leds(int pin_value)
 
 void illuminate_active_game_arcade_led()
 {
-    // illuminate_all_arcade_leds(LOW);
-    // Serial.println("properly illuminate arcade leds");
-    Serial.println("Game state");
-    Serial.println(game_state);
     if (game_state >= 1 && game_state <= 5)
     {
         int button_to_illuminate = game_state + OFFSET_GAMESTATE_TO_ARCADE_BUTTON;
@@ -305,8 +288,6 @@ void illuminate_active_game_arcade_led()
         {
             button_to_illuminate = LETTER_WAND_BUTTON_PIN;
         }
-        Serial.println("Button to illuminate");
-        Serial.println(button_to_illuminate);
         illuminate_game_arcade_leds(LOW);
         illuminate_arcade_led(button_to_illuminate);
     }

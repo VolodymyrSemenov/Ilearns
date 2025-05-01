@@ -1,8 +1,9 @@
-#include <games.h>
 #include <button_handler.h>
+
 #include <constants.h>
 #include <games.h>
 #include <illumination.h>
+
 
 // Begins proper game based on game_state and button pressed
 // Returns false if button pressed too quickly
@@ -17,11 +18,11 @@ bool state_button_handler(int button_pressed)
         return false;
     }
     previous_press_time = millis();
-    // button_led_handler(button_pressed);
 
-    Serial.println("Button Pressed");
     int button_press_voltage = digitalRead(button_pressed);
+    Serial.println("Button Pressed");
     Serial.println(button_press_voltage);
+
     if (button_press_voltage == 0)
     {
         illuminate_arcade_led(button_pressed);
@@ -112,7 +113,6 @@ void letter_ordering_button_handler()
     if (state_button_handler(LETTER_ORDERING_BUTTON_PIN))
     {
         Serial.println("Letter Ordering Button Pressed");
-        // illuminate_arcade_led(LETTER_ORDERING_BUTTON_PIN);
     }
 }
 void letter_wand_button_handler()
@@ -120,7 +120,6 @@ void letter_wand_button_handler()
     if (state_button_handler(LETTER_WAND_BUTTON_PIN))
     {
         Serial.println("Letter Wand Button Pressed");
-        // illuminate_arcade_led(LETTER_WAND_BUTTON_PIN);
     }
 }
 void number_ordering_button_handler()

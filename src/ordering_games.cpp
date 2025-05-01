@@ -1,11 +1,5 @@
-#include <constants.h>
-#include <structures.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_PN532.h>
-#include <FastLED.h>
-#include <illumination.h>
 #include <games.h>
+#include <illumination.h>
 
 void ordering_game()
 {

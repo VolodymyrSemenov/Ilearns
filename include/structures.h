@@ -1,9 +1,9 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-#include <constants.h>
 #include <FastLED.h>
 #include <Adafruit_PN532.h>
+#include <constants.h>
 
 // Each game piece stores a character, NFC UID, a decoder value, and LED positions.
 struct GamePiece
