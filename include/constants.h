@@ -51,7 +51,7 @@ constexpr int ENUNCIATION_STATE = 5;
 constexpr int GAME_OVER_STATE = 6;
 constexpr int RECALIBRATING_STATE = 7;
 // Decoder Pins
-constexpr int decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
+constexpr int decoder_pins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
 
 // -------------------------
 // Constant Values

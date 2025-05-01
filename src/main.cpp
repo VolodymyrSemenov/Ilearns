@@ -184,7 +184,7 @@ void loop()
     switch (game_state)
     {
     case GAME_OVER_STATE:
-        startLEDRainbowDance();
+        rainbow_gradient_game_over();
         game_state = WAITING_STATE;
         break;
 
@@ -220,7 +220,7 @@ void loop()
         break;
 
     case WAITING_STATE:
-        rainbow_dance();
+        rainbow_gradient_waiting();
         illuminate_game_arcade_leds(HIGH);
         break;
     }

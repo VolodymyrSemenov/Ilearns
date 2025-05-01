@@ -110,7 +110,7 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
     }
 }
 
-void rainbow_dance(unsigned long delay_time = 50)
+void rainbow_gradient_waiting(unsigned long delay_time = 50)
 {
     static uint8_t hue = 0;
     static unsigned long last_update = 0;
@@ -143,27 +143,8 @@ void rainbow_dance(unsigned long delay_time = 50)
     hue += 5;
 }
 
-// Subroutine to start a rainbow LED dance when game_over is true.
-// New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
-// void startLEDRainbowDance() {
-//     unsigned long startTime = millis(); // Record the start time
 
-//     // Run a rainbow pattern for 5 seconds.
-//     while (millis() - startTime < 5000) {
-//         static uint8_t hue = 0;
-//         fill_rainbow(letter_crgb_leds, NUM_LETTER_LEDS, hue, 8);
-//         fill_rainbow(number_crgb_leds, NUM_NUMBER_LEDS, hue, 8);
-//         FastLED.show();
-//         hue += 5; // Gradually shift colors
-//         delay(50);
-//     }
-
-//     // After 5 seconds, clear the LEDs
-//     FastLED.clear();
-//     FastLED.show();
-// }
-
-void startLEDRainbowDance(int delay_time = 15)
+void rainbow_gradient_game_over(int delay_time = 15)
 {
     unsigned long startTime = millis(); // Record the start time
     static uint8_t hue = 0;

@@ -6,7 +6,7 @@
 #include <illumination.h>
 
 // Given a base index, fill the positions array for a game piece.
-void generatePositions(int baseIndex, int positions[])
+void generate_positions(int baseIndex, int positions[])
 {
     for (int i = 0; i < WIDTH_PER_PIECE; i++)
     {
@@ -20,7 +20,7 @@ GamePiece generate_single_game_piece(GamePiece game_piece, byte character_value,
     game_piece.character = character_value;
     memcpy(game_piece.uid, uid, MAX_UID_LENGTH);
     game_piece.decoder_value = decoder_value;
-    generatePositions(OFFSET_BLANK_WS2811_LEDS + i * WIDTH_PER_PIECE, game_piece.positions);
+    generate_positions(OFFSET_BLANK_WS2811_LEDS + i * WIDTH_PER_PIECE, game_piece.positions);
 
     return game_piece;
 }
@@ -75,14 +75,14 @@ void generate_game_pieces_structure()
 }
 
 // Write entire GamePieces struct to EEPROM (at game_pieces_address)
-void PiecesToEEPROM()
+void put_pieces_to_eeprom()
 {
     EEPROM.put(EEPROM_VALID_BIT_ADDRESS, 1);
     EEPROM.put(EEPROM_GAME_PIECES_ADDRESS, game_pieces);
 }
 
 // Read the GamePieces struct from EEPROM
-GamePieces PiecesFromEEPROM()
+GamePieces get_pieces_from_eeprom()
 {
     GamePieces gp;
     EEPROM.get(EEPROM_GAME_PIECES_ADDRESS, gp);
@@ -94,7 +94,7 @@ void recalibrate_game_pieces()
 {
     fill_board_solid(CRGB::Black);
     generate_game_pieces_structure();
-    PiecesToEEPROM();
+    put_pieces_to_eeprom();
 }
 
 // Populate GamePieces struct
@@ -103,7 +103,7 @@ void populate_game_pieces_structure()
     int valid_bit = EEPROM.read(EEPROM_VALID_BIT_ADDRESS);
     if (valid_bit == 1)
     {
-        game_pieces = PiecesFromEEPROM();
+        game_pieces = get_pieces_from_eeprom();
     }
     else
     {

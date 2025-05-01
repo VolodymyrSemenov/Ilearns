@@ -14,7 +14,7 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
 
 // Subroutine to start a rainbow LED dance when game_over is true.
 // New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
-void startLEDRainbowDance(int delay_time = 15);
+void rainbow_gradient_game_over(int delay_time = 15);
 
 // For recalibrate
 void illuminate_next_letter_tile_location(int tile_index, CRGB color);
@@ -31,6 +31,6 @@ void deilluminate_arcade_led(int button_number);
 void button_led_handler(int button_number);
 void illuminate_game_arcade_leds(int pin_value);
 void illuminate_all_arcade_leds(int pin_value);
-void rainbow_dance(unsigned long delay_time = 50);
+void rainbow_gradient_waiting(unsigned long delay_time = 50);
 void illuminate_active_game_arcade_led();
 #endif
