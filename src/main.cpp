@@ -213,13 +213,13 @@ void loop()
         break;
 
     case NUMBER_ORDERING_STATE:
-
         Serial.println("Starting number ordering game");
         ordering_game();
         game_state = GAME_OVER_STATE;
         break;
 
     case WAITING_STATE:
+        utility_button_pressed = 0;
         rainbow_gradient_waiting();
         illuminate_game_arcade_leds(HIGH);
         break;

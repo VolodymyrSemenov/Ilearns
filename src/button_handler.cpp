@@ -19,6 +19,7 @@ bool state_button_handler(int button_pressed)
     }
     previous_press_time = millis();
 
+    // Illuminate arcade leds
     int button_press_voltage = digitalRead(button_pressed);
     Serial.println("Button Pressed");
     Serial.println(button_press_voltage);
@@ -31,9 +32,9 @@ bool state_button_handler(int button_pressed)
     {
         deilluminate_arcade_led(button_pressed);
     }
-
     illuminate_active_game_arcade_led();
 
+    // Change state based on button press
     switch (button_pressed)
     {
     case LETTER_ORDERING_BUTTON_PIN:
@@ -42,6 +43,7 @@ bool state_button_handler(int button_pressed)
             game_state = LETTER_ORDERING_STATE;
         }
         break;
+
     case LETTER_WAND_BUTTON_PIN:
         if (game_state == WAITING_STATE)
         {
@@ -55,12 +57,14 @@ bool state_button_handler(int button_pressed)
             }
         }
         break;
+
     case NUMBER_ORDERING_BUTTON_PIN:
         if (game_state == WAITING_STATE)
         {
             game_state = NUMBER_ORDERING_STATE;
         }
         break;
+
     case NUMBER_WAND_BUTTON_PIN:
         if (game_state == WAITING_STATE)
         {
@@ -98,9 +102,11 @@ bool state_button_handler(int button_pressed)
             game_state = GAME_OVER_STATE;
         }
         break;
+
     case RECALIBRATE_BUTTON:
         game_state = RECALIBRATING_STATE;
         break;
+        
     default:
         Serial.println("Error, this wasn't supposed to happen");
         break;

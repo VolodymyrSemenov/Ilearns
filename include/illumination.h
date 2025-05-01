@@ -24,6 +24,10 @@ void fill_letters_solid(CRGB color);
 void fill_numbers_solid(CRGB color);
 void fill_board_solid(CRGB color);
 
+void flash_board_letters(CRGB color, int number_of_flashes, int delay_time = 160);
+void flash_board_numbers(CRGB color, int number_of_flashes, int delay_time = 160);
+void flash_board_solid(CRGB color, int number_of_flashes, int delay_time = 200);
+
 void illuminate_arcade_led(int button_number);
 void deilluminate_arcade_led(int button_number);
 void button_led_handler(int button_number);

@@ -85,6 +85,7 @@ void generate_game_pieces_structure()
         if (utility_button_pressed){
             if (utility_button_pressed == END_GAME_BUTTON_PIN){
                 utility_button_pressed = 0;
+                flash_board_solid(CRGB::Red, 3);
                 return;  
             }
             utility_button_pressed = 0;
@@ -134,6 +135,7 @@ void generate_game_pieces_structure()
         if (utility_button_pressed){
             if (utility_button_pressed == END_GAME_BUTTON_PIN){
                 utility_button_pressed = 0;
+                flash_board_solid(CRGB::Red, 3);
                 return;  
             }
             utility_button_pressed = 0;
@@ -146,6 +148,7 @@ void generate_game_pieces_structure()
         delay(delay_time_between_reads);
     }
     put_pieces_to_eeprom();
+    flash_board_solid(CRGB::Green, 3);
 }
 
 // Recalibrate game pieces and write to EEPROM

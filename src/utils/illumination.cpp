@@ -32,6 +32,34 @@ void fill_board_solid(CRGB color)
     fill_numbers_solid(color);
 }
 
+void flash_board_letters(CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_letters_solid(color);
+        delay(delay_time);
+        fill_letters_solid(CRGB::Black);
+        delay(delay_time);
+    }
+}
+
+void flash_board_numbers(CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_numbers_solid(color);
+        delay(delay_time);
+        fill_numbers_solid(CRGB::Black);
+        delay(delay_time);
+    }
+}
+
+void flash_board_solid(CRGB color, int number_of_flashes, int delay_time)
+{
+    flash_board_letters(color, number_of_flashes, delay_time);
+    flash_board_numbers(color, number_of_flashes, delay_time);
+}
+
 // Set the color of a game piece and display it on the LED strip
 void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
 {
@@ -94,9 +122,10 @@ void illuminate_setup_progress()
 
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
+    delay(100);
 }
 
-void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250)
+void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time)
 {
     for (int i = 0; i < number_of_flashes; i++)
     {
@@ -107,7 +136,7 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
     }
 }
 
-void rainbow_gradient_waiting(unsigned long delay_time = 50)
+void rainbow_gradient_waiting(unsigned long delay_time)
 {
     static uint8_t hue = 0;
     static unsigned long last_update = 0;
@@ -141,7 +170,7 @@ void rainbow_gradient_waiting(unsigned long delay_time = 50)
 }
 
 
-void rainbow_gradient_game_over(int delay_time = 15)
+void rainbow_gradient_game_over(int delay_time)
 {
     unsigned long startTime = millis(); // Record the start time
     static uint8_t hue = 0;
@@ -201,7 +230,7 @@ void illuminate_next_letter_tile_location(int tile_index, CRGB color)
 }
 
 
-void flash_next_letter_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250)
+void flash_next_letter_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time)
 {
     for (int i=0; i < number_of_flashes; i++)
     {
@@ -229,7 +258,7 @@ void illuminate_next_number_tile_location(int tile_index, CRGB color)
 }
 
 
-void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time = 250)
+void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time)
 {
     for (int i=0; i < number_of_flashes; i++)
     {
