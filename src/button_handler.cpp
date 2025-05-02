@@ -10,6 +10,8 @@
 // Returns true if valid button press
 bool state_button_handler(int button_pressed)
 {
+    // Illuminate arcade leds
+    button_led_handler(button_pressed);
 
     // Disregard mutliple button presses with 0.1s
     static int previous_press_time = 0;
@@ -18,21 +20,6 @@ bool state_button_handler(int button_pressed)
         return false;
     }
     previous_press_time = millis();
-
-    // Illuminate arcade leds
-    int button_press_voltage = digitalRead(button_pressed);
-    Serial.println("Button Pressed");
-    Serial.println(button_press_voltage);
-
-    if (button_press_voltage == 0)
-    {
-        illuminate_arcade_led(button_pressed);
-    }
-    else
-    {
-        deilluminate_arcade_led(button_pressed);
-    }
-    illuminate_active_game_arcade_led();
 
     // Change state based on button press
     switch (button_pressed)
@@ -106,7 +93,7 @@ bool state_button_handler(int button_pressed)
     case RECALIBRATE_BUTTON:
         game_state = RECALIBRATING_STATE;
         break;
-        
+
     default:
         Serial.println("Error, this wasn't supposed to happen");
         break;

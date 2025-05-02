@@ -21,20 +21,14 @@ bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]
 }
 
 // Get a random game piece from the list that's not in the random game pieces list
-GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[], int max_correct)
+GamePiece get_unique_random_gamepiece(int max_random_value, GamePiece game_piece_list[], GamePiece random_game_pieces_list[], int size_of_list_of_game_pieces)
 {
-  int random_index = random(0, max_size);
+  int random_index = random(0, max_random_value);
 
-  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, max_correct))
+  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, size_of_list_of_game_pieces) ||
+       (hint_is_active && game_piece_is_in_list(game_piece_list[random_index], hint_game_pieces_list, max_hints)))
   {
-    random_index = random(0, max_size);
-
-    // Make sure none of the hints are in the list of future correct ones, or already in the list for hints
-    if (hint_is_active){
-      while (game_piece_is_in_list(game_piece_list[random_index], hint_game_pieces_list, max_hints)){
-        random_index = random(0, max_size);
-      }
-    }
+    random_index = random(0, max_random_value);
   }
   return game_piece_list[random_index];
 }
@@ -128,10 +122,10 @@ void begin_wand_game()
   generate_random_seed();
 
   illuminate_active_game_arcade_led();
+  fill_board_solid(CRGB::Black);
 
   for (int i = 0; i < max_correct; i++)
   {
-    fill_board_solid(CRGB::Black);
     if (game_state == NUMBER_WAND_STATE)
     {
       random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
@@ -144,12 +138,18 @@ void begin_wand_game()
     }
   }
 
+  Serial.println("Random game pieces list:");
+  for (int i = 0; i<max_correct; i++){
+    print_single_game_piece(random_game_pieces_list[i]);
+  }
+  Serial.println("");
+
   while (correct_selections < max_correct)
   {
     GamePiece current_game_piece = random_game_pieces_list[correct_selections];
 
     Serial.print("Find the following tile: ");
-    Serial.println(current_game_piece.character);
+    Serial.println((char)current_game_piece.character);
 
     send_serial_audio_command(current_game_piece);
 
@@ -172,7 +172,7 @@ void begin_wand_game()
             if (game_state == NUMBER_WAND_STATE){
               for (int i = 0; i < max_hints; i++)
               {
-                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_hints);
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
                 print_single_game_piece(hint_game_pieces_list[i]);
               }
             }
@@ -181,7 +181,7 @@ void begin_wand_game()
               Serial.println("Hint button pressed ELSE");
               for (int i = 0; i < max_hints; i++)
               {
-                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, random_game_pieces_list, max_hints);
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, random_game_pieces_list, max_correct);
                 print_single_game_piece(hint_game_pieces_list[i]);
               }
             }
@@ -236,6 +236,17 @@ void begin_wand_game()
       repeat = 0;
       continue; // Don't flash the tile if it's already green
     }
+
+    else if ((game_state == NUMBER_WAND_STATE) && uid_is_uid_of_a_previous_gamepiece_in_list(NUM_LETTERS, game_pieces.letters, uid))
+    {
+      continue; // Don't flash the tile if it's from the letters during number game
+    }
+
+    else if ((game_state == LETTER_WAND_STATE || game_state == ENUNCIATION_STATE) && uid_is_uid_of_a_previous_gamepiece_in_list(NUM_NUMBERS, game_pieces.numbers, uid))
+    {
+      continue; // Don't flash the tile if it's from the numbers during letter game
+    }
+
     else
     {
       GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);

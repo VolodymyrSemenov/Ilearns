@@ -56,8 +56,16 @@ void flash_board_numbers(CRGB color, int number_of_flashes, int delay_time)
 
 void flash_board_solid(CRGB color, int number_of_flashes, int delay_time)
 {
-    flash_board_letters(color, number_of_flashes, delay_time);
-    flash_board_numbers(color, number_of_flashes, delay_time);
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_letters_solid(color);
+        fill_numbers_solid(color);
+        delay(delay_time);
+        fill_letters_solid(CRGB::Black);
+        fill_numbers_solid(CRGB::Black);
+        delay(delay_time);
+    }
+    
 }
 
 // Set the color of a game piece and display it on the LED strip
@@ -274,7 +282,7 @@ void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_f
 // Illuminates a given arcade button led
 void illuminate_arcade_led(int button_number)
 {
-    Serial.println("Illuminating arcade led");
+    Serial.print("Illuminating arcade led: ");
     Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, HIGH);
     // delay(1000);
@@ -283,32 +291,27 @@ void illuminate_arcade_led(int button_number)
 // Turns off a given arcade button led
 void deilluminate_arcade_led(int button_number)
 {
-    Serial.println("De illuminating arcade led");
+    Serial.print("De illuminating arcade led: ");
     Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, LOW);
 }
 
 // Proper arcade button lighting during game_states
-void button_led_handler(int button_number)
+void button_led_handler(int button_pressed)
 {
-    Serial.println("Button LED Handler");
-    Serial.println(button_number);
-    Serial.println("Game state");
-    Serial.println(game_state);
-    Serial.println(digitalRead(button_number));
-    // on falling edges (button presses)
-    if (digitalRead(button_number) == FALLING)
-    {
-        Serial.println("Button Pressed IF");
-        illuminate_arcade_led(button_number);
-    }
+    Serial.print("Button LED Handler with voltage: ");
+    int button_press_voltage = digitalRead(button_pressed);
+    Serial.println(button_press_voltage);
 
-    // on rising edges (button release)
+    if (button_press_voltage == 0)
+    {
+        illuminate_arcade_led(button_pressed);
+    }
     else
     {
-        Serial.println("De illuminate");
-        deilluminate_arcade_led(button_number);
+        deilluminate_arcade_led(button_pressed);
     }
+    illuminate_active_game_arcade_led();
 }
 
 void illuminate_game_arcade_leds(int pin_value)
@@ -319,17 +322,18 @@ void illuminate_game_arcade_leds(int pin_value)
     digitalWrite(NUMBER_WAND_LED_PIN, pin_value);
 }
 
-void illuminate_all_arcade_leds(int pin_value)
+void illuminate_utility_arcade_leds(int pin_value)
 {
-    digitalWrite(LETTER_ORDER_LED_PIN, pin_value);
-    digitalWrite(NUMBER_ORDERING_LED_PIN, pin_value);
-    digitalWrite(LETTER_WAND_LED_PIN, pin_value);
-    digitalWrite(NUMBER_WAND_LED_PIN, pin_value);
-
     digitalWrite(END_GAME_LED_PIN, pin_value);
     digitalWrite(SKIP_LED_PIN, pin_value);
     digitalWrite(REPEAT_LED_PIN, pin_value);
     digitalWrite(HINT_LED_PIN, pin_value);
+}
+
+void illuminate_all_arcade_leds(int pin_value)
+{
+    illuminate_game_arcade_leds(pin_value);
+    illuminate_utility_arcade_leds(pin_value);
 }
 
 void illuminate_active_game_arcade_led()

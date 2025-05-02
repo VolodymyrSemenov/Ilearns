@@ -32,6 +32,7 @@ void illuminate_arcade_led(int button_number);
 void deilluminate_arcade_led(int button_number);
 void button_led_handler(int button_number);
 void illuminate_game_arcade_leds(int pin_value);
+void illuminate_utility_arcade_leds(int pin_value);
 void illuminate_all_arcade_leds(int pin_value);
 void illuminate_active_game_arcade_led();
 

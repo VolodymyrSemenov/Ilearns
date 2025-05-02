@@ -87,8 +87,7 @@ void initialize_wand_reader()
     if (!versiondata)
     {
         Serial.println("Didn't find PN532 board");
-        fill_letters_solid(CRGB::Red);
-        fill_numbers_solid(CRGB::Red);
+        fill_board_solid(CRGB::Red);
         while (true)
         {
         }; // Halt
@@ -183,32 +182,23 @@ void loop()
     }
     switch (game_state)
     {
-    case GAME_OVER_STATE:
-        rainbow_gradient_game_over();
-        game_state = WAITING_STATE;
-        break;
 
-    case RECALIBRATING_STATE:
-        Serial.println("Starting recalibration");
-        recalibrate_game_pieces();
-        game_state = WAITING_STATE;
-        break;
-
-    case LETTER_WAND_STATE:
-        Serial.println("Starting letter wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
-        break;
-
-    case NUMBER_WAND_STATE:
-        Serial.println("Starting number wand game");
-        begin_wand_game();
-        game_state = GAME_OVER_STATE;
+    case WAITING_STATE:
+        utility_button_pressed = 0;
+        rainbow_gradient_waiting();
+        illuminate_game_arcade_leds(HIGH);
+        // illuminate_utility_arcade_leds(LOW);
         break;
 
     case LETTER_ORDERING_STATE:
         Serial.println("Starting letter ordering game");
         ordering_game();
+        game_state = GAME_OVER_STATE;
+        break;
+
+    case LETTER_WAND_STATE:
+        Serial.println("Starting letter wand game");
+        begin_wand_game();
         game_state = GAME_OVER_STATE;
         break;
 
@@ -218,10 +208,27 @@ void loop()
         game_state = GAME_OVER_STATE;
         break;
 
-    case WAITING_STATE:
-        utility_button_pressed = 0;
-        rainbow_gradient_waiting();
-        illuminate_game_arcade_leds(HIGH);
+    case NUMBER_WAND_STATE:
+        Serial.println("Starting number wand game");
+        begin_wand_game();
+        game_state = GAME_OVER_STATE;
+        break;
+
+    case ENUNCIATION_STATE:
+        Serial.println("Starting enunciation wand game");
+        begin_wand_game();
+        game_state = GAME_OVER_STATE;
+        break;
+
+    case GAME_OVER_STATE:
+        rainbow_gradient_game_over();
+        game_state = WAITING_STATE;
+        break;
+
+    case RECALIBRATING_STATE:
+        Serial.println("Starting recalibration");
+        recalibrate_game_pieces();
+        game_state = WAITING_STATE;
         break;
     }
 }
