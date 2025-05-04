@@ -59,7 +59,7 @@ void send_serial_audio_command(GamePiece game_piece)
   }
 
   else if (game_state == NUMBER_WAND_STATE){
-    byte_to_send = game_piece.character; // 0-20
+    byte_to_send = game_piece.character + 52; // 0-20
   }
   
   Serial.print("Sending byte: ");
