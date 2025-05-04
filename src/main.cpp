@@ -187,37 +187,31 @@ void loop()
         utility_button_pressed = 0;
         rainbow_gradient_waiting();
         illuminate_game_arcade_leds(HIGH);
-        // illuminate_utility_arcade_leds(LOW);
         break;
 
     case LETTER_ORDERING_STATE:
         Serial.println("Starting letter ordering game");
         ordering_game();
-        game_state = GAME_OVER_STATE;
         break;
 
     case LETTER_WAND_STATE:
         Serial.println("Starting letter wand game");
         begin_wand_game();
-        game_state = GAME_OVER_STATE;
         break;
 
     case NUMBER_ORDERING_STATE:
         Serial.println("Starting number ordering game");
         ordering_game();
-        game_state = GAME_OVER_STATE;
         break;
 
     case NUMBER_WAND_STATE:
         Serial.println("Starting number wand game");
         begin_wand_game();
-        game_state = GAME_OVER_STATE;
         break;
 
     case ENUNCIATION_STATE:
         Serial.println("Starting enunciation wand game");
         begin_wand_game();
-        game_state = GAME_OVER_STATE;
         break;
 
     case GAME_OVER_STATE:
@@ -228,7 +222,6 @@ void loop()
     case RECALIBRATING_STATE:
         Serial.println("Starting recalibration");
         recalibrate_game_pieces();
-        game_state = WAITING_STATE;
         break;
     }
 }

@@ -197,8 +197,7 @@ void begin_wand_game()
 
       case END_GAME_BUTTON_PIN:
         Serial.println("End game button pressed. Exiting game.");
-        correct_selections = max_correct; // End the game
-        break;
+        return;
 
       case REPEAT_BUTTON_PIN:
         Serial.println("Repeat button pressed. Repeating audio");
@@ -255,5 +254,6 @@ void begin_wand_game()
       Serial.println("Incorrect selection. Try again!");
     }
   }
+  game_state = GAME_OVER_STATE;
   Serial.println("Game complete: 5 correct selections achieved!");
 }

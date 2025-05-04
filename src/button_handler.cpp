@@ -84,9 +84,10 @@ bool state_button_handler(int button_pressed)
             utility_button_pressed = END_GAME_BUTTON_PIN;
         }
 
-        if (game_state != WAITING_STATE && game_state != RECALIBRATING_STATE)
+        if (game_state != WAITING_STATE && game_state != GAME_OVER_STATE)
         {
-            game_state = GAME_OVER_STATE;
+            flash_board_solid(CRGB::Red, 3);
+            game_state = WAITING_STATE;
         }
         break;
 

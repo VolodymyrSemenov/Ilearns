@@ -41,8 +41,7 @@ void ordering_game()
             {
             case END_GAME_BUTTON_PIN:
                 Serial.println("End game button pressed. Exiting game.");
-                correct_selections = max_correct; // End the game
-                break;
+                return;
 
             case SKIP_BUTTON_PIN:
                 skip = 1;
@@ -74,5 +73,6 @@ void ordering_game()
             illuminate_single_game_piece(current_game_piece, CRGB::Yellow);
         }
     }
+    game_state = GAME_OVER_STATE;
     Serial.println("Order Game Complete");
 }
