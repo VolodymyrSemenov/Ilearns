@@ -7,6 +7,7 @@ void ordering_game()
     int correct_selections = 0;
     int max_correct;
     GamePiece *selected_pieces;
+    int hint_or_repeat_pressed = 0;
     if (game_state == LETTER_ORDERING_STATE)
     {
         fill_letters_solid(CRGB::White);
@@ -25,7 +26,6 @@ void ordering_game()
     {
         GamePiece current_game_piece = selected_pieces[correct_selections];
 
-        // flash_tile_location(current_game_piece, CRGB::Yellow, 2);
         illuminate_single_game_piece(current_game_piece, CRGB::Yellow);
 
         uint8_t uidLength;
@@ -48,6 +48,10 @@ void ordering_game()
                 skip = 1;
                 Serial.println("Skip button pressed.");
                 break;
+
+            default:
+                hint_or_repeat_pressed = 1;
+                break;
             }
             utility_button_pressed = 0; // Reset the button press
         }
@@ -56,13 +60,13 @@ void ordering_game()
         {
             Serial.println("matched");
             correct_selections += 1;
-            // flash_tile_location(current_game_piece, CRGB::Green, 2);
             illuminate_single_game_piece(current_game_piece, CRGB::Green);
             skip = 0;
         }
-        else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, selected_pieces, uid))
+        else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, selected_pieces, uid) || hint_or_repeat_pressed)
         {
-            continue; // Don't flash the tile if it's already green
+            hint_or_repeat_pressed = 0;
+            continue; // Don't flash the tile if it's already green, or hint/repeat pressed
         }
         else
         {
