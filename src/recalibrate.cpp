@@ -85,7 +85,6 @@ void generate_game_pieces_structure()
         if (utility_button_pressed){
             if (utility_button_pressed == END_GAME_BUTTON_PIN){
                 utility_button_pressed = 0;
-                flash_board_solid(CRGB::Red, 3);
                 return;  
             }
             utility_button_pressed = 0;
