@@ -9,7 +9,6 @@
 #include <printing.h>
 #include <illumination.h>
 #include <recalibrate.h>
-#include <order.h>
 
 // -------------------------
 // Game State Variables from constants and structures headers
@@ -21,6 +20,7 @@ GamePieces game_pieces;
 CRGB letter_crgb_leds[NUM_LETTER_LEDS];
 CRGB number_crgb_leds[NUM_NUMBER_LEDS];
 Adafruit_PN532 nfc(53, &SPI);
+GamePiece mario;
 
 // Gives buttons pull up resistors and sets leds as outputs
 void set_pin_modes()
@@ -111,6 +111,7 @@ void get_random_seed()
 void setup()
 {
     Serial.begin(115200);
+    Serial2.begin(115200);
     illuminate_board_on_power_up();
 
     Serial.println("Initializing LED strips");
@@ -216,6 +217,7 @@ void loop()
         break;
 
     case GAME_OVER_STATE:
+        send_serial_audio_command(mario);
         rainbow_gradient_game_over();
         game_state = WAITING_STATE;
         break;

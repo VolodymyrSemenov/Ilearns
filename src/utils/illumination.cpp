@@ -182,7 +182,7 @@ void rainbow_gradient_game_over(int delay_time)
     static uint8_t hue = 0;
 
     // Run a rainbow pattern for 5 seconds.
-    while (millis() - startTime < 5000)
+    while (millis() - startTime < 8000)
     {
         uint8_t currentHue = hue;
         int hue_increase = 16;

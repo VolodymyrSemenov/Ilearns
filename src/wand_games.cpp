@@ -62,9 +62,12 @@ void send_serial_audio_command(GamePiece game_piece)
     byte_to_send = game_piece.character + 52; // 0-20
   }
   
+  else if (game_state == GAME_OVER_STATE) {
+    byte_to_send = 73;
+  }
   Serial.print("Sending byte: ");
   Serial.println(byte_to_send, DEC);
-  Serial1.write(byte_to_send);
+  Serial2.write(byte_to_send);
 }
 
 // Given a uid, return its gamepiece
