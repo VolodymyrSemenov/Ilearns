@@ -1,4 +1,4 @@
-#include <structures.h>
+#include <illumination.h>
 
 
 int base_letter_setup_indice = 0;
@@ -32,6 +32,42 @@ void fill_board_solid(CRGB color)
     fill_numbers_solid(color);
 }
 
+void flash_board_letters(CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_letters_solid(color);
+        delay(delay_time);
+        fill_letters_solid(CRGB::Black);
+        delay(delay_time);
+    }
+}
+
+void flash_board_numbers(CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_numbers_solid(color);
+        delay(delay_time);
+        fill_numbers_solid(CRGB::Black);
+        delay(delay_time);
+    }
+}
+
+void flash_board_solid(CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i = 0; i < number_of_flashes; i++)
+    {
+        fill_letters_solid(color);
+        fill_numbers_solid(color);
+        delay(delay_time);
+        fill_letters_solid(CRGB::Black);
+        fill_numbers_solid(CRGB::Black);
+        delay(delay_time);
+    }
+    
+}
+
 // Set the color of a game piece and display it on the LED strip
 void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
 {
@@ -52,7 +88,6 @@ void illuminate_single_game_piece(GamePiece game_piece, CRGB color)
     FastLED.show(); // Display updated leds
 }
 
-
 void illuminate_range_of_letter_game_pieces(int first_indice, int last_indice, CRGB color)
 {
     for (int i = first_indice; i < last_indice; i++)
@@ -60,7 +95,6 @@ void illuminate_range_of_letter_game_pieces(int first_indice, int last_indice, C
         illuminate_single_game_piece(game_pieces.letters[i], color);
     }
 }
-
 
 void illuminate_range_of_number_game_pieces(int first_indice, int last_indice, CRGB color)
 {
@@ -70,9 +104,8 @@ void illuminate_range_of_number_game_pieces(int first_indice, int last_indice, C
     }
 }
 
-
-
-void illuminate_board_on_power_up(){
+void illuminate_board_on_power_up()
+{
     fill_board_solid(CRGB::Black);
     fill_board_solid(CRGB::Purple);
     delay(500);
@@ -84,20 +117,21 @@ void illuminate_setup_progress()
     int base_letter_increment = 6;
     int base_number_increment = 5;
 
-    if (base_letter_setup_indice >=18){
+    if (base_letter_setup_indice >= 18)
+    {
         base_letter_increment = 8;
         base_number_increment = 6;
     }
 
-    illuminate_range_of_letter_game_pieces(base_letter_setup_indice, base_letter_setup_indice+base_letter_increment, CRGB::Purple);
-    illuminate_range_of_number_game_pieces(base_number_setup_indice, base_number_setup_indice+base_number_increment, CRGB::Purple);
-    
+    illuminate_range_of_letter_game_pieces(base_letter_setup_indice, base_letter_setup_indice + base_letter_increment, CRGB::Purple);
+    illuminate_range_of_number_game_pieces(base_number_setup_indice, base_number_setup_indice + base_number_increment, CRGB::Purple);
+
     base_letter_setup_indice += base_letter_increment;
     base_number_setup_indice += base_number_increment;
-    // delay(500);
+    delay(100);
 }
 
-void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time = 250)
+void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes, int delay_time)
 {
     for (int i = 0; i < number_of_flashes; i++)
     {
@@ -108,10 +142,7 @@ void flash_tile_location(GamePiece game_piece, CRGB color, int number_of_flashes
     }
 }
 
-
-
-
-void rainbow_dance(unsigned long delay_time = 50)
+void rainbow_gradient_waiting(unsigned long delay_time)
 {
     static uint8_t hue = 0;
     static unsigned long last_update = 0;
@@ -144,27 +175,8 @@ void rainbow_dance(unsigned long delay_time = 50)
     hue += 5;
 }
 
-// Subroutine to start a rainbow LED dance when game_over is true.
-// New subroutine to start a rainbow LED dance for 5 seconds when game_over is true.
-// void startLEDRainbowDance() {
-//     unsigned long startTime = millis(); // Record the start time
 
-//     // Run a rainbow pattern for 5 seconds.
-//     while (millis() - startTime < 5000) {
-//         static uint8_t hue = 0;
-//         fill_rainbow(letter_crgb_leds, NUM_LETTER_LEDS, hue, 8);
-//         fill_rainbow(number_crgb_leds, NUM_NUMBER_LEDS, hue, 8);
-//         FastLED.show();
-//         hue += 5; // Gradually shift colors
-//         delay(50);
-//     }
-
-//     // After 5 seconds, clear the LEDs
-//     FastLED.clear();
-//     FastLED.show();
-// }
-
-void startLEDRainbowDance(int delay_time = 15)
+void rainbow_gradient_game_over(int delay_time)
 {
     unsigned long startTime = millis(); // Record the start time
     static uint8_t hue = 0;
@@ -208,9 +220,6 @@ void startLEDRainbowDance(int delay_time = 15)
 void illuminate_next_letter_tile_location(int tile_index, CRGB color)
 {
     int next_starting_position = OFFSET_BLANK_WS2811_LEDS;
-    // Serial.println("illuminate next Letter");
-    // Serial.println(tile_index);
-    // Serial.println(game_pieces.letters[tile_index - 1].positions[0]);
 
     if (tile_index > 0)
     {
@@ -224,6 +233,18 @@ void illuminate_next_letter_tile_location(int tile_index, CRGB color)
         letter_crgb_leds[i] = color;
     }
     FastLED.show();
+}
+
+
+void flash_next_letter_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i=0; i < number_of_flashes; i++)
+    {
+        illuminate_next_letter_tile_location(tile_index, color);
+        delay(delay_time);
+        illuminate_next_letter_tile_location(tile_index, CRGB::Black);
+        delay(delay_time);
+    }
 }
 
 // For recalibrate
@@ -243,71 +264,83 @@ void illuminate_next_number_tile_location(int tile_index, CRGB color)
 }
 
 
+void flash_next_number_tile_location(int tile_index, CRGB color, int number_of_flashes, int delay_time)
+{
+    for (int i=0; i < number_of_flashes; i++)
+    {
+        illuminate_next_number_tile_location(tile_index, color);
+        delay(delay_time);
+        illuminate_next_number_tile_location(tile_index, CRGB::Black);
+        delay(delay_time);
+    }
+}
 
 // ARCADE BUTTONS
 
 // Illuminates a given arcade button led
 void illuminate_arcade_led(int button_number)
-{   
+{
+    Serial.print("Illuminating arcade led: ");
+    Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, HIGH);
-    delay(1000);
+    // delay(1000);
 }
 
 // Turns off a given arcade button led
 void deilluminate_arcade_led(int button_number)
 {
+    Serial.print("De illuminating arcade led: ");
+    Serial.println(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED);
     digitalWrite(button_number + OFFSET_ARCADE_BUTTON_TO_ARCADE_LED, LOW);
 }
 
 // Proper arcade button lighting during game_states
-void button_led_handler(int button_number)
+void button_led_handler(int button_pressed)
 {
-    // on falling edges (button presses)
-    if (digitalRead(button_number) == FALLING)
-    { 
-        illuminate_arcade_led(button_number);
-    }
+    Serial.print("Button LED Handler with voltage: ");
+    int button_press_voltage = digitalRead(button_pressed);
+    Serial.println(button_press_voltage);
 
-    // on rising edges (button release)
+    if (button_press_voltage == 0)
+    {
+        illuminate_arcade_led(button_pressed);
+    }
     else
     {
-        deilluminate_arcade_led(button_number);
-
-        // Serial.println("Button Pressed Else");
-        // if (button_number - OFFSET_GAMESTATE_TO_ARCADE_BUTTON != game_state)
-        // {
-        //     Serial.println("De illuminate");
-        //     deilluminate_arcade_led(button_number);
-        // }
+        deilluminate_arcade_led(button_pressed);
     }
+    illuminate_active_game_arcade_led();
 }
 
 void illuminate_game_arcade_leds(int pin_value)
 {
-    digitalWrite(letter_ordering_led, pin_value);
-    digitalWrite(number_ordering_led, pin_value);
-    digitalWrite(letter_wand_led, pin_value);
-    digitalWrite(number_wand_led, pin_value);
+    digitalWrite(LETTER_ORDER_LED_PIN, pin_value);
+    digitalWrite(NUMBER_ORDERING_LED_PIN, pin_value);
+    digitalWrite(LETTER_WAND_LED_PIN, pin_value);
+    digitalWrite(NUMBER_WAND_LED_PIN, pin_value);
 }
 
-void illuminate_all_arcade_leds(int pin_value)
+void illuminate_utility_arcade_leds(int pin_value)
 {
-    digitalWrite(letter_ordering_led, pin_value);
-    digitalWrite(number_ordering_led, pin_value);
-    digitalWrite(letter_wand_led, pin_value);
-    digitalWrite(number_wand_led, pin_value);
-
     digitalWrite(END_GAME_LED_PIN, pin_value);
     digitalWrite(SKIP_LED_PIN, pin_value);
     digitalWrite(REPEAT_LED_PIN, pin_value);
     digitalWrite(HINT_LED_PIN, pin_value);
 }
 
-void illuminate_active_game_arcade_led(){
-    // illuminate_all_arcade_leds(LOW);
-    if (game_state>=1 && game_state<=5){
+void illuminate_all_arcade_leds(int pin_value)
+{
+    illuminate_game_arcade_leds(pin_value);
+    illuminate_utility_arcade_leds(pin_value);
+}
+
+void illuminate_active_game_arcade_led()
+{
+    if (game_state >= 1 && game_state <= 5)
+    {
         int button_to_illuminate = game_state + OFFSET_GAMESTATE_TO_ARCADE_BUTTON;
-        if (game_state==5){
+        if (game_state == 5)
+        {
             button_to_illuminate = LETTER_WAND_BUTTON_PIN;
         }
         illuminate_game_arcade_leds(LOW);

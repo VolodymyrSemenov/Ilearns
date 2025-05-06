@@ -1,4 +1,4 @@
-#include <structures.h>
+#include <printing.h>
 
 
 // Print a single game piece

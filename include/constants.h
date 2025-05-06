@@ -9,7 +9,7 @@
 constexpr int RECALIBRATE_BUTTON = 2;
 
 // Difficulty Switch / Rocker for selecting between games
-constexpr int ENUNCIATION_PIN = 9;
+constexpr int ENUNCIATION_BUTTON_PIN = 9;
 
 // BUTTONS
 // Left side
@@ -25,14 +25,14 @@ constexpr int SKIP_BUTTON_PIN = 21;     // right green
 
 // LEDs
 // Left side (+23 offset from their respective button pins)
-constexpr int letter_ordering_led = 33;
-constexpr int letter_wand_led = 34;
-constexpr int number_ordering_led = 35;
-constexpr int number_wand_led = 36;
+constexpr int LETTER_ORDER_LED_PIN = 33;
+constexpr int LETTER_WAND_LED_PIN = 34;
+constexpr int NUMBER_ORDERING_LED_PIN = 35;
+constexpr int NUMBER_WAND_LED_PIN = 36;
 
 // WS2811 LED strips
-constexpr int LETTER_LED_STRIP_PIN = 38; // WS2811 data pin for letter LEDs
-constexpr int NUMBER_LED_STRIP_PIN = 39; // WS2811 data pin for number LEDs
+constexpr int LETTER_LED_STRIP_PIN = 26; // WS2811 data pin for letter LEDs
+constexpr int NUMBER_LED_STRIP_PIN = 27; // WS2811 data pin for number LEDs
 
 // Right side (+23 offset from their respective button pins)
 constexpr int HINT_LED_PIN = 41;
@@ -51,7 +51,7 @@ constexpr int ENUNCIATION_STATE = 5;
 constexpr int GAME_OVER_STATE = 6;
 constexpr int RECALIBRATING_STATE = 7;
 // Decoder Pins
-constexpr int decoderPins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
+// constexpr int decoder_pins[] = {26, 27, 28, 29, 30, 31, 32}; // ~EN through A5
 
 // -------------------------
 // Constant Values

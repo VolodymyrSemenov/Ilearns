@@ -1,16 +1,11 @@
-/**************************************************************************
- * Find Numbers Game
- **************************************************************************/
-
-// #include <audio_config.ino>
-#include <constants.h>
-#include <structures.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_PN532.h>
-#include <FastLED.h>
+#include <games.h>
 #include <illumination.h>
 #include <printing.h>
+
+
+int hint_is_active = 0;
+constexpr int max_hints = 3; // plus the correct one
+GamePiece hint_game_pieces_list[max_hints+1];
 
 // Return true if the game piece is in a list of game pieces
 bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[], int size_of_list_of_game_pieces)
@@ -26,13 +21,14 @@ bool game_piece_is_in_list(GamePiece game_piece, GamePiece list_of_game_pieces[]
 }
 
 // Get a random game piece from the list that's not in the random game pieces list
-GamePiece get_unique_random_gamepiece(int max_size, GamePiece game_piece_list[], GamePiece random_game_pieces_list[], int max_correct)
+GamePiece get_unique_random_gamepiece(int max_random_value, GamePiece game_piece_list[], GamePiece random_game_pieces_list[], int size_of_list_of_game_pieces)
 {
-  int random_index = random(0, max_size);
+  int random_index = random(0, max_random_value);
 
-  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, max_correct))
+  while (game_piece_is_in_list(game_piece_list[random_index], random_game_pieces_list, size_of_list_of_game_pieces) ||
+       (hint_is_active && game_piece_is_in_list(game_piece_list[random_index], hint_game_pieces_list, max_hints)))
   {
-    random_index = random(0, max_size);
+    random_index = random(0, max_random_value);
   }
   return game_piece_list[random_index];
 }
@@ -51,18 +47,24 @@ bool uids_match(uint8_t uid1[], uint8_t uid2[])
 
 void send_serial_audio_command(GamePiece game_piece)
 {
-  String game_piece_character_string;
 
-  if (game_state == 4)
-  {
-    // Convert number as bytes to String
-    game_piece_character_string = String((char)game_piece.character);
+  byte byte_to_send;
+
+  if (game_state == LETTER_WAND_STATE){
+    byte_to_send = game_piece.character - 'a'; // 'a' is 97 in ASCII
   }
-  else
-  {
-    game_piece_character_string = String(game_piece.character);
+
+  else if (game_state == ENUNCIATION_STATE){
+    byte_to_send = game_piece.character - 'a' + 26; // 'a' is 97 in ASCII
   }
-  // Serial1.println()
+
+  else if (game_state == NUMBER_WAND_STATE){
+    byte_to_send = game_piece.character + 52; // 0-20
+  }
+  
+  Serial.print("Sending byte: ");
+  Serial.println(byte_to_send, DEC);
+  Serial1.write(byte_to_send);
 }
 
 // Given a uid, return its gamepiece
@@ -85,7 +87,7 @@ GamePiece get_gamepiece_by_uid(uint8_t uid[])
   return GamePiece(); // Return an empty GamePiece if not found
 }
 
-bool uid_is_uid_of_previous_gamepiece(int correct_selections, GamePiece random_game_pieces_list[], uint8_t uid[])
+bool uid_is_uid_of_a_previous_gamepiece_in_list(int correct_selections, GamePiece random_game_pieces_list[], uint8_t uid[])
 {
   for (int i = 0; i < correct_selections; i++)
   {
@@ -115,18 +117,15 @@ void begin_wand_game()
   constexpr int max_correct = 5;
   GamePiece random_game_pieces_list[max_correct];
   
-  constexpr int max_hints = 3; // plus the correct one
-  GamePiece hint_game_pieces_list[max_hints+1];
-  int hint = 0;
   int repeat = 0;
   int skip = 0;
   generate_random_seed();
 
   illuminate_active_game_arcade_led();
+  fill_board_solid(CRGB::Black);
 
   for (int i = 0; i < max_correct; i++)
   {
-    fill_board_solid(CRGB::Black);
     if (game_state == NUMBER_WAND_STATE)
     {
       random_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
@@ -139,12 +138,18 @@ void begin_wand_game()
     }
   }
 
+  Serial.println("Random game pieces list:");
+  for (int i = 0; i<max_correct; i++){
+    print_single_game_piece(random_game_pieces_list[i]);
+  }
+  Serial.println("");
+
   while (correct_selections < max_correct)
   {
     GamePiece current_game_piece = random_game_pieces_list[correct_selections];
 
     Serial.print("Find the following tile: ");
-    Serial.println(current_game_piece.character);
+    Serial.println((char)current_game_piece.character);
 
     send_serial_audio_command(current_game_piece);
 
@@ -159,47 +164,52 @@ void begin_wand_game()
     {
       switch (utility_button_pressed){
         case HINT_BUTTON_PIN:
+          if (!hint_is_active){
 
-          Serial.println("Hint button pressed. Exiting game.");
-          if (game_state == NUMBER_WAND_STATE){
-            for (int i = 0; i < max_hints; i++)
-            {
-              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, hint_game_pieces_list, max_hints);
+            hint_is_active = 1;
+
+            Serial.println("Hint button pressed. Exiting game.");
+            if (game_state == NUMBER_WAND_STATE){
+              for (int i = 0; i < max_hints; i++)
+              {
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_NUMBERS, game_pieces.numbers, random_game_pieces_list, max_correct);
+                print_single_game_piece(hint_game_pieces_list[i]);
+              }
+            }
+
+            else{
+              Serial.println("Hint button pressed ELSE");
+              for (int i = 0; i < max_hints; i++)
+              {
+                hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, random_game_pieces_list, max_correct);
+                print_single_game_piece(hint_game_pieces_list[i]);
+              }
+            }
+
+            hint_game_pieces_list[max_hints] = current_game_piece;
+            print_single_game_piece(hint_game_pieces_list[max_hints]);
+            for (int i = 0; i < max_hints + 1; i++){
+              illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
             }
           }
 
-          else{
-            for (int i = 0; i < max_hints; i++)
-            {
-              hint_game_pieces_list[i] = get_unique_random_gamepiece(NUM_LETTERS, game_pieces.letters, hint_game_pieces_list, max_hints);
-            }
-          }
+        break;
 
-          for (int i=0; i<sizeof(hint_game_pieces_list); i++){
-            print_single_game_piece(hint_game_pieces_list[i]);
-          }
+      case END_GAME_BUTTON_PIN:
+        Serial.println("End game button pressed. Exiting game.");
+        return;
 
-          hint_game_pieces_list[max_hints] = current_game_piece;
-          for (int i = 0; i < max_hints + 1; i++){
-            illuminate_single_game_piece(hint_game_pieces_list[i], CRGB(250, 70, 0));
-          }
-          hint = 1;
-          break;
-
-        case END_GAME_BUTTON_PIN:
-          Serial.println("End game button pressed. Exiting game.");
-          correct_selections = max_correct; // End the game
-          break;
-
-        case REPEAT_BUTTON_PIN:
-          Serial.println("Repeat button pressed. Repeating audio");
-          send_serial_audio_command(current_game_piece);
-          repeat = 1;
-          break;
+      case REPEAT_BUTTON_PIN:
+        Serial.println("Repeat button pressed. Repeating audio");
+        send_serial_audio_command(current_game_piece);
+        repeat = 1;
+        break;
 
         case SKIP_BUTTON_PIN:
+          // Serial.println("Skip button pressed. Exiting game.");
           skip = 1;
           Serial.println("Skip button pressed. Exiting game.");
+          Serial.println(digitalRead(SKIP_BUTTON_PIN));
           break;
       }
       utility_button_pressed = 0; // Reset the button press
@@ -207,11 +217,11 @@ void begin_wand_game()
 
     if (uids_match(uid, current_game_piece.uid) || skip)
     {
-      if (hint){
+      if (hint_is_active){
         for (int i = 0; i < max_hints+1; i++){
           illuminate_single_game_piece(hint_game_pieces_list[i], CRGB::Yellow);
         }
-        hint = 0;
+        hint_is_active = 0;
       }
 
       flash_tile_location(current_game_piece, CRGB::Green, 2);
@@ -219,12 +229,23 @@ void begin_wand_game()
       correct_selections++;
       skip = 0; // Reset skip flag
     }
-    
-    else if (uid_is_uid_of_previous_gamepiece(correct_selections, random_game_pieces_list, uid) || repeat)
+
+    else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, random_game_pieces_list, uid) || repeat)
     {
       repeat = 0;
       continue; // Don't flash the tile if it's already green
     }
+
+    else if ((game_state == NUMBER_WAND_STATE) && uid_is_uid_of_a_previous_gamepiece_in_list(NUM_LETTERS, game_pieces.letters, uid))
+    {
+      continue; // Don't flash the tile if it's from the letters during number game
+    }
+
+    else if ((game_state == LETTER_WAND_STATE || game_state == ENUNCIATION_STATE) && uid_is_uid_of_a_previous_gamepiece_in_list(NUM_NUMBERS, game_pieces.numbers, uid))
+    {
+      continue; // Don't flash the tile if it's from the numbers during letter game
+    }
+
     else
     {
       GamePiece incorrect_gamepiece = get_gamepiece_by_uid(uid);
@@ -233,5 +254,6 @@ void begin_wand_game()
       Serial.println("Incorrect selection. Try again!");
     }
   }
+  game_state = GAME_OVER_STATE;
   Serial.println("Game complete: 5 correct selections achieved!");
 }
