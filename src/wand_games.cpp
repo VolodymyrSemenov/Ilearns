@@ -154,8 +154,10 @@ void begin_wand_game()
     Serial.print("Find the following tile: ");
     Serial.println((char)current_game_piece.character);
 
-    send_serial_audio_command(current_game_piece);
-
+    if( !hint_is_active || repeat == 1) {
+      send_serial_audio_command(current_game_piece);
+      repeat = 0;
+    }
     uint8_t uidLength;
     uint8_t uid[7] = {0, 0, 0, 0, 0, 0, 0};
     while (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 30) && !utility_button_pressed)
@@ -204,7 +206,6 @@ void begin_wand_game()
 
       case REPEAT_BUTTON_PIN:
         Serial.println("Repeat button pressed. Repeating audio");
-        send_serial_audio_command(current_game_piece);
         repeat = 1;
         break;
 
@@ -235,7 +236,6 @@ void begin_wand_game()
 
     else if (uid_is_uid_of_a_previous_gamepiece_in_list(correct_selections, random_game_pieces_list, uid) || repeat)
     {
-      repeat = 0;
       continue; // Don't flash the tile if it's already green
     }
 

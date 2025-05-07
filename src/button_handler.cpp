@@ -15,7 +15,7 @@ bool state_button_handler(int button_pressed)
 
     // Disregard mutliple button presses with 0.1s
     static int previous_press_time = 0;
-    if ((millis() - previous_press_time) < 250)
+    if ((millis() - previous_press_time) < 500)
     {
         return false;
     }
